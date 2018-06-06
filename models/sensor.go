@@ -33,3 +33,7 @@ func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
 		helper.RespondSuccess(w, r, "Rows affected:", count)
 	}
 }
+
+func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
+	helper.RespondErr(w, r, 500, "not implemented yet")
+}

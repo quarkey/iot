@@ -16,8 +16,8 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/sensors", srv.NewSensorReading).Methods("POST")
+	r.HandleFunc("/api/sensors/{serial}", srv.Sensors).Methods("GET")
 
-	// localhost:6001/health-check
 	r.HandleFunc("/health-check", srv.HealthCheckHandler).Methods("GET")
 
 	http.Handle("/", r)
