@@ -13,7 +13,7 @@ int tempPin = 0;
 
 EthernetClient client;
 
-byte server[] = {192, 168, 10, 119}; // Google
+byte server[] = {192, 168, 10, 119};
 
 void setup()
 {
@@ -30,9 +30,10 @@ void loop()
     pollsensor();
     client.println("POST /search?q=arduino HTTP/1.1");
     client.println("Host: www.google.com");
-    client.println("Connection: close");
-    //client.println("Content-Type: application/json");
-    //client.println("{\"asd\":\"asd\"}");
+    client.println("Content-Type: application/json");
+    client.println("Content-Length: 13");
+    client.println();
+    client.println("say=Hi&to=Mom");
     client.println();
     client.stop();
   }
