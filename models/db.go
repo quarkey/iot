@@ -1,15 +1,18 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"net/http"
 
 	"github.com/jmoiron/sqlx"
 )
 
+// Server ....
 type Server struct {
-	DB *sqlx.DB
+	DB     *sqlx.DB
+	Config map[string]interface{}
 }
 
 // NewDB opens connection to database
@@ -22,23 +25,22 @@ func NewDB(driver, source string) *Server {
 		log.Fatalf("unable to ping db: %v", err)
 	}
 	log.Printf("Connected to: %s (%s)", source, db.DriverName())
-	return &Server{DB: db}
+	s := &Server{DB: db}
+	s.loadcfg()
+	return s
 }
 
-func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	// e.g. http.HandleFunc("/health-check", HealthCheckHandler)
-	// A very simple health check.
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-
-	// In the future we could report back on the status of our DB, or our cache
-	// (e.g. Redis) by performing a simple PING, and include them in the response.
-	var dbstatus string
-	if err := s.DB.Ping(); err != nil {
-		dbstatus = fmt.Sprintf("ping error: %v", err)
-		log.Printf(dbstatus)
-	} else {
-		dbstatus = "alive"
+// loadcfg
+func (s *Server) loadcfg() error {
+	// TODO use io.reader
+	defaultPath := "./exampleconfig.json"
+	data, err := ioutil.ReadFile(defaultPath)
+	if err != nil {
+		return fmt.Errorf("unable to read file: %v", err)
 	}
-	fmt.Fprintf(w, `{"api": "alive", "db": "%s"}`, dbstatus)
+	if err := json.Unmarshal(data, &s.Config); err != nil {
+		return fmt.Errorf("unable to unmarshal: %v", err)
+	}
+	fmt.Println(s.Config)
+	return nil
 }
