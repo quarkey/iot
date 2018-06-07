@@ -16,8 +16,8 @@ func main() {
 	srv := models.NewDB()
 	r := mux.NewRouter()
 
+	r.HandleFunc("/api/sensors", srv.Sensors).Methods("GET")
 	r.HandleFunc("/api/sensors", srv.NewSensorReading).Methods("POST")
-	r.HandleFunc("/api/sensors/{serial}", srv.Sensors).Methods("GET")
 
 	r.HandleFunc("/health-check", srv.HealthCheckHandler).Methods("GET")
 

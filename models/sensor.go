@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	helper "github.com/quarkey/iot/json"
 )
@@ -33,9 +34,23 @@ func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Sensors ....
+type Sensor struct {
+	ID          int       `db:"id" json:"id"`
+	Description string    `db:"description" json:"description"`
+	ArduinoKey  string    `db:"arduino_key" json:"arduino_key"`
+	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+}
+
+// Sensors lists all available sensors in the database
 func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
-	helper.RespondErr(w, r, 500, "not implemented yet")
+	var sensors []Sensor
+	err := s.DB.Select(&sensors, "select id, description, arduino_key, created_at from sensor")
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	helper.Respond(w, r, 200, sensors)
 }
 
 // arrayToString converts a slice of floats to json array
