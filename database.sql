@@ -6,8 +6,8 @@ drop table sensor;
 
 create table if not exists sensor (
   id serial primary key,
-  description text not null,
-  key text not null,
+  description text not null, -- aurdino sensor description
+  arduino_key text not null, -- unique identifyer key
   created_at timestamp NOT NULL DEFAULT now()::timestamp(0)
 );
 create table if not exists dataset(
@@ -23,11 +23,11 @@ create table if not exists sensordata (
   id serial primary key,
   sensor_id integer references sensor (id),
   dataset_id integer references dataset (id),
-  data jsonb,
+  data text not null,
   time timestamp NOT NULL DEFAULT now()::timestamp(0)
 );
 
-insert into sensor(description, key) values('temp og hydro', 'arduino serial');
+insert into sensor(description, arduino_key) values('temp og hydro', 'arduino serial');
 insert into dataset(sensor_id, description, reference, intervalsec, fields) values(1,'temperatur measurement, growhouse','reference x',1800,'["temp", "hydro"]');
 insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32","ubro"]');
 

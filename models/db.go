@@ -19,7 +19,6 @@ type Server struct {
 func NewDB() *Server {
 	srv := &Server{}
 	srv.loadcfg("./exampleconfig.json")
-	fmt.Println(srv)
 	driver := srv.Config["driver"].(string)
 	connectionstr := srv.Config["connectString"].(string)
 
@@ -30,6 +29,7 @@ func NewDB() *Server {
 	if err := db.Ping(); err != nil {
 		log.Fatalf("unable to ping db: %v", err)
 	}
+	srv.DB = db
 	log.Printf("Connected to: %s (%s)", connectionstr, db.DriverName())
 	return srv
 }
