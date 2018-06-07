@@ -7,12 +7,13 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq" // postgres driver
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/quarkey/iot/models"
 )
 
 func main() {
-	srv := models.NewDB("sqlite3", "database.db")
+	srv := models.NewDB()
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/sensors", srv.NewSensorReading).Methods("POST")
@@ -27,7 +28,7 @@ func main() {
 		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
 		handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With"}),
 	)(r)
-	log.Fatal(http.ListenAndServe("192.168.10.119:6001", logRequest(corsHandler)))
+	log.Fatal(http.ListenAndServe(srv.Config["api_addr"].(string), logRequest(corsHandler)))
 }
 
 func logRequest(handler http.Handler) http.Handler {
