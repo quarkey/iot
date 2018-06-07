@@ -5,11 +5,11 @@ import (
 	"log"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq" // postgres driver
 )
 
 func main() {
-	db, err := sqlx.Open("sqlite3", "../../database.db")
+	db, err := sqlx.Open("postgres", "host=localhost port=25432 user=iot password=iot dbname=iot sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -19,17 +19,17 @@ func main() {
 		log.Fatal(err)
 	}
 	query := []string{
-		`create table sensordata (
-			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			sensor_description text not null,
+		`create table if not exists sensordata(
+			id serial primary key,
+			descr text not null,
 			serial text not null,
-			temp text not null,
-			time text not null
-		);`,
-		// `insert into data('sensor_description','serial','temp','time') values('sensor descr','serial no','23.12','2018-01-01 123301');`,
+			data jsonb not null
+		  );`,
+		`insert into sensordata(descr, serial, data) values('descr','serialno','{ "customer": "John Doe", "items": {"product": "Beer","qty": 6}}'::jsonb);`,
+		`insert into sensordata(descr, serial, data) values('descr 2','serialno 2','{"abc": "val"}'::jsonb);`,
+		`insert into sensordata(descr, serial, data) values('temperatur sensor', 'serialyo','{  "sensor description": "Temperature readings",  "hardware description": "arduino uno with temp sensor",  "serial": "a8f5f167f44f4964e6c998dee827110c",  "ip address": "192.168.10.100",  "network mask": "255.255.255.0",  "server": "192.168.10.1",  "encryption key": "8ed358a7da3cc760364909d4aaf7321e",  "record interval": "1800",  "data": {"serial": "a8f5f167f44f4964e6c998dee827110c","temp c": ["33.1","22.1"],"record time": ["113030","1200"]}}'::jsonb);`,
 	}
 	for _, q := range query {
-		// fmt.Println("query:", q)
 		_, err := db.Exec(q)
 		if err != nil {
 			fmt.Println(err)
