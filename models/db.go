@@ -16,31 +16,33 @@ type Server struct {
 }
 
 // NewDB opens connection to database
-func NewDB(driver, source string) *Server {
-	db, err := sqlx.Open(driver, source)
+func NewDB() *Server {
+	srv := &Server{}
+	srv.loadcfg("./exampleconfig.json")
+	fmt.Println(srv)
+	driver := srv.Config["driver"].(string)
+	connectionstr := srv.Config["connectString"].(string)
+
+	db, err := sqlx.Open(driver, connectionstr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if err := db.Ping(); err != nil {
 		log.Fatalf("unable to ping db: %v", err)
 	}
-	log.Printf("Connected to: %s (%s)", source, db.DriverName())
-	s := &Server{DB: db}
-	s.loadcfg()
-	return s
+	log.Printf("Connected to: %s (%s)", connectionstr, db.DriverName())
+	return srv
 }
 
 // loadcfg
-func (s *Server) loadcfg() error {
+func (s *Server) loadcfg(path string) error {
 	// TODO use io.reader
-	defaultPath := "./exampleconfig.json"
-	data, err := ioutil.ReadFile(defaultPath)
+	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("unable to read file: %v", err)
 	}
 	if err := json.Unmarshal(data, &s.Config); err != nil {
 		return fmt.Errorf("unable to unmarshal: %v", err)
 	}
-	fmt.Println(s.Config)
 	return nil
 }
