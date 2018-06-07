@@ -7,6 +7,7 @@ import (
 	helper "github.com/quarkey/iot/json"
 )
 
+// TempReading ....
 type TempReading struct {
 	SensorDescription string `json:"sensor_description"`
 	Serial            string `json:"serial"`
@@ -14,6 +15,7 @@ type TempReading struct {
 	Time              string `json:"time"`
 }
 
+// NewSensorReading ....
 func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
 	dat := TempReading{}
 	err := helper.DecodeBody(r, &dat)
@@ -34,6 +36,7 @@ func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Sensors ....
 func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
 	helper.RespondErr(w, r, 500, "not implemented yet")
 }
