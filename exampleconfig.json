@@ -1,0 +1,6 @@
+{
+    "dbuser": "username",
+    "dbpass": "password",
+    "dbhost": "localhost",
+    "dbport": "1234"
+}
