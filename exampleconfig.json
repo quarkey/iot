@@ -1,6 +1,5 @@
 {
-    "dbuser": "username",
-    "dbpass": "password",
-    "dbhost": "localhost",
-    "dbport": "1234"
+    "connectString": "host=localhost port=25432 user=iot password=iot dbname=iot sslmode=disable",
+    "driver": "postgres",
+    "api_addr": ":6001"
 }
