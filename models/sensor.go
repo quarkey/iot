@@ -1,10 +1,9 @@
 package models
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	helper "github.com/quarkey/iot/json"
@@ -12,12 +11,12 @@ import (
 
 // TempReading ....
 type SensorRead struct {
-	SensorID  int       `json:"sensor_id"`
-	DatasetID int       `json:"dataset_id"`
-	Data      []float64 `json:"data"`
+	SensorID  int              `json:"sensor_id"`
+	DatasetID int              `json:"dataset_id"`
+	Data      *json.RawMessage `json:"data"`
 }
 
-// NewSensorReading ....
+// NewSensorReading is registering sensor readings (json) to database.
 func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
 	dat := SensorRead{}
 	err := helper.DecodeBody(r, &dat)
@@ -26,7 +25,7 @@ func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
-	_, err = s.DB.Exec("insert into sensordata(sensor_id, dataset_id, data) values($1,$2,$3)", dat.SensorID, dat.DatasetID, arrayToString(dat.Data, ","))
+	_, err = s.DB.Exec("insert into sensordata(sensor_id, dataset_id, data) values($1,$2,$3)", dat.SensorID, dat.DatasetID, dat.Data)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
@@ -51,9 +50,4 @@ func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helper.Respond(w, r, 200, sensors)
-}
-
-// arrayToString converts a slice of floats to json array
-func arrayToString(a []float64, delim string) string {
-	return fmt.Sprintf("[%s]", strings.Trim(strings.Replace(fmt.Sprint(a), " ", delim, -1), "[]"))
 }

@@ -19,6 +19,9 @@ func main() {
 	r.HandleFunc("/api/sensors", srv.Sensors).Methods("GET")
 	r.HandleFunc("/api/sensors", srv.NewSensorReading).Methods("POST")
 
+	r.HandleFunc("/api/datasets", srv.Datasets).Methods("GET")
+	r.HandleFunc("/api/datasets", srv.NewDataset).Methods("POST")
+
 	r.HandleFunc("/health-check", srv.HealthCheckHandler).Methods("GET")
 
 	http.Handle("/", r)
