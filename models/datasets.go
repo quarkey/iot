@@ -15,6 +15,7 @@ import (
 type Dataset struct {
 	ID          int              `db:"id" json:"id"`
 	SensorID    int              `db:"sensor_id" json:"sensor_id"`
+	Title       string           `db:"title" json:"title"`
 	Description string           `db:"description" json:"description"`
 	Reference   string           `db:"reference" json:"reference"`
 	IntervalSec int              `db:"intervalsec" json:"intervalsec"`
@@ -25,7 +26,7 @@ type Dataset struct {
 // Datasets ....
 func (s *Server) Datasets(w http.ResponseWriter, r *http.Request) {
 	var datasets []Dataset
-	err := s.DB.Select(&datasets, "select id, sensor_id, description, reference, intervalsec, fields, created_at from dataset")
+	err := s.DB.Select(&datasets, "select id, sensor_id, title, description, reference, intervalsec, fields, created_at from dataset")
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
