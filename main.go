@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,8 +16,11 @@ import (
 func main() {
 	srv := models.NewDB()
 	r := mux.NewRouter()
+	fmt.Println(srv.Config["encryptionkey"])
 
 	r.HandleFunc("/api/sensors", srv.Sensors).Methods("GET")
+	r.HandleFunc("/api/sensors/{reference}", srv.SensorByReference).Methods("GET")
+
 	r.HandleFunc("/api/sensors", srv.NewSensorReading).Methods("POST")
 
 	r.HandleFunc("/api/datasets", srv.Datasets).Methods("GET")

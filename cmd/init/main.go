@@ -58,9 +58,21 @@ func main() {
 	runCommands(query, db)
 	if *testdata {
 		testdata := []string{
-			`insert into sensor(description, arduino_key) values('temp og hydro', 'arduino serial');`,
-			`insert into dataset(sensor_id, description, reference, intervalsec, fields) values(1,'temperatur measurement, growhouse','reference x',1800,'["temp", "hydro"]');`,
-			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32","ubro"]');`,
+			`insert into sensor(description, arduino_key) values('temp og hydro', '8a1bbddba98a8d8512787d311352d951');`,
+			`insert into dataset(sensor_id, description, reference, intervalsec, fields) values(1,'temperatur measurement, growhouse','8a1bbddba98a8d8512787d311352d951',1800,'["temp", "hydro"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32"]');`,
+
+			`insert into sensor(description, arduino_key) values('temp og hydro', '4987fb174ae91dc702394024378fc1cd');`,
+			`insert into dataset(sensor_id, description, reference, intervalsec, fields) values(2,'some kind of surveying','4987fb174ae91dc702394024378fc1cd',1800,'["temp", "hydro", "fieldxx", "fieldxx"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32","ubro","fieldxx"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32","ubro","fieldxx"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32","ubro","fieldxx"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32","ubro","fieldxx"]');`,
+			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32","ubro","fieldxx"]');`,
 		}
 		runCommands(testdata, db)
 	}
