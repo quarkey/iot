@@ -69,7 +69,7 @@ func main() {
 			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["23.13","59.32"]');`,
 
 			`insert into sensor(title, description, arduino_key) values('Arduino + GPS','Arduino UNO with GPS tracking', '4987fb174ae91dc702394024378fc1cd');`,
-			`insert into dataset(sensor_id, title, description, reference, intervalsec, fields) values(2,'Bicycle to work','Tracking lat/long','4987fb174ae91dc702394024378fc1cd',1800,'["lat (n)", "long (e)", "direction"]');`,
+			`insert into dataset(sensor_id, title, description, reference, intervalsec, fields) values(2,'Bicycle to work','Battery-driven lat/long tracker','4987fb174ae91dc702394024378fc1cd',1800,'["lat (n)", "long (e)", "direction"]');`,
 			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["58.8533","5.7329","e"]');`,
 			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["58.8533","5.7329","n/e"]');`,
 			`insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["58.8532","5.7329","n"]');`,
