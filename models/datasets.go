@@ -47,7 +47,6 @@ func (s *Server) Datasets(w http.ResponseWriter, r *http.Request) {
 		modified.Fields = d.Fields
 		modified.CreatedAt = d.CreatedAt
 		modified.SensorTitle = s.getArduinoTitle(d.Reference)
-		fmt.Printf("looking up: %s, title: %s\n", d.Reference, d.SensorTitle)
 		newdataset = append(newdataset, modified)
 	}
 	// fmt.Println(datasets)
@@ -67,7 +66,7 @@ func (s *Server) DatasetByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var dataset Dataset
 	dataset.SensorTitle = s.getArduinoTitle(vars["reference"])
-	err := s.DB.Get(&dataset, "select sensor_id, description, reference, intervalsec, fields, created_at from dataset where reference=$1", vars["reference"])
+	err := s.DB.Get(&dataset, "select id, sensor_id, title, description, reference, intervalsec, fields, created_at from dataset where reference=$1", vars["reference"])
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)

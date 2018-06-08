@@ -19,6 +19,7 @@ type SensorRead struct {
 
 // NewSensorReading is registering sensor readings (json) to database.
 func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
+	// TODO: must verify arduino_key on input
 	dat := SensorRead{}
 	err := helper.DecodeBody(r, &dat)
 	if err != nil {
