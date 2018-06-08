@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	helper "github.com/quarkey/iot/json"
 )
 
@@ -32,6 +33,17 @@ func (s *Server) Datasets(w http.ResponseWriter, r *http.Request) {
 	}
 	helper.Respond(w, r, 200, datasets)
 
+}
+func (s *Server) DatasetByReference(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var dataset Dataset
+	err := s.DB.Get(&dataset, "select sensor_id, description, reference, intervalsec, fields, created_at from dataset where reference=$1", vars["reference"])
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	helper.Respond(w, r, 200, dataset)
 }
 
 // NewDataset ...

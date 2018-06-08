@@ -37,6 +37,7 @@ func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
 // Sensor ....
 type Sensor struct {
 	ID          int       `db:"id" json:"id"`
+	Title       string    `db:"title" json:"title"`
 	Description string    `db:"description" json:"description"`
 	ArduinoKey  string    `db:"arduino_key" json:"arduino_key"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
@@ -45,13 +46,26 @@ type Sensor struct {
 // Sensors lists all available sensors in the database
 func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
-	err := s.DB.Select(&sensors, "select id, description, arduino_key, created_at from sensor")
+	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, created_at from sensor")
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
 	helper.Respond(w, r, 200, sensors)
+}
+
+// Sensor is looking up a particular sensor based on a reference or an arduino_key
+func (s *Server) SensorByReference(w http.ResponseWriter, r *http.Request) {
+	var sensor Sensor
+	vars := mux.Vars(r)
+	err := s.DB.Get(&sensor, "select id, title, description, arduino_key, created_at from sensor where arduino_key=$1", vars["reference"])
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	helper.Respond(w, r, 200, sensor)
 }
 
 // type Payload struct {
@@ -70,7 +84,7 @@ type Data struct {
 	Time time.Time        `json:"time"`
 }
 
-func (s *Server) SensorByReference(w http.ResponseWriter, r *http.Request) {
+func (s *Server) SensorDataByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var data []Data
 	var datasetID int
