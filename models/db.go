@@ -16,9 +16,9 @@ type Server struct {
 }
 
 // NewDB opens connection to database
-func NewDB() *Server {
+func NewDB(path string) *Server {
 	srv := &Server{}
-	srv.loadcfg("./exampleconfig.json")
+	srv.loadcfg(path)
 	driver := srv.Config["driver"].(string)
 	connectionstr := srv.Config["connectString"].(string)
 

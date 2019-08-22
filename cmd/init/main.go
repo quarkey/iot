@@ -6,30 +6,25 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
+	"github.com/quarkey/iot/models"
 )
 
 func main() {
+	confPath := flag.String("conf", "", "path to your config")
 	testdata := flag.Bool("testdata", false, "some test data will be included when creating")
 	drop := flag.Bool("drop", false, "dropping tables before creating schemas")
-
 	flag.Parse()
-
-	db, err := sqlx.Open("postgres", "host=localhost port=25432 user=iot password=iot dbname=iot sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
+	if *confPath == "" {
+		log.Fatalf("ERROR: missing configuration jsonfile")
 	}
-	defer db.Close()
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
+	srv := models.NewDB(*confPath)
 	if *drop {
 		drop := []string{
 			`drop table sensordata`,
 			`drop table dataset`,
 			`drop table sensor`,
 		}
-		runCommands(drop, db)
+		runCommands(drop, srv.DB)
 	}
 	query := []string{
 		`create table sensor (
@@ -57,7 +52,7 @@ func main() {
 			time timestamp NOT NULL DEFAULT now()::timestamp(0)
 		  );`,
 	}
-	runCommands(query, db)
+	runCommands(query, srv.DB)
 	if *testdata {
 		testdata := []string{
 			`insert into sensor(title, description, arduino_key) values('Arduino + Ethernet shield','Arduino UNO with Ethernet shield. LM35 temperatur sensor and hydrosensor. Used for project X', '8a1bbddba98a8d8512787d311352d951');`,
@@ -82,7 +77,7 @@ func main() {
 			// `insert into sensor(title, description, arduino_key) values('temp og hydro', 'a long description', dummy');`,
 			// `insert into sensor(title, description, arduino_key) values('temp og hydro', 'a long description', dummy');`,
 		}
-		runCommands(testdata, db)
+		runCommands(testdata, srv.DB)
 	}
 }
 func runCommands(commands []string, db *sqlx.DB) {
