@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -8,12 +9,16 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq" // postgres driver
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/quarkey/iot/models"
 )
 
 func main() {
-	srv := models.NewDB()
+	confPath := flag.String("conf", "", "path to configuration file")
+	flag.Parse()
+	if *confPath == "" {
+		log.Fatalf("ERROR: missing configuration jsonfile")
+	}
+	srv := models.NewDB(*confPath)
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/sensors", srv.Sensors).Methods("GET")                       // many sensors
@@ -26,7 +31,7 @@ func main() {
 	r.HandleFunc("/api/datasets/{reference}", srv.DatasetByReference).Methods("GET") // one dataset by reference
 	r.HandleFunc("/api/datasets", srv.NewDataset).Methods("POST")                    // insert new dataset
 
-	r.HandleFunc("/health-check", srv.HealthCheckHandler).Methods("GET")
+	r.HandleFunc("/health", srv.HealthCheckHandler).Methods("GET")
 
 	http.Handle("/", r)
 	log.SetOutput(os.Stdout) // setting log output to the filehandler
