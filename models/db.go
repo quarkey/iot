@@ -18,7 +18,10 @@ type Server struct {
 // NewDB opens connection to database
 func NewDB(path string) *Server {
 	srv := &Server{}
-	srv.loadcfg(path)
+	err := srv.loadcfg(path)
+	if err != nil {
+		log.Fatalf("unable to load config : %v", err)
+	}
 	driver := srv.Config["driver"].(string)
 	connectionstr := srv.Config["connectString"].(string)
 
