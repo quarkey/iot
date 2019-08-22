@@ -98,7 +98,7 @@ func runCommandsDescr(q []query, db *sqlx.DB) {
 		log.Printf("%s\n", q.descr)
 		_, err := db.Exec(q.query)
 		if err != nil {
-			log.Printf("DB ERROR: %v", err)
+			log.Printf("DB ERROR: %v (%s)", err, q.descr)
 		}
 	}
 }
