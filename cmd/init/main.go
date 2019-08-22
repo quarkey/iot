@@ -13,28 +13,31 @@ func main() {
 	confPath := flag.String("conf", "", "path to your config")
 	testdata := flag.Bool("testdata", false, "some test data will be included when creating")
 	drop := flag.Bool("drop", false, "dropping tables before creating schemas")
+
 	flag.Parse()
+
 	if *confPath == "" {
 		log.Fatalf("ERROR: missing configuration jsonfile")
 	}
 	srv := models.NewDB(*confPath)
 	if *drop {
-		drop := []string{
-			`drop table sensordata`,
-			`drop table dataset`,
-			`drop table sensor`,
+		drop := []query{
+			{"dropping iot schema with cascade", "drop schema if exists iot cascade;"},
 		}
-		runCommands(drop, srv.DB)
+		runCommandsDescr(drop, srv.DB)
 	}
-	query := []string{
-		`create table sensor (
+	querys := []query{
+		{"creating schema iot", "create schema iot;"},
+		{"creating sensor table",
+			`create table sensor (
 			id serial primary key,
 			title text not null,
 			description text not null, -- aurdino sensor description
 			arduino_key text not null, -- unique identifyer key
 			created_at timestamp NOT NULL DEFAULT now()::timestamp(0)
-		  );`,
-		`create table dataset(
+		  );`},
+		{"creating dataset table",
+			`create table dataset (
 			id serial primary key,
 			sensor_id integer references sensor (id),
 			title text not null,
@@ -43,17 +46,21 @@ func main() {
 			intervalsec int not null,
 			fields jsonb,
 			created_at timestamp NOT NULL DEFAULT now()::timestamp(0)
-		  );`,
-		`create table sensordata (
+		  );`},
+		{"creating sensordata table",
+			`create table sensordata (
 			id serial primary key,
 			sensor_id integer references sensor (id),
 			dataset_id integer references dataset (id),
 			data jsonb,
 			time timestamp NOT NULL DEFAULT now()::timestamp(0)
-		  );`,
+		  );`},
 	}
-	runCommands(query, srv.DB)
+	runCommandsDescr(querys, srv.DB)
+
 	if *testdata {
+		log.Println("Inserting testdata ...")
+		// TODO: use struct instead of array
 		testdata := []string{
 			`insert into sensor(title, description, arduino_key) values('Arduino + Ethernet shield','Arduino UNO with Ethernet shield. LM35 temperatur sensor and hydrosensor. Used for project X', '8a1bbddba98a8d8512787d311352d951');`,
 			`insert into dataset(sensor_id, title, description, reference, intervalsec, fields) values(1,'temp&hydro','Temperatur/hydro measurement, growhouse 1','8a1bbddba98a8d8512787d311352d951',1800,'["temp", "hydro"]');`,
@@ -80,6 +87,22 @@ func main() {
 		runCommands(testdata, srv.DB)
 	}
 }
+
+type query struct {
+	descr string
+	query string
+}
+
+func runCommandsDescr(q []query, db *sqlx.DB) {
+	for _, q := range q {
+		log.Printf("%s\n", q.descr)
+		_, err := db.Exec(q.query)
+		if err != nil {
+			log.Printf("DB ERROR: %v", err)
+		}
+	}
+}
+
 func runCommands(commands []string, db *sqlx.DB) {
 	for _, q := range commands {
 		_, err := db.Exec(q)
