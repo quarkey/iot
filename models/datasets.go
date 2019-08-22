@@ -54,7 +54,7 @@ func (s *Server) Datasets(w http.ResponseWriter, r *http.Request) {
 }
 func (s Server) getArduinoTitle(arduinokey string) string {
 	var sensortitle string
-	err := s.DB.Get(&sensortitle, "select title from sensor where arduino_key=$1", arduinokey)
+	err := s.DB.Get(&sensortitle, "select title from sensors where arduino_key=$1", arduinokey)
 	if err != nil {
 		return ""
 	}

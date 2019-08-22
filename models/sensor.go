@@ -47,7 +47,7 @@ type Sensor struct {
 // Sensors lists all available sensors in the database
 func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
-	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, created_at from sensor")
+	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, created_at from sensors")
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
@@ -60,7 +60,7 @@ func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
 func (s *Server) SensorByReference(w http.ResponseWriter, r *http.Request) {
 	var sensor Sensor
 	vars := mux.Vars(r)
-	err := s.DB.Get(&sensor, "select id, title, description, arduino_key, created_at from sensor where arduino_key=$1", vars["reference"])
+	err := s.DB.Get(&sensor, "select id, title, description, arduino_key, created_at from sensors where arduino_key=$1", vars["reference"])
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
