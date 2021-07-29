@@ -45,8 +45,14 @@ func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
 func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var dataset Dataset
-	dataset.SensorTitle = s.getArduinoTitle(vars["reference"])
-	err := s.DB.Get(&dataset, "select id, sensor_id, title, description, reference, intervalsec, fields, created_at from dataset where reference=$1", vars["reference"])
+	err := s.DB.Get(&dataset, `
+	select a.id, a.sensor_id, a.title, a.description, 
+	a.reference, a.intervalsec, a.fields,  
+	a.created_at, b.title as sensor_title
+	 from dataset a, sensors b
+		where reference=$1
+		and a.sensor_id = b.id
+		`, vars["reference"])
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
