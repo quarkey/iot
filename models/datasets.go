@@ -40,14 +40,6 @@ func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
 	}
 	helper.Respond(w, r, 200, datasets)
 }
-func (s Server) getArduinoTitle(arduinokey string) string {
-	var sensortitle string
-	err := s.DB.Get(&sensortitle, "select title from sensors where arduino_key=$1", arduinokey)
-	if err != nil {
-		return ""
-	}
-	return sensortitle
-}
 
 // GetDatasetByReference fetches a dataset based on a reference
 func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
