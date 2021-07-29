@@ -17,8 +17,8 @@ type SensorRead struct {
 	Data      *json.RawMessage `json:"data"`
 }
 
-// NewSensorReading is registering sensor readings (json) to database.
-func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
+// SaveSensorReading is registering sensor readings (json) to database.
+func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
 	// TODO: must verify arduino_key on input
 	dat := SensorRead{}
 	err := helper.DecodeBody(r, &dat)
@@ -35,7 +35,7 @@ func (s *Server) NewSensorReading(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Sensor ....
+// Sensor meta information
 type Sensor struct {
 	ID          int       `db:"id" json:"id"`
 	Title       string    `db:"title" json:"title"`
@@ -44,8 +44,8 @@ type Sensor struct {
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 }
 
-// Sensors lists all available sensors in the database
-func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
+// GetSensorsList fetches a list of all available sensors in the database
+func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
 	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, created_at from sensors")
 	if err != nil {
@@ -56,8 +56,8 @@ func (s *Server) Sensors(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, sensors)
 }
 
-// Sensor is looking up a particular sensor based on a reference or an arduino_key
-func (s *Server) SensorByReference(w http.ResponseWriter, r *http.Request) {
+// GetSensorByReference is looking up a particular sensor based on a arduino_key
+func (s *Server) GetSensorByReference(w http.ResponseWriter, r *http.Request) {
 	var sensor Sensor
 	vars := mux.Vars(r)
 	err := s.DB.Get(&sensor, "select id, title, description, arduino_key, created_at from sensors where arduino_key=$1", vars["reference"])
@@ -69,23 +69,15 @@ func (s *Server) SensorByReference(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, sensor)
 }
 
-// type Payload struct {
-// 	SensorID    int                `json:"sensor_id"`
-// 	Intervalsec int                `json:"intervalsec"`
-// 	Reference   string             `json:"reference"`
-// 	CreatedAt   time.Time          `json:"created_at"`
-// 	ID          int                `json:"id"`
-// 	Description string             `json:"description"`
-// 	Fields      *json.RawMessage   `json:"fields"`
-// 	Data        []*json.RawMessage `json:"data"`
-// }
+// Data JSON payload
 type Data struct {
 	ID   int              `json:"id"`
 	Data *json.RawMessage `json:"data"`
 	Time time.Time        `json:"time"`
 }
 
-func (s *Server) SensorDataByReference(w http.ResponseWriter, r *http.Request) {
+// GetSensorDataByReference fetches a dataset by a reference
+func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var data []Data
 	var datasetID int

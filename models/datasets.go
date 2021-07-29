@@ -25,7 +25,7 @@ type Dataset struct {
 }
 
 // Datasets ....
-func (s *Server) Datasets(w http.ResponseWriter, r *http.Request) {
+func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
 	var datasets []Dataset
 	var newdataset []Dataset
 
@@ -61,8 +61,8 @@ func (s Server) getArduinoTitle(arduinokey string) string {
 	return sensortitle
 }
 
-// DatasetByReference ....
-func (s *Server) DatasetByReference(w http.ResponseWriter, r *http.Request) {
+// GetDatasetByReference ....
+func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var dataset Dataset
 	dataset.SensorTitle = s.getArduinoTitle(vars["reference"])
