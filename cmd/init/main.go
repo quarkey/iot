@@ -6,7 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
-	"github.com/quarkey/iot/models"
+	models "github.com/quarkey/iot/models"
 )
 
 func main() {
