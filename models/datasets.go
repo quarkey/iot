@@ -21,48 +21,28 @@ type Dataset struct {
 	IntervalSec int              `db:"intervalsec" json:"intervalsec"`
 	Fields      *json.RawMessage `db:"fields" json:"fields"`
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
-	SensorTitle string           `json:"sensor_title,omitempty"`
+	SensorTitle string           `db:"sensor_title" json:"sensor_title"`
 }
 
-// Datasets ....
-func (s *Server) Datasets(w http.ResponseWriter, r *http.Request) {
+// GetDatasetsList fetches a list of all datasets
+func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
 	var datasets []Dataset
-	var newdataset []Dataset
-
-	err := s.DB.Select(&datasets, "select id, sensor_id, title, description, reference, intervalsec, fields, created_at from dataset")
+	err := s.DB.Select(&datasets,
+		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
+				a.intervalsec, a.fields, a.created_at,
+				b.title as sensor_title
+		from dataset a, sensors b
+		where a.sensor_id = b.id`)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
-	// adding sensor title to payload, ugly i know :(
-	for _, d := range datasets {
-		var modified Dataset
-		modified.ID = d.ID
-		modified.SensorID = d.SensorID
-		modified.Title = d.Title
-		modified.Description = d.Description
-		modified.Reference = d.Reference
-		modified.IntervalSec = d.IntervalSec
-		modified.Fields = d.Fields
-		modified.CreatedAt = d.CreatedAt
-		modified.SensorTitle = s.getArduinoTitle(d.Reference)
-		newdataset = append(newdataset, modified)
-	}
-	// fmt.Println(datasets)
-	helper.Respond(w, r, 200, newdataset)
-}
-func (s Server) getArduinoTitle(arduinokey string) string {
-	var sensortitle string
-	err := s.DB.Get(&sensortitle, "select title from sensors where arduino_key=$1", arduinokey)
-	if err != nil {
-		return ""
-	}
-	return sensortitle
+	helper.Respond(w, r, 200, datasets)
 }
 
-// DatasetByReference ....
-func (s *Server) DatasetByReference(w http.ResponseWriter, r *http.Request) {
+// GetDatasetByReference fetches a dataset based on a reference
+func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var dataset Dataset
 	dataset.SensorTitle = s.getArduinoTitle(vars["reference"])

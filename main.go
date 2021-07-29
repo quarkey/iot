@@ -21,15 +21,15 @@ func main() {
 	srv := models.NewDB(*confPath)
 	r := mux.NewRouter()
 
-	r.HandleFunc("/api/sensors", srv.Sensors).Methods("GET")                       // many sensors
-	r.HandleFunc("/api/sensors/{reference}", srv.SensorByReference).Methods("GET") // one sensor by reference
+	r.HandleFunc("/api/sensors", srv.GetSensorsList).Methods("GET")                   // many sensors
+	r.HandleFunc("/api/sensors/{reference}", srv.GetSensorByReference).Methods("GET") // one sensor by reference
 
-	r.HandleFunc("/api/sensordata/{reference}", srv.SensorDataByReference).Methods("GET") // sensordata by reference (listing all)
-	r.HandleFunc("/api/sensordata", srv.NewSensorReading).Methods("POST")                 // insert new reading
+	r.HandleFunc("/api/sensordata/{reference}", srv.GetSensorDataByReference).Methods("GET") // sensordata by reference (listing all)
+	r.HandleFunc("/api/sensordata", srv.SaveSensorReading).Methods("POST")                   // insert new reading
 
-	r.HandleFunc("/api/datasets", srv.Datasets).Methods("GET")                       // many datasets
-	r.HandleFunc("/api/datasets/{reference}", srv.DatasetByReference).Methods("GET") // one dataset by reference
-	r.HandleFunc("/api/datasets", srv.NewDataset).Methods("POST")                    // insert new dataset
+	r.HandleFunc("/api/datasets", srv.GetDatasetsList).Methods("GET")                   // many datasets
+	r.HandleFunc("/api/datasets/{reference}", srv.GetDatasetByReference).Methods("GET") // one dataset by reference
+	r.HandleFunc("/api/datasets", srv.NewDataset).Methods("POST")                       // insert new dataset
 
 	r.HandleFunc("/health", srv.HealthCheckHandler).Methods("GET")
 
