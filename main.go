@@ -18,7 +18,7 @@ func main() {
 	if *confPath == "" {
 		log.Fatalf("ERROR: missing configuration jsonfile")
 	}
-	srv := models.NewDB(*confPath)
+	srv := models.NewDB(*confPath, true)
 	r := mux.NewRouter()
 
 	r.HandleFunc("/api/sensors", srv.GetSensorsList).Methods("GET")                   // many sensors

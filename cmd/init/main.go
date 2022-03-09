@@ -19,7 +19,7 @@ func main() {
 	if *confPath == "" {
 		log.Fatalf("ERROR: missing configuration jsonfile")
 	}
-	srv := models.NewDB(*confPath)
+	srv := models.NewDB(*confPath, false)
 	if *drop {
 		drop := []query{
 			{"dropping iot schema with cascade", "drop schema if exists iot cascade;"},
