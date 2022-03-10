@@ -26,12 +26,13 @@ import (
 
 // Server ....
 type Server struct {
-	DB     *sqlx.DB
-	Config map[string]interface{}
-	Router *mux.Router
+	DB         *sqlx.DB
+	Config     map[string]interface{}
+	Router     *mux.Router
+	httpServer *http.Server
 }
 
-// New opens a database connection.
+// New initialize server and opens a database connection.
 func New(path string, automigrate bool) *Server {
 	srv := &Server{}
 	err := srv.loadcfg(path)
@@ -97,10 +98,11 @@ func (srv *Server) Run(ctx context.Context) {
 		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
 		handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With"}),
 	)(srv.Router)
-	httpServer := &http.Server{
+	srv.httpServer = &http.Server{
 		Addr:    srv.Config["api_addr"].(string),
 		Handler: logRequest(corsHandler),
 	}
+
 	log.Printf("[INFO] Starting to listen on %s", srv.Config["api_addr"].(string))
 
 	go func(ctx context.Context) {
@@ -110,24 +112,24 @@ func (srv *Server) Run(ctx context.Context) {
 			select {
 			case <-ctx.Done():
 				log.Print("[INFO] Received cancel request, shutting down...")
-				srv.Stop(ctx, httpServer)
+				srv.Stop(ctx)
 
 				return
 			case sig := <-signalCh:
 				log.Printf("[INFO] Received signal %v, shutting down...\n", sig)
-				srv.Stop(ctx, httpServer)
+				srv.Stop(ctx)
 			}
 		}
 	}(ctx)
-	err := httpServer.ListenAndServe()
+	err := srv.httpServer.ListenAndServe()
 	if err != nil {
 		log.Printf("[INFO] Service stopped")
 	}
 }
 
 // Stop stops the webserver by shutting down context.Background
-func (s *Server) Stop(ctx context.Context, srv *http.Server) {
-	err := srv.Shutdown(context.Background())
+func (s *Server) Stop(ctx context.Context) {
+	err := s.httpServer.Shutdown(context.Background())
 	if err != nil {
 		log.Printf("ERROR: failed shutting down server after cancel request: %v", err)
 	}

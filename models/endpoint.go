@@ -14,5 +14,6 @@ func (s *Server) SetupEndpoints() {
 	s.Router.HandleFunc("/api/datasets/{reference}", s.GetDatasetByReference).Methods("GET") // one dataset by reference
 	s.Router.HandleFunc("/api/datasets", s.NewDataset).Methods("POST")                       // insert new dataset
 
-	s.Router.HandleFunc("/health", s.HealthCheckHandler).Methods("GET")
+	s.Router.HandleFunc("/api/health", s.HealthCheckHandler).Methods("GET")
+
 }
