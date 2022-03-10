@@ -16,6 +16,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
+	helper "github.com/quarkey/iot/json"
 
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
@@ -154,4 +155,8 @@ func logRequest(handler http.Handler) http.Handler {
 		log.Printf("%s %s %s body: %v\n", r.RemoteAddr, r.Method, r.URL, r.Body)
 		handler.ServeHTTP(w, r)
 	})
+}
+
+func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	helper.Respond(w, r, 200, "it's alive!")
 }
