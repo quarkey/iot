@@ -3,7 +3,8 @@ build:
 	go build ./cmd/init
 
 testdata:
-	./init --conf exampleconfig.json --testdata
+	go build ./cmd/init
+	./init --conf ./config/exampleconfig.json --automigrate
 
 clean:
 	rm -f api
