@@ -15,7 +15,7 @@ func main() {
 	if *confPath == "" {
 		log.Fatalf("ERROR: missing configuration jsonfile")
 	}
-	srv := models.NewDB(*confPath, true) //automigration=true
-	srv.SetupEndpoints()
-	srv.Run(context.Background())
+	server := models.New(*confPath, true) //automigration=true
+	server.SetupEndpoints()
+	server.Run(context.Background())
 }

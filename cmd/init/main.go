@@ -18,7 +18,7 @@ func main() {
 	if *confPath == "" {
 		log.Fatalf("ERROR: missing configuration jsonfile")
 	}
-	srv := models.NewDB(*confPath, *automigrate)
+	server := models.New(*confPath, *automigrate)
 
 	log.Println("Inserting testdata ...")
 	testdata := []query{
@@ -38,7 +38,7 @@ func main() {
 		{"data point 4", `insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('dataset', 'id')),'["58.8531","5.7329","e"]');`},
 		{"data point 5", `insert into sensors(title, description, arduino_key) values('SuperduperRecordingbox','this device is awesome', 'dummy');`},
 	}
-	runCommandsDescr(testdata, srv.DB)
+	runCommandsDescr(testdata, server.DB)
 }
 
 type query struct {

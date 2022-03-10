@@ -31,7 +31,7 @@ type Server struct {
 	Router *mux.Router
 }
 
-// NewDB opens a database connection.
+// New opens a database connection.
 func New(path string, automigrate bool) *Server {
 	srv := &Server{}
 	err := srv.loadcfg(path)
