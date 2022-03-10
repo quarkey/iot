@@ -1,13 +1,21 @@
 package models
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq" // postgres driver
 
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
@@ -20,10 +28,11 @@ import (
 type Server struct {
 	DB     *sqlx.DB
 	Config map[string]interface{}
+	Router *mux.Router
 }
 
-// NewDB opens connection to database
-func NewDB(path string, automigrate bool) *Server {
+// NewDB opens a database connection.
+func New(path string, automigrate bool) *Server {
 	srv := &Server{}
 	err := srv.loadcfg(path)
 	if err != nil {
@@ -81,7 +90,50 @@ func NewDB(path string, automigrate bool) *Server {
 	return srv
 }
 
-// loadcfg
+// Run starts the webserver
+func (srv *Server) Run(ctx context.Context) {
+	corsHandler := handlers.CORS(
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With"}),
+	)(srv.Router)
+	httpServer := &http.Server{
+		Addr:    srv.Config["api_addr"].(string),
+		Handler: logRequest(corsHandler),
+	}
+	log.Printf("[INFO] Starting to listen on %s", srv.Config["api_addr"].(string))
+
+	go func(ctx context.Context) {
+		signalCh := make(chan os.Signal, 1024)
+		signal.Notify(signalCh, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM, os.Interrupt)
+		for {
+			select {
+			case <-ctx.Done():
+				log.Print("[INFO] Received cancel request, shutting down...")
+				srv.Stop(ctx, httpServer)
+
+				return
+			case sig := <-signalCh:
+				log.Printf("[INFO] Received signal %v, shutting down...\n", sig)
+				srv.Stop(ctx, httpServer)
+			}
+		}
+	}(ctx)
+	err := httpServer.ListenAndServe()
+	if err != nil {
+		log.Printf("[INFO] Service stopped")
+	}
+}
+
+// Stop stops the webserver by shutting down context.Background
+func (s *Server) Stop(ctx context.Context, srv *http.Server) {
+	err := srv.Shutdown(context.Background())
+	if err != nil {
+		log.Printf("ERROR: failed shutting down server after cancel request: %v", err)
+	}
+}
+
+// loadcfg reads the contents of a jsonfile
 func (s *Server) loadcfg(path string) error {
 	// TODO use io.reader
 	data, err := ioutil.ReadFile(path)
@@ -92,4 +144,12 @@ func (s *Server) loadcfg(path string) error {
 		return fmt.Errorf("unable to unmarshal: %v", err)
 	}
 	return nil
+}
+
+// logRequest is a middleware that prints out all incoming requests in a nice way
+func logRequest(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s body: %v\n", r.RemoteAddr, r.Method, r.URL, r.Body)
+		handler.ServeHTTP(w, r)
+	})
 }
