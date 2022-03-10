@@ -1,7 +1,12 @@
-build-all:
-	go build
+build:
+	go build ./cmd/api
 	go build ./cmd/init
 
-initdb:
-	./init --conf exampleconfig.json --testdata --drop
+testdata:
+	./init --conf exampleconfig.json --testdata
+
+clean:
+	rm -f api
+	rm -f init
+
 
