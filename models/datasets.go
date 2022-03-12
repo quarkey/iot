@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -31,7 +30,7 @@ func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
 		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
 				a.intervalsec, a.fields, a.created_at,
 				b.title as sensor_title
-		from dataset a, sensors b
+		from datasets a, sensors b
 		where a.sensor_id = b.id`)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
@@ -49,7 +48,7 @@ func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	select a.id, a.sensor_id, a.title, a.description, 
 	a.reference, a.intervalsec, a.fields,  
 	a.created_at, b.title as sensor_title
-	 from dataset a, sensors b
+	 from datasets a, sensors b
 		where reference=$1
 		and a.sensor_id = b.id
 		`, vars["reference"])
@@ -70,13 +69,13 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
-	fmt.Println(dat.Fields)
 	//TODO must be unique reference!
-	_, err = s.DB.Exec("insert into dataset(sensor_id, description, reference, intervalsec, fields, created_at) values($1,$2,$3,$4,$5,$6)", dat.SensorID, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.CreatedAt)
+	_, err = s.DB.Exec(`insert into datasets(sensor_id, title, description, reference, intervalsec, fields, created_at) 
+	values($1,$2,$3,$4,$5,$6,$7)`, dat.SensorID, dat.Title, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.CreatedAt)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
-	helper.RespondErr(w, r, http.StatusNotImplemented, "not implemented")
+	helper.RespondSuccess(w, r)
 }

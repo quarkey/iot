@@ -27,6 +27,7 @@ func TestSensordata(t *testing.T) {
 		descr          string
 		url            string
 		method         string
+		param          string
 		got            []byte
 		expextedBody   []byte
 		expectedStatus int
@@ -35,6 +36,7 @@ func TestSensordata(t *testing.T) {
 			"insert sensordata",
 			"/sensordata",
 			"POST",
+			"",
 			[]byte(`{"sensor_id": 1,"dataset_id": 1,"data": [123.00,12.00]}`),
 			nil,
 			200,
@@ -43,7 +45,42 @@ func TestSensordata(t *testing.T) {
 			"get sensor list",
 			"/sensors",
 			"GET",
+			"",
 			nil,
+			nil,
+			200,
+		},
+		// datasets
+		{
+			"GetDatasetsList()",
+			"/datasets",
+			"GET",
+			"",
+			nil,
+			nil,
+			200,
+		},
+		{
+			"GetDatasetByReference()",
+			"/datasets/",
+			"GET",
+			"8a1bbddba98a8d8512787d311352d951",
+			nil,
+			nil,
+			200,
+		},
+		{
+			"NewDataset()",
+			"/datasets",
+			"POST",
+			"",
+			[]byte(`{
+				"sensor_id": 1,
+				"description": "this is a test",
+				"reference": "balle",
+				"intervalsec": 32,
+				"fields": "['kinetic energy']"
+			  }`),
 			nil,
 			200,
 		},
@@ -51,6 +88,7 @@ func TestSensordata(t *testing.T) {
 			"testing a non existent endpoint",
 			"/sensors_uggabugga",
 			"GET",
+			"",
 			nil,
 			nil,
 			404,
@@ -59,7 +97,7 @@ func TestSensordata(t *testing.T) {
 
 	for _, test := range tests {
 		log.Printf("%s ...", test.descr)
-		url := fmt.Sprintf("%s%s", server.API_URL(), test.url)
+		url := fmt.Sprintf("%s%s%s", server.API_URL(), test.url, test.param)
 		req, err := http.NewRequest(test.method, url, bytes.NewBuffer(test.got))
 		if err != nil {
 			t.Errorf("Failed creating request: %v", err)
@@ -70,9 +108,8 @@ func TestSensordata(t *testing.T) {
 		}
 		defer res.Body.Close()
 		if res.StatusCode != test.expectedStatus {
-			t.Errorf("unable to insert data to database")
+			t.Errorf("test failed: %s - expected: %d, got: %d", test.descr, test.expectedStatus, res.StatusCode)
 		}
 	}
-
 	server.Stop(ctx)
 }
