@@ -160,3 +160,6 @@ func logRequest(handler http.Handler) http.Handler {
 func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, "it's alive!")
 }
+func (s *Server) API_URL() string {
+	return fmt.Sprintf("http://%s/api", s.Config["api_addr"].(string))
+}
