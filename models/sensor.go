@@ -24,7 +24,7 @@ func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
 	dat := SensorData{}
 	err := helper.DecodeBody(r, &dat)
 	if err != nil {
-		helper.RespondErr(w, r, 500, "unable to read sensordata: %v", err)
+		helper.RespondErr(w, r, 500, "unable to read sensordata:", err)
 		return
 	}
 	err = saveReadings([]SensorData{dat}, s.DB)
@@ -49,7 +49,7 @@ func (s *Server) SyncSensorData(w http.ResponseWriter, r *http.Request) {
 	dat := []SensorData{}
 	err := helper.DecodeBody(r, &dat)
 	if err != nil {
-		helper.RespondErr(w, r, 500, "unable to read sensordata: %v", err)
+		helper.RespondErr(w, r, 500, "unable to read sensordata:", err)
 		return
 	}
 	err = saveReadings(dat, s.DB)
