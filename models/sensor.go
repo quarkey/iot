@@ -103,15 +103,10 @@ type Data struct {
 func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var data []Data
-	var datasetID int
-	err := s.DB.Get(&datasetID, "select id from dataset where reference=$1", vars["reference"])
+	err := s.DB.Select(&data, `select a.id, a.data, a.time from 
+	sensordata a, dataset b where b.reference=$1 and b.id = a.dataset_id`, vars["reference"])
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
-		return
-	}
-	err = s.DB.Select(&data, "select id, data, time from sensordata where dataset_id=$1;", datasetID)
-	if err != nil {
-		helper.RespondErr(w, r, 500, "unable to select sensordataxx")
 		return
 	}
 	helper.Respond(w, r, 200, data)
