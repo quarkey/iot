@@ -62,3 +62,15 @@ insert into sensordata(descr, serial, data) values('temperatur sensor', 'serialy
     b.title as sensor_title
     from dataset a, sensors b
     where a.sensor_id = b.id;
+
+
+select
+  a.id,
+  a.data,
+  a.time
+from 
+  sensordata a,
+  dataset b
+where
+  b.reference='8a1bbddba98a8d8512787d311352d951'
+  and b.id = a.dataset_id
