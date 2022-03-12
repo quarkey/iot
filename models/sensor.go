@@ -2,16 +2,18 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
 )
 
-// SensorRead ....
-type SensorRead struct {
+// SensorData ....
+type SensorData struct {
 	SensorID  int              `json:"sensor_id"`
 	DatasetID int              `json:"dataset_id"`
 	Data      *json.RawMessage `json:"data"`
@@ -19,18 +21,40 @@ type SensorRead struct {
 
 // SaveSensorReading is registering sensor readings (json) to database.
 func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
-	// TODO: must verify arduino_key on input
-	dat := SensorRead{}
+	dat := SensorData{}
 	err := helper.DecodeBody(r, &dat)
 	if err != nil {
-		log.Printf("unable to decode body: %v", err)
-		helper.RespondHTTPErr(w, r, 500)
+		helper.RespondErr(w, r, 500, "unable to read sensordata: %v", err)
 		return
 	}
-	_, err = s.DB.Exec("insert into sensordata(sensor_id, dataset_id, data) values($1,$2,$3)", dat.SensorID, dat.DatasetID, dat.Data)
+	err = saveReadings([]SensorData{dat}, s.DB)
 	if err != nil {
-		log.Printf("unable to run query: %v", err)
-		helper.RespondHTTPErr(w, r, 500)
+		helper.RespondErr(w, r, 500, "unable to save reading:", err)
+		return
+	}
+}
+
+func saveReadings(datapoints []SensorData, db *sqlx.DB) error {
+	for _, r := range datapoints {
+		_, err := db.Exec("insert into sensordata(sensor_id, dataset_id, data) values($1,$2,$3)", r.SensorID, r.DatasetID, r.Data)
+		if err != nil {
+			return fmt.Errorf("unablet to save sensor reading to db: %v", err)
+		}
+	}
+	return nil
+}
+
+// SyncDataset ...
+func (s *Server) SyncSensorData(w http.ResponseWriter, r *http.Request) {
+	dat := []SensorData{}
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to read sensordata: %v", err)
+		return
+	}
+	err = saveReadings(dat, s.DB)
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to save sensor reading to db:", err)
 		return
 	}
 }
@@ -49,8 +73,7 @@ func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
 	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, created_at from sensors")
 	if err != nil {
-		log.Printf("unable to run query: %v", err)
-		helper.RespondHTTPErr(w, r, 500)
+		helper.RespondErr(w, r, 500, "unable to select sensorlist: ", err)
 		return
 	}
 	helper.Respond(w, r, 200, sensors)
@@ -63,7 +86,7 @@ func (s *Server) GetSensorByReference(w http.ResponseWriter, r *http.Request) {
 	err := s.DB.Get(&sensor, "select id, title, description, arduino_key, created_at from sensors where arduino_key=$1", vars["reference"])
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
-		helper.RespondHTTPErr(w, r, 500)
+		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)
 		return
 	}
 	helper.Respond(w, r, 200, sensor)
@@ -83,11 +106,13 @@ func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request
 	var datasetID int
 	err := s.DB.Get(&datasetID, "select id from dataset where reference=$1", vars["reference"])
 	if err != nil {
-		log.Printf("unable to run query referece: %v", err)
+		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
+		return
 	}
 	err = s.DB.Select(&data, "select id, data, time from sensordata where dataset_id=$1;", datasetID)
 	if err != nil {
-		log.Printf("unable to run query two: %v", err)
+		helper.RespondErr(w, r, 500, "unable to select sensordataxx")
+		return
 	}
 	helper.Respond(w, r, 200, data)
 }
