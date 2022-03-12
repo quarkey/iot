@@ -43,6 +43,22 @@ func saveReadings(datapoints []SensorData, db *sqlx.DB) error {
 	}
 	return nil
 }
+func saceReadingsTx(datapoints []SensorData, db *sqlx.DB) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("tx failed: %v", err)
+	}
+	err = saveReadings(datapoints, db)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("tx failed: %v", err)
+	}
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("commit failed: %v", err)
+	}
+	return nil
+}
 
 // SyncDataset ...
 func (s *Server) SyncSensorData(w http.ResponseWriter, r *http.Request) {
