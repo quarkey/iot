@@ -43,7 +43,7 @@ func saveReadings(datapoints []SensorData, db *sqlx.DB) error {
 	}
 	return nil
 }
-func saceReadingsTx(datapoints []SensorData, db *sqlx.DB) error {
+func saveReadingsTx(datapoints []SensorData, db *sqlx.DB) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return fmt.Errorf("tx failed: %v", err)
@@ -68,9 +68,9 @@ func (s *Server) SyncSensorData(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to read sensordata:", err)
 		return
 	}
-	err = saveReadings(dat, s.DB)
+	err = saveReadingsTx(dat, s.DB)
 	if err != nil {
-		helper.RespondErr(w, r, 500, "unable to save sensor reading to db:", err)
+		helper.RespondErr(w, r, 500, "synchronization failed", err)
 		return
 	}
 }
