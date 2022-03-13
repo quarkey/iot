@@ -163,3 +163,6 @@ func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) API_URL() string {
 	return fmt.Sprintf("http://%s/api", s.Config["api_addr"].(string))
 }
+func (s *Server) SERVER_URL() string {
+	return fmt.Sprintf("http://%s", s.Config["api_addr"].(string))
+}

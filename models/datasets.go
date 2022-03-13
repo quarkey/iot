@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
 )
 
@@ -24,7 +25,7 @@ type Dataset struct {
 }
 
 // GetDatasetsList fetches a list of all datasets
-func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
+func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request) {
 	var datasets []Dataset
 	err := s.DB.Select(&datasets,
 		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
@@ -38,6 +39,19 @@ func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helper.Respond(w, r, 200, datasets)
+}
+func GetDatasetsList(db *sqlx.DB) []Dataset {
+	var datasets []Dataset
+	err := db.Select(&datasets,
+		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
+				a.intervalsec, a.fields, a.created_at,
+				b.title as sensor_title
+		from datasets a, sensors b
+		where a.sensor_id = b.id`)
+	if err != nil {
+		return nil
+	}
+	return datasets
 }
 
 // GetDatasetByReference fetches a dataset based on a reference
