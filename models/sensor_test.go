@@ -76,6 +76,7 @@ func TestSensordata(t *testing.T) {
 			"",
 			[]byte(`{
 				"sensor_id": 1,
+				"title": "test 007",
 				"description": "this is a test",
 				"reference": "balle",
 				"intervalsec": 32,
