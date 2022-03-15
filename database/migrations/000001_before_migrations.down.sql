@@ -1,5 +1,5 @@
-drop table if exists iot.sensordata;
+drop table if exists iot.sensordata cascade;
 
-drop table if exists iot.dataset;
+drop table if exists iot.dataset cascade;
 
-drop table if exists iot.sensors;
+drop table if exists iot.sensors cascade;
