@@ -38,3 +38,8 @@ You'll need to have docker and golang installed on your machine.
 
 1.  $ docker tag iot:latest iot:v1.0 // create tag
 2.  $ docker rmi iot:v1.0 // remove tag
+
+#### gomigrate
+
+export POSTGRESQL_URL="postgresql://iot:iot@localhost:5432/iot"
+migrate -database ${POSTGRESQL_URL} -path database/migrations down
