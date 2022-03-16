@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-var server *Server
-var ctx context.Context
+// var server *Server
+// var ctx context.Context
 
 func init() {
 	path := "../config/exampleconfig.json"
@@ -20,7 +20,7 @@ func init() {
 	ctx = context.Background()
 	go server.Run(ctx)
 }
-func TestSensordata(t *testing.T) {
+func TestDatasets(t *testing.T) {
 	time.Sleep(3 * time.Second)
 
 	tests := []struct {
@@ -32,32 +32,40 @@ func TestSensordata(t *testing.T) {
 		expextedBody   []byte
 		expectedStatus int
 	}{
+		// datasets
 		{
-			"insert sensordata",
-			"/sensordata",
+			"GetDatasetsListEndpoint()",
+			"/datasets",
+			"GET",
+			"",
+			nil,
+			nil,
+			200,
+		},
+		{
+			"GetDatasetByReference()",
+			"/datasets/",
+			"GET",
+			"8a1bbddba98a8d8512787d311352d951",
+			nil,
+			nil,
+			200,
+		},
+		{
+			"NewDataset()",
+			"/datasets",
 			"POST",
 			"",
-			[]byte(`{"sensor_id": 1,"dataset_id": 1,"data": [123.00,12.00]}`),
+			[]byte(`{
+				"sensor_id": 1,
+				"title": "test 007",
+				"description": "this is a test",
+				"reference": "balle",
+				"intervalsec": 32,
+				"fields": "['kinetic energy']"
+			  }`),
 			nil,
 			200,
-		},
-		{
-			"get sensor list",
-			"/sensors",
-			"GET",
-			"",
-			nil,
-			nil,
-			200,
-		},
-		{
-			"testing a non existent endpoint",
-			"/sensors_uggabugga",
-			"GET",
-			"",
-			nil,
-			nil,
-			404,
 		},
 	}
 
