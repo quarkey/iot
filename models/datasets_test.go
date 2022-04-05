@@ -62,7 +62,8 @@ func TestDatasets(t *testing.T) {
 				"description": "this is a test",
 				"reference": "balle",
 				"intervalsec": 32,
-				"fields": "['kinetic energy']"
+				"fields": "['kinetic energy']",
+				"types": "['float']"
 			  }`),
 			nil,
 			200,

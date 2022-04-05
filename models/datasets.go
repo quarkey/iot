@@ -20,6 +20,7 @@ type Dataset struct {
 	Reference   string           `db:"reference" json:"reference"`
 	IntervalSec int              `db:"intervalsec" json:"intervalsec"`
 	Fields      *json.RawMessage `db:"fields" json:"fields"`
+	Types       *json.RawMessage `db:"types" json:"types"`
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 	SensorTitle string           `db:"sensor_title" json:"sensor_title"`
 }
@@ -29,7 +30,7 @@ func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request)
 	var datasets []Dataset
 	err := s.DB.Select(&datasets,
 		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
-				a.intervalsec, a.fields, a.created_at,
+				a.intervalsec, a.fields, a.types, a.created_at,
 				b.title as sensor_title
 		from datasets a, sensors b
 		where a.sensor_id = b.id`)
@@ -44,7 +45,7 @@ func GetDatasetsList(db *sqlx.DB) []Dataset {
 	var datasets []Dataset
 	err := db.Select(&datasets,
 		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
-				a.intervalsec, a.fields, a.created_at,
+				a.intervalsec, a.fields, a.types, a.created_at,
 				b.title as sensor_title
 		from datasets a, sensors b
 		where a.sensor_id = b.id`)
@@ -60,7 +61,7 @@ func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	var dataset Dataset
 	err := s.DB.Get(&dataset, `
 	select a.id, a.sensor_id, a.title, a.description, 
-	a.reference, a.intervalsec, a.fields,  
+	a.reference, a.intervalsec, a.fields, a.types, 
 	a.created_at, b.title as sensor_title
 	 from datasets a, sensors b
 		where reference=$1
@@ -84,8 +85,8 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//TODO must be unique reference!
-	_, err = s.DB.Exec(`insert into datasets(sensor_id, title, description, reference, intervalsec, fields, created_at) 
-	values($1,$2,$3,$4,$5,$6,$7)`, dat.SensorID, dat.Title, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.CreatedAt)
+	_, err = s.DB.Exec(`insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types, created_at) 
+	values($1,$2,$3,$4,$5,$6,$7,$8)`, dat.SensorID, dat.Title, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.Types, dat.CreatedAt)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)

@@ -1,0 +1,1 @@
+alter table iot.datasets drop column types;
