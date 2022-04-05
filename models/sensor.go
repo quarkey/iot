@@ -120,7 +120,7 @@ func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request
 	vars := mux.Vars(r)
 	var data []Data
 	err := s.DB.Select(&data, `select a.id, a.data, a.time from 
-	sensordata a, dataset b where b.reference=$1 and b.id = a.dataset_id`, vars["reference"])
+	sensordata a, datasets b where b.reference=$1 and b.id = a.dataset_id`, vars["reference"])
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
 		return

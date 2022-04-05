@@ -59,6 +59,15 @@ func TestSensordata(t *testing.T) {
 			nil,
 			404,
 		},
+		{
+			"get sensor data by reference",
+			"/sensordata/8a1bbddba98a8d8512787d311352d951",
+			"GET",
+			"",
+			nil,
+			nil,
+			200,
+		},
 	}
 
 	for _, test := range tests {
