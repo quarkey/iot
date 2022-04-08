@@ -26,19 +26,19 @@ func main() {
 	server := models.New(*confPath, *automigrate)
 	datasets := models.GetDatasetsList(server.DB)
 
-	_ = models.New(*confPath, *automigrate)
+	//_ = models.New(*confPath, *automigrate)
 	var jobs []chan string
 	for i, ds := range datasets {
 		log.Printf("[INFO] %d/%d simulating sensor for dataset '%s, interval duration: %d'\n", i+1, len(datasets), ds.Title, ds.IntervalSec)
 		job := make(chan string)
 		jobs = append(jobs, job)
-		go runSim(&ds)
+		go runSim(ds)
 	}
 	for _, result := range jobs {
 		fmt.Println("kanal:", <-result)
 	}
 }
-func runSim(ds *models.Dataset) {
+func runSim(ds models.Dataset) {
 	tick := 0
 	url := "http://localhost:6001/api/sensordata"
 	data := []byte(fmt.Sprintf(`{"sensor_id": %d,"dataset_id": %d,"data": [123.00,12.00]}`, ds.SensorID, ds.ID))
