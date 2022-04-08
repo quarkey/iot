@@ -1,10 +1,10 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
-import { Device } from '../models/device';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { environment } from "src/environments/environment";
+import { Device } from "../models/device";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class DevicesService {
   constructor(private http: HttpClient) {}
@@ -20,5 +20,8 @@ export class DevicesService {
   public AddNewDevice(title: string, description: string) {
     const obj = { title, description };
     return this.http.post<Device>(`${environment.apiUrl}/api/sensors`, obj);
+  }
+  public UpdateDevice(device: Device) {
+    return this.http.put<Device>(`${environment.apiUrl}/api/sensors`, device);
   }
 }

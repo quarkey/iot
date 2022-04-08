@@ -1,9 +1,32 @@
 <mat-tab-group mat-align-tabs="start">
   <mat-tab label="DETAILS">
-    <pre
+    <mat-card [formGroup]="form">
+      <mat-form-field class="example-full-width" appearance="fill">
+        <mat-label>Titlte</mat-label>
+        <input matInput formControlName="title" />
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width" appearance="fill">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description"></textarea>
+      </mat-form-field>
+      <mat-card-actions>
+        <div style="flex: 1 1 auto"></div>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="updateDevice()"
+          [disabled]="form.pristine"
+        >
+          UPDATE
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- <pre
       >{{ device | json }}
 </pre
-    >
+    > -->
   </mat-tab>
   <mat-tab label="TELEMETRY"> asd </mat-tab>
   <mat-tab label="EVENTS"> asd </mat-tab>

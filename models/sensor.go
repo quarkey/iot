@@ -129,14 +129,14 @@ func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request
 	helper.Respond(w, r, 200, data)
 }
 
-type NewSensor struct {
+type NewDevice struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 }
 
-// AddNewSensor adds a fresh device to the database
-func (s *Server) AddNewSensor(w http.ResponseWriter, r *http.Request) {
-	dat := NewSensor{}
+// AddNewDevice adds a fresh device to the database
+func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
+	dat := NewDevice{}
 	err := helper.DecodeBody(r, &dat)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to read sensordata:", err)
@@ -157,4 +157,27 @@ func (s *Server) AddNewSensor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helper.Respond(w, r, 200, device)
+}
+
+// UpdateDevice updates sensor metadata fields
+func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
+	var device = Sensor{}
+	err := helper.DecodeBody(r, &device)
+	if err != nil {
+		log.Printf("unable to decode body: %v", err)
+		helper.RespondErr(w, r, 500, "unable to decode body: ", err)
+		return
+	}
+	_, err = s.DB.Exec(`update iot.sensors set title=$1, description=$2 where arduino_key=$3`,
+		device.Title,
+		device.Description,
+		device.ArduinoKey,
+	)
+	fmt.Println(device)
+	if err != nil {
+		log.Println(err)
+		helper.RespondErr(w, r, 500, "unable to update device: ", err)
+		return
+	}
+	helper.RespondSuccess(w, r)
 }

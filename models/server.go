@@ -96,7 +96,7 @@ func New(path string, automigrate bool) *Server {
 func (srv *Server) Run(ctx context.Context) {
 	corsHandler := handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}),
-		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "OPTIONS"}),
 		handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With"}),
 	)(srv.Router)
 	srv.httpServer = &http.Server{
