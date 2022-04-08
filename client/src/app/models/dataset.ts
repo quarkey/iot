@@ -8,4 +8,5 @@ export interface Dataset {
   fields: any;
   created_at: string;
   types: any;
+  sensor_title: string;
 }
