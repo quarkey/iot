@@ -13,3 +13,4 @@
 
 *.db
 plan
+**/client/node_modules/**

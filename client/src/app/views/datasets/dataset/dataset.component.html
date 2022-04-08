@@ -1,0 +1,11 @@
+<mat-tab-group mat-align-tabs="start">
+  <mat-tab label="DETAILS">
+    <app-dataset-details [data]="dataset"></app-dataset-details>
+  </mat-tab>
+  <mat-tab label="DATA">
+    <app-dataset-data [reference]="dataset.reference"></app-dataset-data>
+  </mat-tab>
+  <!-- <mat-tab label="DATA">EVENTS</mat-tab>
+  <mat-tab label="TELEMETRY">Telemetry</mat-tab>
+  <mat-tab label="ALERTS">Alert</mat-tab> -->
+</mat-tab-group>

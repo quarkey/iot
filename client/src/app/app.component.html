@@ -1,0 +1,9 @@
+<app-toolbar (sidenavToggle)="sidenav.toggle()"></app-toolbar>
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="side" [opened]="true">
+    <app-sidenav></app-sidenav>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

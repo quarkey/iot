@@ -1,0 +1,24 @@
+<h3>Add new device</h3>
+<mat-dialog-content [formGroup]="form">
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Titlte</mat-label>
+    <input matInput formControlName="title" />
+  </mat-form-field>
+
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>Description</mat-label>
+    <textarea matInput formControlName="description"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <div style="flex: 1 1 auto"></div>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="addNewDevice()"
+    [disabled]="form.invalid"
+  >
+    <mat-icon>add</mat-icon>
+    <span>ADD</span>
+  </button>
+</mat-dialog-actions>
