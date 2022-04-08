@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
@@ -126,4 +127,26 @@ func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request
 		return
 	}
 	helper.Respond(w, r, 200, data)
+}
+
+type NewSensor struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
+// AddNewSensor adds a fresh device to the database
+func (s *Server) AddNewSensor(w http.ResponseWriter, r *http.Request) {
+	dat := NewSensor{}
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to read sensordata:", err)
+		return
+	}
+	id := uuid.New()
+	res, err := s.DB.Exec("insert into iot.sensors(title, description, arduino_key) values($1, $2, $3)", dat.Title, dat.Description, id.String())
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to add new sensor device:", err)
+		return
+	}
+	helper.Respond(w, r, 200, res)
 }

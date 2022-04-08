@@ -14,3 +14,7 @@ clean:
 downup:
 	migrate -database ${POSTGRESQL_URL} -path database/migrations down
 	migrate -database ${POSTGRESQL_URL} -path database/migrations up
+
+run:
+	go build ./cmd/api
+	./api --conf config/exampleconfig.json

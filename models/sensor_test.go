@@ -68,6 +68,16 @@ func TestSensordata(t *testing.T) {
 			nil,
 			200,
 		},
+		{
+			"add new sensor endpoint",
+			"/sensors",
+			"POST",
+			"",
+			// sensor details
+			[]byte(`{"title": "wrom","description": "jalla"}`),
+			nil,
+			200,
+		},
 	}
 
 	for _, test := range tests {
