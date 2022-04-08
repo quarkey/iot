@@ -3,6 +3,10 @@ build:
 	go build ./cmd/init
 	go build ./cmd/simulator
 
+sim: 
+	go build ./cmd/simulator
+	./simulator --conf ./config/exampleconfig.json
+	
 testdata:
 	go build ./cmd/init
 	./init --conf ./config/exampleconfig.json --automigrate
@@ -10,6 +14,7 @@ testdata:
 clean:
 	rm -f api
 	rm -f init
+	rm -f simulator
 
 downup:
 	migrate -database ${POSTGRESQL_URL} -path database/migrations down
