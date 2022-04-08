@@ -143,10 +143,18 @@ func (s *Server) AddNewSensor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := uuid.New()
-	res, err := s.DB.Exec("insert into iot.sensors(title, description, arduino_key) values($1, $2, $3)", dat.Title, dat.Description, id.String())
+	_, err = s.DB.Exec("insert into iot.sensors(title, description, arduino_key) values($1, $2, $3) returning arduino_key", dat.Title, dat.Description, id.String())
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to add new sensor device:", err)
 		return
 	}
-	helper.Respond(w, r, 200, res)
+	//TODO only return uuid, full device not needed
+	var device Sensor
+	err = s.DB.Get(&device, "select id, title, description, arduino_key, created_at from sensors where arduino_key=$1", id)
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)
+		return
+	}
+	helper.Respond(w, r, 200, device)
 }
