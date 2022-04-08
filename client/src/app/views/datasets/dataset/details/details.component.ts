@@ -8,9 +8,10 @@ import { Dataset } from "src/app/models/dataset";
   styleUrls: ["./details.component.scss"],
 })
 export class DetailsComponent implements OnInit {
-  @Input() data: Dataset;
+  @Input() dataset: Dataset;
+  form: FormGroup;
 
-  constructor() {}
+  constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit(): void {}
 }
