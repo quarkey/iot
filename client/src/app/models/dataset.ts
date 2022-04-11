@@ -5,8 +5,8 @@ export interface Dataset {
   description: string;
   reference: string;
   intervalsec: number;
-  fields: any;
+  fields: string[];
   created_at: string;
-  types: any;
+  types: string[];
   sensor_title: string;
 }

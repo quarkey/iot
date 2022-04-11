@@ -45,7 +45,9 @@ export class DeviceComponent implements OnInit {
     };
 
     this.deviceService.UpdateDevice(dat).subscribe((res) => {
-      this.form.markAsPristine();
+      if (res) {
+        this.form.markAsPristine();
+      }
     });
   }
 }
