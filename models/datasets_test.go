@@ -68,6 +68,15 @@ func TestDatasets(t *testing.T) {
 			nil,
 			200,
 		},
+		{
+			"update dataset",
+			"/datasets",
+			"PUT",
+			"",
+			[]byte(`{"title":"Bicycle to work","description":"Battery-driven lat/long tracker","intervalsec":1,"types":["float","float","string"],"fields":["lat (n)","long (e)","directionssss"],"reference":"4987fb174ae91dc702394024378fc1cd"}`),
+			nil,
+			200,
+		},
 	}
 
 	for _, test := range tests {

@@ -58,6 +58,15 @@ func GetDatasetsList(db *sqlx.DB) []Dataset {
 // GetDatasetByReference fetches a dataset based on a reference
 func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	dataset, err := s.getDsetByRef(vars["reference"])
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	helper.Respond(w, r, 200, dataset)
+}
+func (s Server) getDsetByRef(ref string) (Dataset, error) {
 	var dataset Dataset
 	err := s.DB.Get(&dataset, `
 	select a.id, a.sensor_id, a.title, a.description, 
@@ -66,13 +75,11 @@ func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	 from datasets a, sensors b
 		where reference=$1
 		and a.sensor_id = b.id
-		`, vars["reference"])
+		`, ref)
 	if err != nil {
-		log.Printf("unable to run query: %v", err)
-		helper.RespondHTTPErr(w, r, 500)
-		return
+		return dataset, err
 	}
-	helper.Respond(w, r, 200, dataset)
+	return dataset, err
 }
 
 // NewDataset ...
@@ -93,4 +100,35 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helper.RespondSuccess(w, r)
+}
+func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
+	dat := Dataset{}
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		log.Printf("unable to decode body: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	_, err = s.DB.Exec(`update iot.datasets set 
+	title=$1, 
+	description=$2,
+	fields=$3,
+	types=$4,
+	intervalsec=$5
+	where
+	reference=$6
+	and id=$7
+	`, dat.Title, dat.Description, dat.Fields, dat.Types, dat.IntervalSec, dat.Reference, dat.ID)
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	dataset, err := s.getDsetByRef(dat.Reference)
+	if err != nil {
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	helper.Respond(w, r, 200, dataset)
+
 }
