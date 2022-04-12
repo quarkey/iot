@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -91,9 +92,14 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
-	//TODO must be unique reference!
-	_, err = s.DB.Exec(`insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types, created_at) 
-	values($1,$2,$3,$4,$5,$6,$7,$8)`, dat.SensorID, dat.Title, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.Types, dat.CreatedAt)
+
+	if dat.Reference == "" {
+		helper.RespondErr(w, r, http.StatusBadRequest, "missing device reference")
+		return
+	}
+	fmt.Println(dat)
+	_, err = s.DB.Exec(`insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types) 
+	values($1,$2,$3,$4,$5,$6,$7)`, dat.SensorID, dat.Title, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.Types)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
