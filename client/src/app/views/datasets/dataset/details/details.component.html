@@ -1,0 +1,54 @@
+<mat-card [formGroup]="form">
+  <mat-card-title><h2>Dataset configuration</h2></mat-card-title>
+  <mat-card-subtitle>{{ dataset.sensor_title }}</mat-card-subtitle>
+  <mat-form-field appearance="fill">
+    <input matInput formControlName="title" placeholder="Title" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Description</mat-label>
+    <textarea matInput formControlName="description"></textarea>
+  </mat-form-field>
+  <br />
+  <h3>Datapoint collection interval in seconds</h3>
+  <mat-form-field appearance="fill" class="smaller">
+    <input matInput formControlName="intervalsec" type="number" />
+  </mat-form-field>
+  <h3>Datapoint types and fields</h3>
+  <div formArrayName="types">
+    <button mat-icon-button (click)="addTypeField()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <mat-form-field
+      *ngFor="let type of types.controls; let i = index"
+      appearance="fill"
+      class="smaller"
+    >
+      <input matInput [formControlName]="i" />
+    </mat-form-field>
+  </div>
+
+  <div formArrayName="fields">
+    <mat-form-field
+      *ngFor="let field of fields.controls; let i = index"
+      appearance="fill"
+    >
+      <input matInput [formControlName]="i" />
+    </mat-form-field>
+  </div>
+  <mat-card-actions>
+    <div style="flex: 1 1 auto"></div>
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="form.pristine"
+      (click)="updateDataset()"
+    >
+      UPDATE
+    </button>
+  </mat-card-actions>
+</mat-card>
+<pre
+  >{{ dataset | json }}
+  {{ form.value | json }}
+</pre>

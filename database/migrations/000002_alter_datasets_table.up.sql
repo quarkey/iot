@@ -1,0 +1,1 @@
+alter table iot.dataset rename to datasets;

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
 )
 
@@ -20,18 +21,19 @@ type Dataset struct {
 	Reference   string           `db:"reference" json:"reference"`
 	IntervalSec int              `db:"intervalsec" json:"intervalsec"`
 	Fields      *json.RawMessage `db:"fields" json:"fields"`
+	Types       *json.RawMessage `db:"types" json:"types"`
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 	SensorTitle string           `db:"sensor_title" json:"sensor_title"`
 }
 
 // GetDatasetsList fetches a list of all datasets
-func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
+func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request) {
 	var datasets []Dataset
 	err := s.DB.Select(&datasets,
 		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
-				a.intervalsec, a.fields, a.created_at,
+				a.intervalsec, a.fields, a.types, a.created_at,
 				b.title as sensor_title
-		from dataset a, sensors b
+		from datasets a, sensors b
 		where a.sensor_id = b.id`)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
@@ -40,19 +42,45 @@ func (s *Server) GetDatasetsList(w http.ResponseWriter, r *http.Request) {
 	}
 	helper.Respond(w, r, 200, datasets)
 }
+func GetDatasetsList(db *sqlx.DB) []Dataset {
+	var datasets []Dataset
+	err := db.Select(&datasets,
+		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
+				a.intervalsec, a.fields, a.types, a.created_at,
+				b.title as sensor_title
+		from datasets a, sensors b
+		where a.sensor_id = b.id`)
+	if err != nil {
+		return nil
+	}
+	return datasets
+}
 
 // GetDatasetByReference fetches a dataset based on a reference
 func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	var dataset Dataset
-	dataset.SensorTitle = s.getArduinoTitle(vars["reference"])
-	err := s.DB.Get(&dataset, "select id, sensor_id, title, description, reference, intervalsec, fields, created_at from dataset where reference=$1", vars["reference"])
+	dataset, err := s.getDsetByRef(vars["reference"])
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
 	helper.Respond(w, r, 200, dataset)
+}
+func (s Server) getDsetByRef(ref string) (Dataset, error) {
+	var dataset Dataset
+	err := s.DB.Get(&dataset, `
+	select a.id, a.sensor_id, a.title, a.description, 
+	a.reference, a.intervalsec, a.fields, a.types, 
+	a.created_at, b.title as sensor_title
+	 from datasets a, sensors b
+		where reference=$1
+		and a.sensor_id = b.id
+		`, ref)
+	if err != nil {
+		return dataset, err
+	}
+	return dataset, err
 }
 
 // NewDataset ...
@@ -64,13 +92,49 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
-	fmt.Println(dat.Fields)
-	//TODO must be unique reference!
-	_, err = s.DB.Exec("insert into dataset(sensor_id, description, reference, intervalsec, fields, created_at) values($1,$2,$3,$4,$5,$6)", dat.SensorID, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.CreatedAt)
+
+	if dat.Reference == "" {
+		helper.RespondErr(w, r, http.StatusBadRequest, "missing device reference")
+		return
+	}
+	fmt.Println(dat)
+	_, err = s.DB.Exec(`insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types) 
+	values($1,$2,$3,$4,$5,$6,$7)`, dat.SensorID, dat.Title, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.Types)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
-	helper.RespondErr(w, r, http.StatusNotImplemented, "not implemented")
+	helper.RespondSuccess(w, r)
+}
+func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
+	dat := Dataset{}
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		log.Printf("unable to decode body: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	_, err = s.DB.Exec(`update iot.datasets set 
+	title=$1, 
+	description=$2,
+	fields=$3,
+	types=$4,
+	intervalsec=$5
+	where
+	reference=$6
+	and id=$7
+	`, dat.Title, dat.Description, dat.Fields, dat.Types, dat.IntervalSec, dat.Reference, dat.ID)
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	dataset, err := s.getDsetByRef(dat.Reference)
+	if err != nil {
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	helper.Respond(w, r, 200, dataset)
+
 }

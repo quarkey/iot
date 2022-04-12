@@ -13,3 +13,10 @@
 
 *.db
 plan
+# System Files
+.DS_Store
+Thumbs.db
+
+**/client/node_modules
+**/client/.angular
+**/client/dist

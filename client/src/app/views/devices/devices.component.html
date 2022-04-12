@@ -1,0 +1,10 @@
+<p>devices works!</p>
+<mat-nav-list *ngFor="let item of devices">
+  <mat-list-item [routerLink]="item.arduino_key">
+    <a matLine routerLinkActive>{{ item.title }}</a>
+  </mat-list-item>
+</mat-nav-list>
+<button mat-raised-button color="primary" (click)="newDeviceDialog()">
+  <mat-icon>add</mat-icon>
+  <span>ADD NEW DEVICE</span>
+</button>
