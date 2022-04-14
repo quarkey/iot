@@ -1,0 +1,6 @@
+{
+    "connectString": "host=localhost port=5432 user=iot password=iot dbname=iot sslmode=disable",
+    "driver": "postgres",
+    "api_addr": "192.168.10.128:6001",
+    "encryptionkey": "enter encryption key"
+}

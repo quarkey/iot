@@ -1,0 +1,16 @@
+[Unit]
+Description=IOT Api
+ConditionPathExists=/iot
+After=network.target
+Wants=docker.target
+
+[Service]
+Type=simple
+User=slundin
+
+ExecStart=/iot/api --conf /iot/rpi_prod.json
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

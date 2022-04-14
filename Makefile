@@ -23,3 +23,7 @@ downup:
 run:
 	go build ./cmd/api
 	./api --conf config/exampleconfig.json
+
+deploy:
+	GOOS=linux GOARCH=arm go build ./cmd/api
+	scp -r api config/rpi_prod.json resources database client/dist slundin@192.168.10.128:/iot
