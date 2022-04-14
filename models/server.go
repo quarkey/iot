@@ -52,7 +52,7 @@ func New(path string, automigrate bool) *Server {
 	if automigrate {
 
 		// go-migrate
-		sqlFiles, err := (&file.File{}).Open("file://database/migrations")
+		sqlFiles, err := (&file.File{}).Open(srv.Config["migration"].(string))
 		if err != nil {
 			log.Fatalf("[ERROR] open migration files error: %v", err)
 		}
