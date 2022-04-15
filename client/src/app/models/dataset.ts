@@ -10,3 +10,9 @@ export interface Dataset {
   types: string[];
   sensor_title: string;
 }
+
+export interface Sensordata {
+  id: number;
+  data: string[];
+  time: string;
+}
