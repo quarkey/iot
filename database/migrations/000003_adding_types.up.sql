@@ -1,1 +1,0 @@
-ALTER TABLE iot.datasets ADD COLUMN types jsonb;

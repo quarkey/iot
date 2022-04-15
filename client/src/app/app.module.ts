@@ -27,6 +27,8 @@ import { MatInputModule } from "@angular/material/input";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NewDatasetDialogComponent } from "./dialogs/new-dataset/new-dataset.component";
 import { MatSelectModule } from "@angular/material/select";
+import { NgxChartsModule } from "@swimlane/ngx-charts";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
@@ -61,6 +63,8 @@ import { MatSelectModule } from "@angular/material/select";
     ReactiveFormsModule,
     FormsModule,
     MatSelectModule,
+    NgxChartsModule,
+    MatProgressSpinnerModule,
   ],
   providers: [NewDeviceDialogComponent, NewDatasetDialogComponent],
   bootstrap: [AppComponent],

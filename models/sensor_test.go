@@ -37,7 +37,7 @@ func TestSensordata(t *testing.T) {
 			"/sensordata",
 			"POST",
 			"",
-			[]byte(`{"sensor_id": 1,"dataset_id": 1,"data": [123.00,12.00]}`),
+			[]byte(`{"sensor_id": 1,"dataset_id": 1,"data": ["123.00","12.00"]}`),
 			nil,
 			200,
 		},

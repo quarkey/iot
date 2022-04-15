@@ -136,5 +136,20 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helper.Respond(w, r, 200, dataset)
+}
 
+// DatasetFieldsLabels returns a list of column labels for a dataset by given reference
+func (s *Server) DatasetFieldsLabels(ref string) ([]string, error) {
+	var raw *json.RawMessage
+	err := s.DB.Get(&raw, `select fields from datasets where reference=$1`, ref)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get labels from datasets: %v", err)
+	}
+	var labels []string
+	err = json.Unmarshal(*raw, &labels)
+	if err != nil {
+		return nil, fmt.Errorf("unable to unmarshal %v", err)
+
+	}
+	return labels, nil
 }
