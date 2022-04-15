@@ -8,7 +8,7 @@ create table if not exists  sensors (
     created_at timestamp NOT NULL DEFAULT now()::timestamp(0)
 );
 
-create table if not exists dataset (
+create table if not exists datasets (
     id serial primary key,
     sensor_id integer references sensors (id),
     title text not null,
@@ -16,13 +16,14 @@ create table if not exists dataset (
     reference text not null,
     intervalsec int not null,
     fields jsonb,
+    types jsonb,
     created_at timestamp NOT NULL DEFAULT now()::timestamp(0)
 );
 
 create table if not exists sensordata (
     id serial primary key,
     sensor_id integer references sensors (id),
-    dataset_id integer references dataset (id),
+    dataset_id integer references datasets (id),
     data jsonb,
     time timestamp NOT NULL DEFAULT now()::timestamp(0)
 );
