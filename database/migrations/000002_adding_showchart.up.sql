@@ -1,0 +1,1 @@
+alter table datasets add column showcharts jsonb;

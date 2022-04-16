@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Dataset, Sensordata } from "src/app/models/dataset";
 import { DatasetsService } from "src/app/services/datasets.service";
-import { multi } from "./data";
+import { multi, SAMPLEDATA } from "./data";
 
 @Component({
   selector: "app-dataset-data",
@@ -12,6 +12,7 @@ export class DataComponent implements OnInit {
   @Input() dataset: Dataset;
   data: any;
   loading: boolean = true;
+  showSampleDataLabel: boolean = false;
   constructor(private datasetService: DatasetsService) {
     Object.assign(this, { multi });
   }
@@ -41,12 +42,19 @@ export class DataComponent implements OnInit {
   ngOnInit(): void {
     this.datasetService
       .LoadAreaChartDatasetByReference(this.dataset.reference)
-      .subscribe((res) => {
-        this.data = res;
-        if (res) {
-          this.multi = res;
+      .subscribe(
+        (res) => {
+          this.data = res;
+          if (res) {
+            this.multi = res;
+            this.loading = false;
+          }
+        },
+        (error) => {
           this.loading = false;
+          this.showSampleDataLabel = true;
+          this.multi = SAMPLEDATA;
         }
-      });
+      );
   }
 }

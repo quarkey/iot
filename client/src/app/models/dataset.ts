@@ -8,6 +8,7 @@ export interface Dataset {
   fields: string[];
   created_at: string;
   types: string[];
+  showcharts: boolean[];
   sensor_title: string;
 }
 

@@ -25,6 +25,7 @@ export class DetailsComponent implements OnInit {
       intervalsec: [this.dataset.intervalsec, Validators.required],
       types: this.formBuilder.array([]),
       fields: this.formBuilder.array([]),
+      showcharts: this.formBuilder.array([]),
     });
     this.populateFormArray();
   }
@@ -35,6 +36,15 @@ export class DetailsComponent implements OnInit {
     this.dataset.fields.forEach((x) => {
       this.fields.push(this.formBuilder.control(x));
     });
+    if (this.dataset.showcharts === null) {
+      for (let i = 0; i < this.dataset.fields.length; i++) {
+        this.showcharts.push(this.formBuilder.control(false));
+      }
+    } else {
+      this.dataset.showcharts.forEach((x) => {
+        this.showcharts.push(this.formBuilder.control(x));
+      });
+    }
   }
   get types() {
     return this.form.get("types") as FormArray;
@@ -42,10 +52,14 @@ export class DetailsComponent implements OnInit {
   get fields() {
     return this.form.get("fields") as FormArray;
   }
+  get showcharts() {
+    return this.form.get("showcharts") as FormArray;
+  }
   addTypeField() {
     // fields comes in pairs
     this.types.push(this.formBuilder.control(""));
     this.fields.push(this.formBuilder.control(""));
+    this.showcharts.push(this.formBuilder.control(false));
   }
   updateDataset() {
     var obj = {
@@ -53,6 +67,7 @@ export class DetailsComponent implements OnInit {
       reference: this.dataset.reference,
       id: this.dataset.id,
     };
+
     this.datasetService.updateDataset(obj).subscribe((res) => {
       if (res) {
         this.form.markAsPristine();
