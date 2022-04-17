@@ -88,13 +88,13 @@ type Sensor struct {
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 	// nullString because selecting a device without reference
 	// will produce records with empty values
-	DatasetTelem sql.NullString `db:"dataset_telemetry" json:"dataset_telemetry"`
+	DatasetTelem *sql.NullString `db:"dataset_telemetry" json:"dataset_telemetry"`
 }
 
 // GetSensorsList fetches a list of all available sensors in the database
 func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
-	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, created_at from sensors")
+	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, dataset_telemetry, created_at from sensors")
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to select sensorlist: ", err)
 		return
