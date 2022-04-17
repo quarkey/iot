@@ -141,19 +141,19 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, dataset)
 }
 
-// DatasetFieldsLabels returns a list of column labels for a dataset by given reference
-func (s *Server) DatasetFieldsLabels(ref string) ([]string, error) {
+// DatasetFieldsList returns a list of column labels for a dataset by given reference
+func (s *Server) DatasetFieldsList(ref string) ([]string, error) {
 	var raw *json.RawMessage
 	err := s.DB.Get(&raw, `select fields from datasets where reference=$1`, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get labels from datasets: %v", err)
 	}
-	var labels []string
-	err = json.Unmarshal(*raw, &labels)
+	var fields []string
+	err = json.Unmarshal(*raw, &fields)
 	if err != nil {
 		return nil, fmt.Errorf("unable to unmarshal %v", err)
 	}
-	return labels, nil
+	return fields, nil
 }
 
 // DatasetShowChartBools returns a list of boolean values to indicate if chart should show or not.

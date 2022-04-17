@@ -10,8 +10,8 @@ import (
 	helper "github.com/quarkey/iot/json"
 )
 
-// AreaPlotDataSeries will generate a data structure that is fitted to ngx-charts.
-func (s *Server) AreaPlotDataSeries(w http.ResponseWriter, r *http.Request) {
+// AreaChartDataSeries will generate a data structure that is fitted to ngx-charts.
+func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var data []Data
 	err := s.DB.Select(&data, `select a.id, a.data, a.time from 
@@ -30,8 +30,8 @@ func (s *Server) AreaPlotDataSeries(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, err)
 		return
 	}
-	// fetching field labels
-	labels, err := s.DatasetFieldsLabels(vars["reference"])
+	// fetching field list
+	fields, err := s.DatasetFieldsList(vars["reference"])
 	if err != nil {
 		helper.RespondErr(w, r, 400, err)
 		return
@@ -64,7 +64,7 @@ func (s *Server) AreaPlotDataSeries(w http.ResponseWriter, r *http.Request) {
 			}
 			ps = append(ps, point{Name: set.Time.String(), Value: toFloatValue})
 		}
-		out = append(out, series{Name: labels[i], Point: ps})
+		out = append(out, series{Name: fields[i], Point: ps})
 	}
 	helper.Respond(w, r, 200, out)
 }

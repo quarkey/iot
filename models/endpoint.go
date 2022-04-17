@@ -19,7 +19,7 @@ func (s *Server) SetupEndpoints() {
 	s.Router.HandleFunc("/api/datasets", s.NewDataset).Methods("POST")
 
 	// charts
-	s.Router.HandleFunc("/api/chart/area/{reference}", s.AreaPlotDataSeries).Methods("GET")
+	s.Router.HandleFunc("/api/chart/area/{reference}", s.AreaChartDataSeries).Methods("GET")
 
 	s.Router.HandleFunc("/api/health", s.HealthCheckHandler).Methods("GET")
 
