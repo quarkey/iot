@@ -15,9 +15,11 @@ import (
 
 // SensorData ....
 type SensorData struct {
-	SensorID  int              `json:"sensor_id"`
-	DatasetID int              `json:"dataset_id"`
-	Data      *json.RawMessage `json:"data"`
+	ID            int              `db:"id" json:"id"`
+	SensorID      int              `db:"sensor_id" json:"sensor_id"`
+	DatasetID     int              `db:"dataset_id" json:"dataset_id"`
+	Data          *json.RawMessage `db:"data" json:"data"`
+	RecordingTime time.Time        `db:"time" json:"time"`
 }
 
 // SaveSensorReading is registering sensor readings (json) to database.
