@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -22,6 +23,7 @@ type Dataset struct {
 	IntervalSec int              `db:"intervalsec" json:"intervalsec"`
 	Fields      *json.RawMessage `db:"fields" json:"fields"`
 	Types       *json.RawMessage `db:"types" json:"types"`
+	Showcharts  *json.RawMessage `db:"showcharts" json:"showcharts"`
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 	SensorTitle string           `db:"sensor_title" json:"sensor_title"`
 }
@@ -31,7 +33,7 @@ func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request)
 	var datasets []Dataset
 	err := s.DB.Select(&datasets,
 		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
-				a.intervalsec, a.fields, a.types, a.created_at,
+				a.intervalsec, a.fields, a.types,a.showcharts, a.created_at,
 				b.title as sensor_title
 		from datasets a, sensors b
 		where a.sensor_id = b.id`)
@@ -46,7 +48,7 @@ func GetDatasetsList(db *sqlx.DB) []Dataset {
 	var datasets []Dataset
 	err := db.Select(&datasets,
 		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
-				a.intervalsec, a.fields, a.types, a.created_at,
+				a.intervalsec, a.fields, a.types, a.showcharts, a.created_at,
 				b.title as sensor_title
 		from datasets a, sensors b
 		where a.sensor_id = b.id`)
@@ -71,7 +73,7 @@ func (s Server) getDsetByRef(ref string) (Dataset, error) {
 	var dataset Dataset
 	err := s.DB.Get(&dataset, `
 	select a.id, a.sensor_id, a.title, a.description, 
-	a.reference, a.intervalsec, a.fields, a.types, 
+	a.reference, a.intervalsec, a.fields, a.types, a.showcharts,
 	a.created_at, b.title as sensor_title
 	 from datasets a, sensors b
 		where reference=$1
@@ -120,11 +122,12 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	description=$2,
 	fields=$3,
 	types=$4,
-	intervalsec=$5
+	intervalsec=$5,
+	showcharts=$6
 	where
-	reference=$6
-	and id=$7
-	`, dat.Title, dat.Description, dat.Fields, dat.Types, dat.IntervalSec, dat.Reference, dat.ID)
+	reference=$7
+	and id=$8
+	`, dat.Title, dat.Description, dat.Fields, dat.Types, dat.IntervalSec, dat.Showcharts, dat.Reference, dat.ID)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondErr(w, r, 500, err)
@@ -138,18 +141,71 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, dataset)
 }
 
-// DatasetFieldsLabels returns a list of column labels for a dataset by given reference
-func (s *Server) DatasetFieldsLabels(ref string) ([]string, error) {
+// DatasetFieldsList returns a list of column labels for a dataset by given reference
+func (s *Server) DatasetFieldsList(ref string) ([]string, error) {
 	var raw *json.RawMessage
 	err := s.DB.Get(&raw, `select fields from datasets where reference=$1`, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get labels from datasets: %v", err)
 	}
-	var labels []string
-	err = json.Unmarshal(*raw, &labels)
+	var fields []string
+	err = json.Unmarshal(*raw, &fields)
 	if err != nil {
 		return nil, fmt.Errorf("unable to unmarshal %v", err)
-
 	}
-	return labels, nil
+	return fields, nil
+}
+
+// DatasetShowChartBools returns a list of boolean values to indicate if chart should show or not.
+// Method takes in account that showcharts field from pg may be empty.
+func (s *Server) DatasetShowChartBools(ref string) ([]bool, error) {
+	// fetching fields to determine field count
+	var raw *json.RawMessage
+	err := s.DB.Get(&raw, `select fields from datasets where reference=$1`, ref)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get fields from datasets: %v", err)
+	}
+	var fields []string
+	err = json.Unmarshal(*raw, &fields)
+	if err != nil {
+		return nil, fmt.Errorf("unable to unmarshal %v", err)
+	}
+	var nextRaw *json.RawMessage
+	err = s.DB.Get(&nextRaw, `select showcharts from datasets where reference=$1`, ref)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get showchart bools from dataset: %v", err)
+	}
+	var nextOut []bool
+	// defaulting to false if boolean values is missing
+	if nextRaw == nil {
+		if len(nextOut) == 0 {
+			var tmp []bool
+			for i := 0; i < len(fields); i++ {
+				tmp = append(tmp, false)
+			}
+			nextOut = tmp
+		}
+		return nextOut, nil
+	}
+	err = json.Unmarshal(*nextRaw, &nextOut)
+	if err != nil {
+		if err.Error() == "json: cannot unmarshal string into Go value of type bool" {
+			// we can handle them as string
+			var str []string
+			var tmp []bool
+			err := json.Unmarshal(*nextRaw, &str)
+			if err != nil {
+				return nil, fmt.Errorf("DatasetShowChartBools: %v ", err)
+			}
+			for _, v := range str {
+				boolValue, err := strconv.ParseBool(v)
+				if err != nil {
+					return nil, fmt.Errorf("DatasetShowChartBools: %v", err)
+				}
+				tmp = append(tmp, boolValue)
+			}
+			nextOut = tmp
+		}
+	}
+	return nextOut, nil
 }

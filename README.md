@@ -74,3 +74,9 @@ Commands used to set up raspberry pi
 
     # install go bin files
 ```
+
+## Future ideas
+
+- Telemetry - ved å bruke differansen mellom to siste målingene kan vi avdekke poteniselle problemer.
+  F.eks la oss si tiden overskrider intervallet satt i konfigurasjonen det kan indikere potensielle problemer med sensoren.
+- Live monitorering av datasett

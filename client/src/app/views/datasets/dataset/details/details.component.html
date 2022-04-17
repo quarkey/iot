@@ -36,6 +36,11 @@
       <input matInput [formControlName]="i" />
     </mat-form-field>
   </div>
+  <div formArrayName="showcharts">
+    <mat-form-field *ngFor="let show of showcharts.controls; let i = index">
+      <input matInput [formControlName]="i" />
+    </mat-form-field>
+  </div>
   <mat-card-actions>
     <div style="flex: 1 1 auto"></div>
     <button
