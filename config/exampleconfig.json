@@ -3,5 +3,6 @@
     "driver": "postgres",
     "api_addr": "localhost:6001",
     "encryptionkey": "enter encryption key",
-    "migration": "database/migrations"
+    "migration": "database/migrations",
+    "checkTelemetryTimer": 10
 }

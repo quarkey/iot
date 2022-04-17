@@ -3,5 +3,6 @@
     "driver": "postgres",
     "api_addr": "192.168.10.128:6001",
     "encryptionkey": "enter encryption key",
-    "migration": "/iot/database/migrations"
+    "migration": "/iot/database/migrations",
+    "checkTelemetryTimer": 10
 }

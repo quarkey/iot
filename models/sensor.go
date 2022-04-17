@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -15,9 +16,11 @@ import (
 
 // SensorData ....
 type SensorData struct {
-	SensorID  int              `json:"sensor_id"`
-	DatasetID int              `json:"dataset_id"`
-	Data      *json.RawMessage `json:"data"`
+	ID            int              `db:"id" json:"id"`
+	SensorID      int              `db:"sensor_id" json:"sensor_id"`
+	DatasetID     int              `db:"dataset_id" json:"dataset_id"`
+	Data          *json.RawMessage `db:"data" json:"data"`
+	RecordingTime time.Time        `db:"time" json:"time"`
 }
 
 // SaveSensorReading is registering sensor readings (json) to database.
@@ -83,12 +86,15 @@ type Sensor struct {
 	Description string    `db:"description" json:"description"`
 	ArduinoKey  string    `db:"arduino_key" json:"arduino_key"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
+	// nullString because selecting a device without reference
+	// will produce records with empty values
+	DatasetTelem *sql.NullString `db:"dataset_telemetry" json:"dataset_telemetry"`
 }
 
 // GetSensorsList fetches a list of all available sensors in the database
 func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
-	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, created_at from sensors")
+	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, dataset_telemetry, created_at from sensors")
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to select sensorlist: ", err)
 		return
@@ -100,7 +106,7 @@ func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 func (s *Server) GetSensorByReference(w http.ResponseWriter, r *http.Request) {
 	var sensor Sensor
 	vars := mux.Vars(r)
-	err := s.DB.Get(&sensor, "select id, title, description, arduino_key, created_at from sensors where arduino_key=$1", vars["reference"])
+	err := s.DB.Get(&sensor, "select id, title, description, arduino_key, created_at, dataset_telemetry from sensors where arduino_key=$1", vars["reference"])
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)
@@ -150,7 +156,7 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 	}
 	//TODO only return uuid, full device not needed
 	var device Sensor
-	err = s.DB.Get(&device, "select id, title, description, arduino_key, created_at from sensors where arduino_key=$1", id)
+	err = s.DB.Get(&device, "select id, title, description, arduino_key, created_at, dataset_telemetry from sensors where arduino_key=$1", id)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)
