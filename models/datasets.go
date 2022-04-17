@@ -44,6 +44,7 @@ func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request)
 	}
 	helper.Respond(w, r, 200, datasets)
 }
+
 func GetDatasetsList(db *sqlx.DB) []Dataset {
 	var datasets []Dataset
 	err := db.Select(&datasets,
@@ -69,6 +70,7 @@ func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	}
 	helper.Respond(w, r, 200, dataset)
 }
+
 func (s Server) getDsetByRef(ref string) (Dataset, error) {
 	var dataset Dataset
 	err := s.DB.Get(&dataset, `
@@ -109,6 +111,7 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 	}
 	helper.RespondSuccess(w, r)
 }
+
 func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	dat := Dataset{}
 	err := helper.DecodeBody(r, &dat)

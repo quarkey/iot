@@ -31,6 +31,7 @@ type Server struct {
 	Config     map[string]interface{}
 	Router     *mux.Router
 	httpServer *http.Server
+	Telemetry  *Telemetry
 }
 
 // New initialize server and opens a database connection.
@@ -105,6 +106,10 @@ func (srv *Server) Run(ctx context.Context) {
 	}
 
 	log.Printf("[INFO] Starting to listen on %s", srv.Config["api_addr"].(string))
+
+	// server ticker timer for scheduled tasks
+	srv.Telemetry = newTelemetryTicker(srv.DB)
+	srv.Telemetry.startTelemetryTicker(srv.Config)
 
 	go func(ctx context.Context) {
 		signalCh := make(chan os.Signal, 1024)
