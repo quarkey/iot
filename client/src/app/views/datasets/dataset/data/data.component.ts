@@ -49,6 +49,11 @@ export class DataComponent implements OnInit {
             this.multi = res;
             this.loading = false;
           }
+          if (res === null) {
+            this.loading = false;
+            this.showSampleDataLabel = true;
+            this.multi = SAMPLEDATA;
+          }
         },
         (error) => {
           this.loading = false;
