@@ -20,6 +20,7 @@ type LineChartDataset struct {
 	Label string    `json:"label"`
 }
 
+// LineChartDataSeries will generate a data structure that is fitted to ng2-charts.
 func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ref := vars["reference"]
@@ -35,8 +36,8 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// fetching fields and showcharts list
-	// showcharts used to determine if chart should added or not.
+	// fetching fields and showcharts list.
+	// showcharts used to determine if chart should be added or not.
 	fields, showcharts, err := DatasetFieldAndShowCartList(ref, s.DB)
 	if err != nil {
 		helper.RespondErr(w, r, 400, err)
