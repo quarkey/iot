@@ -20,6 +20,7 @@ func (s *Server) SetupEndpoints() {
 
 	// charts
 	s.Router.HandleFunc("/api/chart/area/{reference}", s.AreaChartDataSeries).Methods("GET")
+	s.Router.HandleFunc("/api/chart/line/{reference}", s.LineChartDataSeries).Methods("GET")
 
 	s.Router.HandleFunc("/api/health", s.HealthCheckHandler).Methods("GET")
 

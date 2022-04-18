@@ -1,3 +1,5 @@
+import { ChartDataset } from "chart.js";
+
 export interface Dataset {
   id: number;
   sensor_id: number;
@@ -16,4 +18,9 @@ export interface Sensordata {
   id: number;
   data: string[];
   time: string;
+}
+
+export interface Ng2Dataset {
+  labels: string[];
+  lineChartdataset: ChartDataset[];
 }

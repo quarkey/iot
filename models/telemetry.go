@@ -65,7 +65,17 @@ func (t *Telemetry) UpdateDatasetTelemetry() {
 	for _, dset := range t.datasets {
 		// running query to get last signal received
 		var sd SensorData
-		err := t.db.Get(&sd, "select id, sensor_id, dataset_id, data, time from sensordata where dataset_id=$1 and sensor_id=$2 order by id desc limit 1", dset.ID, dset.SensorID)
+		err := t.db.Get(&sd, `
+		select
+			id,
+			sensor_id,
+			dataset_id,
+			data,
+			time
+		from sensordata 
+		where dataset_id=$1 
+		and sensor_id=$2 
+		order by id desc limit 1`, dset.ID, dset.SensorID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return
