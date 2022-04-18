@@ -29,6 +29,8 @@ import { NewDatasetDialogComponent } from "./dialogs/new-dataset/new-dataset.com
 import { MatSelectModule } from "@angular/material/select";
 import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { LineChartComponent } from "./views/datasets/dataset/line-chart/line-chart.component";
+import { NgChartsModule } from "ng2-charts";
 
 @NgModule({
   declarations: [
@@ -44,6 +46,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
     DataComponent,
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
+    LineChartComponent,
   ],
   imports: [
     BrowserModule,
@@ -65,6 +68,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
     MatSelectModule,
     NgxChartsModule,
     MatProgressSpinnerModule,
+    NgChartsModule,
   ],
   providers: [NewDeviceDialogComponent, NewDatasetDialogComponent],
   bootstrap: [AppComponent],

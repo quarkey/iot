@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
-import { Dataset, Sensordata } from "../models/dataset";
+import { Dataset, Ng2Dataset, Sensordata } from "../models/dataset";
 import { Device } from "../models/device";
 
 @Injectable({
@@ -26,6 +26,11 @@ export class DatasetsService {
   public LoadAreaChartDatasetByReference(reference: string) {
     return this.http.get<any[]>(
       `${environment.apiUrl}/api/chart/area/${reference}`
+    );
+  }
+  public LoadLineChartDatasetByReference(reference: string) {
+    return this.http.get<Ng2Dataset>(
+      `${environment.apiUrl}/api/chart/line/${reference}`
     );
   }
   public newDataset(device: Device) {

@@ -1,0 +1,19 @@
+<!-- 
+    [colors]="lineChartColors"
+    
+-->
+<div class="chart-wrapper">
+  <canvas
+    baseChart
+    [labels]="lineChartLabels"
+    [datasets]="lineChartData"
+    [options]="lineChartOptions"
+    [legend]="lineChartLegend"
+    [type]="lineChartType"
+    [plugins]="lineChartPlugins"
+  >
+  </canvas>
+</div>
+<pre
+  >{{ data | json }}
+</pre>

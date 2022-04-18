@@ -87,7 +87,7 @@ func (s Server) getDsetByRef(ref string) (Dataset, error) {
 	return dataset, err
 }
 
-// NewDataset ...
+// NewDataset adds a new dataset to db
 func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 	dat := Dataset{}
 	err := helper.DecodeBody(r, &dat)
@@ -144,10 +144,22 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, dataset)
 }
 
+func DatasetFieldAndShowCartList(ref string, db *sqlx.DB) ([]string, []bool, error) {
+	fields, err := datasetFieldsList(ref, db)
+	if err != nil {
+		return nil, nil, err
+	}
+	showCharts, err := datasetShowChartBools(ref, db)
+	if err != nil {
+		return nil, nil, err
+	}
+	return fields, showCharts, nil
+}
+
 // DatasetFieldsList returns a list of column labels for a dataset by given reference
-func (s *Server) DatasetFieldsList(ref string) ([]string, error) {
+func datasetFieldsList(ref string, db *sqlx.DB) ([]string, error) {
 	var raw *json.RawMessage
-	err := s.DB.Get(&raw, `select fields from datasets where reference=$1`, ref)
+	err := db.Get(&raw, `select fields from datasets where reference=$1`, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get labels from datasets: %v", err)
 	}
@@ -159,12 +171,14 @@ func (s *Server) DatasetFieldsList(ref string) ([]string, error) {
 	return fields, nil
 }
 
-// DatasetShowChartBools returns a list of boolean values to indicate if chart should show or not.
-// Method takes in account that showcharts field from pg may be empty.
-func (s *Server) DatasetShowChartBools(ref string) ([]bool, error) {
+// datasetShowChartBools returns a list of boolean values to indicate if chart should show or not.
+// Method takes in account that showcharts fields from pg may be empty.
+// Also i think there is a bug in this function, second marshal fails because
+// pg res can be validated as bool [true, "true"]
+func datasetShowChartBools(ref string, db *sqlx.DB) ([]bool, error) {
 	// fetching fields to determine field count
 	var raw *json.RawMessage
-	err := s.DB.Get(&raw, `select fields from datasets where reference=$1`, ref)
+	err := db.Get(&raw, `select fields from datasets where reference=$1`, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get fields from datasets: %v", err)
 	}
@@ -174,7 +188,7 @@ func (s *Server) DatasetShowChartBools(ref string) ([]bool, error) {
 		return nil, fmt.Errorf("unable to unmarshal %v", err)
 	}
 	var nextRaw *json.RawMessage
-	err = s.DB.Get(&nextRaw, `select showcharts from datasets where reference=$1`, ref)
+	err = db.Get(&nextRaw, `select showcharts from datasets where reference=$1`, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get showchart bools from dataset: %v", err)
 	}
