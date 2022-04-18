@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -30,7 +29,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decoding jsonRawMessage data column
-	raw, err := decodeRaw(data[0].Data)
+	raw, err := helper.DecodeRawJSON(data[0].Data)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
@@ -53,7 +52,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		var ps LineChartDataset
 		ps.Label = fields[i]
 		for _, set := range data {
-			decoded, err := decodeRaw(set.Data)
+			decoded, err := helper.DecodeRawJSON(set.Data)
 			if err != nil {
 				helper.RespondErr(w, r, 500, err)
 				return
@@ -88,7 +87,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, err)
 	}
 	// decoding jsonRawMessage data column
-	raw, err := decodeRaw(data[0].Data)
+	raw, err := helper.DecodeRawJSON(data[0].Data)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
@@ -107,7 +106,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		}
 		var ps []Point
 		for _, set := range data {
-			decoded, err := decodeRaw(set.Data)
+			decoded, err := helper.DecodeRawJSON(set.Data)
 			if err != nil {
 				helper.RespondErr(w, r, 500, err)
 				return
@@ -133,7 +132,8 @@ func loadData(db *sqlx.DB, ref string) ([]Data, error) {
 		a.data,
 		a.time 
 	from sensordata a, datasets b 
-	where b.reference=$1 and b.id = a.dataset_id
+	where b.reference=$1 
+	and b.id = a.dataset_id
 	`, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get dataset from db: %v", err)
@@ -142,15 +142,6 @@ func loadData(db *sqlx.DB, ref string) ([]Data, error) {
 		return nil, fmt.Errorf("no data")
 	}
 	return data, nil
-}
-
-func decodeRaw(dat *json.RawMessage) ([]string, error) {
-	var sets []string
-	err := json.Unmarshal(*dat, &sets)
-	if err != nil {
-		return nil, fmt.Errorf("unable to decode: %v", err)
-	}
-	return sets, nil
 }
 
 func toFloatValueFn(str string) float64 {
