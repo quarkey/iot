@@ -41,7 +41,7 @@ func main() {
 func runSim(ds models.Dataset) {
 	tick := 0
 	url := "http://localhost:6001/api/sensordata"
-	data := []byte(fmt.Sprintf(`{"sensor_id": %d,"dataset_id": %d,"data": [123.00,12.00]}`, ds.SensorID, ds.ID))
+	data := []byte(fmt.Sprintf(`{"sensor_id": %d,"dataset_id": %d,"data": ["123.00","12.00"]}`, ds.SensorID, ds.ID))
 	for {
 		tick++
 		log.Printf("[RESULT] tick: %d %s", tick, ds.Title)
