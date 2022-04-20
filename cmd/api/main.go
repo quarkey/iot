@@ -11,11 +11,12 @@ import (
 
 func main() {
 	confPath := flag.String("conf", "", "path to configuration file")
+	debug := flag.Bool("debug", false, "enable debug mode")
 	flag.Parse()
 	if *confPath == "" {
 		log.Fatalf("ERROR: missing configuration jsonfile")
 	}
-	server := models.New(*confPath, true) //automigration=true
+	server := models.New(*confPath, true, *debug) //automigration=true
 	server.SetupEndpoints()
 	server.Run(context.Background())
 }

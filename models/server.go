@@ -32,14 +32,18 @@ type Server struct {
 	Router     *mux.Router
 	httpServer *http.Server
 	Telemetry  *Telemetry
+	Debug      bool
 }
 
 // New initialize server and opens a database connection.
-func New(path string, automigrate bool) *Server {
+func New(path string, automigrate bool, debug bool) *Server {
 	srv := &Server{}
 	err := srv.loadcfg(path)
 	if err != nil {
 		log.Fatalf("unable to load config : %v", err)
+	}
+	if debug {
+		srv.Debug = true
 	}
 	driver := srv.Config["driver"].(string)
 	connectionstr := srv.Config["connectString"].(string)
@@ -109,7 +113,7 @@ func (srv *Server) Run(ctx context.Context) {
 
 	// server ticker timer for scheduled tasks
 	srv.Telemetry = newTelemetryTicker(srv.DB)
-	srv.Telemetry.startTelemetryTicker(srv.Config)
+	srv.Telemetry.startTelemetryTicker(srv.Config, srv.Debug)
 
 	go func(ctx context.Context) {
 		signalCh := make(chan os.Signal, 1024)
