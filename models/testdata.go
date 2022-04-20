@@ -17,7 +17,7 @@ func (s *Server) InsertTestdata() error {
 	testdata := []query{
 		{"adding arduino sensor 1", `insert into sensors(title, description, arduino_key) values('Arduino + Ethernet shield','Arduino UNO with Ethernet shield. LM35 temperatur sensor and hydrosensor. Used for project X', '8a1bbddba98a8d8512787d311352d951');`},
 		{"adding dataset 1", `insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types, showcharts) 
-		values(1,'temp&hydro','Temperatur/hydro measurement, growhouse 1','8a1bbddba98a8d8512787d311352d951',4,'["temp", "hydro"]' ,'["float", "float"]', '[true,true]');`},
+		values(1,'temp&hydro','Temperatur/hydro measurement, growhouse 1','8a1bbddba98a8d8512787d311352d951',4,'["temp", "hydro"]' ,'["float", "float"]', '["true","true"]');`},
 		{"adding data point 1", `insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('datasets', 'id')),'["23.13","59.32"]');`},
 		{"adding data point 2", `insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('datasets', 'id')),'["23.13","59.32"]');`},
 		{"adding data point 3", `insert into sensordata(sensor_id, dataset_id, data) values(1,currval(pg_get_serial_sequence('datasets', 'id')),'["23.13","59.32"]');`},
@@ -26,7 +26,7 @@ func (s *Server) InsertTestdata() error {
 
 		{"adding arduino sensor 2", `insert into sensors(title, description, arduino_key) values('Arduino + GPS','Arduino UNO with GPS tracking', '4987fb174ae91dc702394024378fc1cd');`},
 		{"adding dataset 2", `insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types, showcharts) 
-		values(2,'Bicycle to work 1','Battery-driven lat/long tracker','4987fb174ae91dc702394024378fc1cd',4,'["lat (n)", "long (e)", "direction"]', '["float", "float", "string"]', '[true,true,false]');`},
+		values(2,'Bicycle to work 1','Battery-driven lat/long tracker','4987fb174ae91dc702394024378fc1cd',4,'["lat (n)", "long (e)", "direction"]', '["float", "float", "string"]', '["true","true","false"]');`},
 		{"data point 1", `insert into sensordata(sensor_id, dataset_id, data) values(2,currval(pg_get_serial_sequence('datasets', 'id')),'["58.8533","5.7329","e"]');`},
 		{"data point 2", `insert into sensordata(sensor_id, dataset_id, data) values(2,currval(pg_get_serial_sequence('datasets', 'id')),'["58.8533","5.7329","n/e"]');`},
 		{"data point 3", `insert into sensordata(sensor_id, dataset_id, data) values(2,currval(pg_get_serial_sequence('datasets', 'id')),'["58.8532","5.7329","n"]');`},
