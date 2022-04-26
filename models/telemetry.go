@@ -16,6 +16,7 @@ type Telemetry struct {
 	sensors  []Sensor
 }
 
+// newTelemetryTicker ...
 func newTelemetryTicker(db *sqlx.DB) *Telemetry {
 	return &Telemetry{
 		done: make(chan bool),
@@ -48,12 +49,11 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 }
 
 // UpdateTelemetryLists updates sensors and dataset lists
-//
 func (t *Telemetry) UpdateTelemetryLists() {
 	t.init(false)
 }
 
-// init loads dataset into memory, caller can initiate telemetry check
+// init loads sensors and dataset into memory, caller can initiate telemetry check.
 func (t *Telemetry) init(updateTelemetry bool) {
 	// loading sensor into memory
 	t.sensors = GetSensorsList(t.db)
@@ -80,8 +80,10 @@ func (t *Telemetry) init(updateTelemetry bool) {
 		t.CheckDatasetTelemetry()
 	}
 }
+
 func (t *Telemetry) CheckSensorsTelemetry() {
 	log.Println("[INFO] UpdateSensorsTelemetry() NOT IMPLEMENTED")
+	// TODO: "ping" device by ip
 }
 
 // UpdateDatasetTelemetry checks for duration between collected signals
