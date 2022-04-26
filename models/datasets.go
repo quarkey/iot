@@ -32,9 +32,18 @@ type Dataset struct {
 func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request) {
 	var datasets []Dataset
 	err := s.DB.Select(&datasets,
-		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
-				a.intervalsec, a.fields, a.types,a.showcharts, a.created_at,
-				b.title as sensor_title
+		`select 
+			a.id,
+			a.sensor_id,
+			a.title,
+			a.description,
+			a.reference, 
+			a.intervalsec,
+			a.fields,
+			a.types,
+			a.showcharts,
+			a.created_at,
+			b.title as sensor_title
 		from datasets a, sensors b
 		where a.sensor_id = b.id`)
 	if err != nil {
@@ -48,9 +57,18 @@ func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request)
 func GetDatasetsList(db *sqlx.DB) []Dataset {
 	var datasets []Dataset
 	err := db.Select(&datasets,
-		`select a.id, a.sensor_id, a.title, a.description,a.reference, 
-				a.intervalsec, a.fields, a.types, a.showcharts, a.created_at,
-				b.title as sensor_title
+		`select 
+			a.id,
+			a.sensor_id,
+			a.title,
+			a.description,
+			a.reference,
+			a.intervalsec,
+			a.fields,
+			a.types,
+			a.showcharts,
+			a.created_at,
+			b.title as sensor_title
 		from datasets a, sensors b
 		where a.sensor_id = b.id`)
 	if err != nil {
@@ -74,12 +92,21 @@ func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 func (s Server) getDsetByRef(ref string) (Dataset, error) {
 	var dataset Dataset
 	err := s.DB.Get(&dataset, `
-	select a.id, a.sensor_id, a.title, a.description, 
-	a.reference, a.intervalsec, a.fields, a.types, a.showcharts,
-	a.created_at, b.title as sensor_title
-	 from datasets a, sensors b
-		where reference=$1
-		and a.sensor_id = b.id
+	select 
+		a.id, 
+		a.sensor_id,
+		a.title,
+		a.description, 
+		a.reference,
+		a.intervalsec,
+		a.fields,
+		a.types,
+		a.showcharts,
+		a.created_at,
+		b.title as sensor_title
+	from datasets a, sensors b
+	where reference=$1
+	and a.sensor_id = b.id
 		`, ref)
 	if err != nil {
 		return dataset, err
@@ -103,7 +130,14 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(dat)
 	_, err = s.DB.Exec(`insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types) 
-	values($1,$2,$3,$4,$5,$6,$7)`, dat.SensorID, dat.Title, dat.Description, dat.Reference, dat.IntervalSec, dat.Fields, dat.Types)
+	values($1,$2,$3,$4,$5,$6,$7)`,
+		dat.SensorID,
+		dat.Title,
+		dat.Description,
+		dat.Reference,
+		dat.IntervalSec,
+		dat.Fields,
+		dat.Types)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
@@ -121,14 +155,13 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, err = s.DB.Exec(`update iot.datasets set 
-	title=$1, 
-	description=$2,
-	fields=$3,
-	types=$4,
-	intervalsec=$5,
-	showcharts=$6
-	where
-	reference=$7
+		title=$1, 
+		description=$2,
+		fields=$3,
+		types=$4,
+		intervalsec=$5,
+		showcharts=$6
+	where reference=$7
 	and id=$8
 	`, dat.Title, dat.Description, dat.Fields, dat.Types, dat.IntervalSec, dat.Showcharts, dat.Reference, dat.ID)
 	if err != nil {
@@ -193,7 +226,8 @@ func datasetShowChartBools(ref string, db *sqlx.DB) ([]bool, error) {
 		return nil, fmt.Errorf("unable to get showchart bools from dataset: %v", err)
 	}
 	var nextOut []bool
-	// defaulting to false if boolean values is missing
+	// defaulting to false for all datasets
+	// if boolean values is missing in the database
 	if nextRaw == nil {
 		if len(nextOut) == 0 {
 			var tmp []bool
@@ -207,7 +241,7 @@ func datasetShowChartBools(ref string, db *sqlx.DB) ([]bool, error) {
 	err = json.Unmarshal(*nextRaw, &nextOut)
 	if err != nil {
 		if err.Error() == "json: cannot unmarshal string into Go value of type bool" {
-			// we can handle them as string
+			// we can handle them as bool if they are stored as strings in the database
 			var str []string
 			var tmp []bool
 			err := json.Unmarshal(*nextRaw, &str)
