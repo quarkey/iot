@@ -1,0 +1,1 @@
+alter table sensors drop column if exists sensor_telemetry;
