@@ -1,1 +1,1 @@
-alter table datasets drop if exists column showcharts;
+alter table datasets drop column if exists showcharts;
