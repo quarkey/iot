@@ -143,6 +143,8 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
+	// also update telemetry dataset list
+	s.Telemetry.UpdateTelemetryLists()
 	helper.RespondSuccess(w, r)
 }
 
@@ -174,6 +176,8 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, err)
 		return
 	}
+	// also update telemetry dataset list
+	s.Telemetry.UpdateTelemetryLists()
 	helper.Respond(w, r, 200, dataset)
 }
 

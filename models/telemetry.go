@@ -13,6 +13,7 @@ type Telemetry struct {
 	done     chan bool
 	db       *sqlx.DB
 	datasets []Dataset
+	sensors  []Sensor
 }
 
 func newTelemetryTicker(db *sqlx.DB) *Telemetry {
@@ -28,7 +29,7 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 	durfloat64 := cfg["checkTelemetryTimer"].(float64)
 	ticker := time.NewTicker(time.Duration(int(durfloat64)) * time.Second)
 	log.Printf("[INFO] Telemetry check every %d seconds\n", int(durfloat64))
-	telemetry.init()
+	telemetry.init(true)
 	done := make(chan bool)
 	go func() {
 		for {
@@ -38,29 +39,54 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 			case t := <-ticker.C:
 				if len(telemetry.datasets) > 0 {
 					log.Println("[INFO] Telemetry check", t)
-					telemetry.UpdateDatasetTelemetry()
+					telemetry.CheckDatasetTelemetry()
+					telemetry.CheckSensorsTelemetry()
 				}
 			}
 		}
 	}()
 }
 
-// init loads dataset into memory
-func (t *Telemetry) init() {
+// UpdateTelemetryLists updates sensors and dataset lists
+//
+func (t *Telemetry) UpdateTelemetryLists() {
+	t.init(false)
+}
+
+// init loads dataset into memory, caller can initiate telemetry check
+func (t *Telemetry) init(updateTelemetry bool) {
+	// loading sensor into memory
+	t.sensors = GetSensorsList(t.db)
+	log.Printf("[INFO] loading telemetry list for sensors ...")
+	if len(t.sensors) == 0 {
+		log.Printf("[WARNING] no sensors available in database")
+	}
+	// loading dataset into memory
 	t.datasets = GetDatasetsList(t.db)
-	log.Printf("[INFO] Loading datasets ...")
+	log.Printf("[INFO] loading telemetry list for datasets ...")
 	if len(t.datasets) == 0 {
 		log.Printf("[WARNING] No datasets available in database")
 	}
-	for _, dset := range t.datasets {
-		fmt.Printf("=> monitoring telemetry for '%s'\n", dset.Title)
+
+	for _, dset := range t.sensors {
+		fmt.Printf("=> monitoring sensor telemetry for '%s'\n", dset.Title)
 	}
-	t.UpdateDatasetTelemetry()
+
+	for _, dset := range t.datasets {
+		fmt.Printf("=> monitoring dataset telemetry for '%s'\n", dset.Title)
+	}
+	if updateTelemetry {
+		t.CheckSensorsTelemetry()
+		t.CheckDatasetTelemetry()
+	}
+}
+func (t *Telemetry) CheckSensorsTelemetry() {
+	log.Println("[INFO] UpdateSensorsTelemetry() NOT IMPLEMENTED")
 }
 
-// UpdateDatasetTelemetry checks for duration between collected signal
+// UpdateDatasetTelemetry checks for duration between collected signals
 // and tries to determine connectivity.
-func (t *Telemetry) UpdateDatasetTelemetry() {
+func (t *Telemetry) CheckDatasetTelemetry() {
 	for _, dset := range t.datasets {
 		// running query to get last signal received
 		var sd SensorData
@@ -77,6 +103,12 @@ func (t *Telemetry) UpdateDatasetTelemetry() {
 		order by id desc limit 1`, dset.ID, dset.SensorID)
 		if err != nil {
 			if err == sql.ErrNoRows {
+				msg := fmt.Sprintf("[WARNING] no data points (dataset_id: %d - %s)\n", dset.ID, dset.SensorTitle)
+				log.Print(msg)
+				_, err := t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, dset.SensorID)
+				if err != nil {
+					log.Printf("[ERROR] unable to update dataset telemetry status: %v", err)
+				}
 				return
 			}
 			log.Printf("[ERROR] problems with selecting sensordata: %v", err)

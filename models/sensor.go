@@ -92,7 +92,7 @@ type Sensor struct {
 }
 
 // GetSensorsList fetches a list of all available sensors in the database
-func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
+func (s *Server) GetSensorsListEndpoint(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
 	err := s.DB.Select(&sensors, `
 	select
@@ -108,6 +108,23 @@ func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helper.Respond(w, r, 200, sensors)
+}
+
+func GetSensorsList(db *sqlx.DB) []Sensor {
+	var sensors []Sensor
+	err := db.Select(&sensors, `
+	select
+		id,
+		title,
+		description,
+		arduino_key,
+		dataset_telemetry,
+		created_at 
+	from sensors`)
+	if err != nil {
+		return nil
+	}
+	return sensors
 }
 
 // GetSensorByReference is looking up a particular sensor based on a arduino_key
@@ -196,6 +213,7 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)
 		return
 	}
+	s.Telemetry.UpdateTelemetryLists()
 	helper.Respond(w, r, 200, device)
 }
 
@@ -219,5 +237,6 @@ func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to update device: ", err)
 		return
 	}
+	s.Telemetry.UpdateTelemetryLists()
 	helper.RespondSuccess(w, r)
 }

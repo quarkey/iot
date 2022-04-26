@@ -6,7 +6,7 @@ func (s *Server) SetupEndpoints() {
 	s.Router = mux.NewRouter()
 	s.Router.HandleFunc("/api/sensors", s.AddNewDevice).Methods("POST")
 	s.Router.HandleFunc("/api/sensors", s.UpdateDevice).Methods("PUT")
-	s.Router.HandleFunc("/api/sensors", s.GetSensorsList).Methods("GET")
+	s.Router.HandleFunc("/api/sensors", s.GetSensorsListEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/sensors/{reference}", s.GetSensorByReference).Methods("GET")
 
 	s.Router.HandleFunc("/api/sensordata/{reference}", s.GetSensorDataByReference).Methods("GET")
