@@ -20,6 +20,12 @@ downup:
 	migrate -database ${POSTGRESQL_URL} -path database/migrations down
 	migrate -database ${POSTGRESQL_URL} -path database/migrations up
 
+make down:
+	migrate -database ${POSTGRESQL_URL} -path database/migrations down
+
+make up:
+	migrate -database ${POSTGRESQL_URL} -path database/migrations up
+
 run:
 	go build ./cmd/api
 	./api --conf config/exampleconfig.json

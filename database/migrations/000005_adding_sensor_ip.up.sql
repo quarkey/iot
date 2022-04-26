@@ -1,0 +1,1 @@
+alter table sensors add column if not exists sensor_ip text;
