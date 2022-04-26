@@ -27,7 +27,10 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 	}
-
+	if len(data) == 0 {
+		helper.RespondErr(w, r, 500, "no data avalable with reference: ", ref)
+		return
+	}
 	// decoding jsonRawMessage data column
 	raw, err := helper.DecodeRawJSON(data[0].Data)
 	if err != nil {
