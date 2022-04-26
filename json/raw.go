@@ -14,3 +14,13 @@ func DecodeRawJSON(raw *json.RawMessage) ([]string, error) {
 	}
 	return values, nil
 }
+
+// JsonRawToString converts json.RawMessage to string,
+// returning nothing if marshal fails.
+func JSONrawToString(raw *json.RawMessage) string {
+	j, err := json.Marshal(&raw)
+	if err != nil {
+		return ""
+	}
+	return string(j)
+}

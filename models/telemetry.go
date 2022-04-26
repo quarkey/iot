@@ -22,8 +22,8 @@ func newTelemetryTicker(db *sqlx.DB) *Telemetry {
 	}
 }
 
-// startTicker starts telemetry ticker, running a initial check on startup
-func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}) {
+// startTicker starts telemetry ticker, running a initial check on startup.
+func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, debug bool) {
 	// for some reason map[string]interface{} thinks value is float64
 	durfloat64 := cfg["checkTelemetryTimer"].(float64)
 	ticker := time.NewTicker(time.Duration(int(durfloat64)) * time.Second)
@@ -36,11 +36,10 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}) {
 			case <-done:
 				return
 			case t := <-ticker.C:
-				if len(telemetry.datasets) == 0 {
-					return
+				if len(telemetry.datasets) > 0 {
+					log.Println("[INFO] Telemetry check", t)
+					telemetry.UpdateDatasetTelemetry()
 				}
-				log.Println("[INFO] Telemetry check", t)
-				telemetry.UpdateDatasetTelemetry()
 			}
 		}
 	}()
@@ -86,19 +85,13 @@ func (t *Telemetry) UpdateDatasetTelemetry() {
 		tx := unixdiff(now, sd.RecordingTime)
 		// checking the difference between now and last recording time,
 		// if value is over intervalSec we can say that the sensor is running late.
-		// This could indicate issues with the sensor device itself or server performance.
+		// This could indicate issues with the sensor device itself or performance.
 		if tx.diff() > int64(dset.IntervalSec) {
-			log.Printf("[WARNING] no telemetry for %v: (sensor_id: %d - %s)\n", tx.duration(), sd.SensorID, dset.SensorTitle)
-			msg := fmt.Sprintf("no telemetry for %s", tx.duration())
+			msg := fmt.Sprintf("since last telemetry %s", tx.duration())
+			log.Printf("[WARNING] %s (sensor_id: %d - %s)\n", msg, sd.SensorID, dset.SensorTitle)
 			_, err := t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, sd.SensorID)
 			if err != nil {
-				log.Printf("[ERROR] unable to update dataset_telemetry status: %v", err)
-			}
-		} else {
-			msg := fmt.Sprintf("telemetry ok %s", tx.duration())
-			_, err := t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, sd.SensorID)
-			if err != nil {
-				log.Printf("[ERROR] unable to update dataset_telemetry status: %v", err)
+				log.Printf("[ERROR] unable to update dataset telemetry status: %v", err)
 			}
 		}
 	}

@@ -94,7 +94,15 @@ type Sensor struct {
 // GetSensorsList fetches a list of all available sensors in the database
 func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
-	err := s.DB.Select(&sensors, "select id, title, description, arduino_key, dataset_telemetry, created_at from sensors")
+	err := s.DB.Select(&sensors, `
+	select
+		id,
+		title,
+		description,
+		arduino_key,
+		dataset_telemetry,
+		created_at 
+	from sensors`)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to select sensorlist: ", err)
 		return
@@ -106,7 +114,17 @@ func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 func (s *Server) GetSensorByReference(w http.ResponseWriter, r *http.Request) {
 	var sensor Sensor
 	vars := mux.Vars(r)
-	err := s.DB.Get(&sensor, "select id, title, description, arduino_key, created_at, dataset_telemetry from sensors where arduino_key=$1", vars["reference"])
+	err := s.DB.Get(&sensor, `
+	select
+		id,
+		title,
+		description,
+		arduino_key,
+		created_at,
+		dataset_telemetry
+	from sensors 
+	where arduino_key=$1`,
+		vars["reference"])
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)
@@ -126,8 +144,15 @@ type Data struct {
 func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var data []Data
-	err := s.DB.Select(&data, `select a.id, a.data, a.time from 
-	sensordata a, datasets b where b.reference=$1 and b.id = a.dataset_id`, vars["reference"])
+	err := s.DB.Select(&data, `
+	select 
+		a.id,
+		a.data,
+		a.time 
+	from sensordata a, datasets b 
+	where b.reference=$1 
+	and b.id = a.dataset_id`,
+		vars["reference"])
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
 		return
@@ -156,7 +181,16 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 	}
 	//TODO only return uuid, full device not needed
 	var device Sensor
-	err = s.DB.Get(&device, "select id, title, description, arduino_key, created_at, dataset_telemetry from sensors where arduino_key=$1", id)
+	err = s.DB.Get(&device, `
+	select
+		id,
+		title,
+		description,
+		arduino_key,
+		created_at,
+		dataset_telemetry
+	from sensors 
+	where arduino_key=$1`, id)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)

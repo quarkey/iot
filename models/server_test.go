@@ -10,7 +10,7 @@ import (
 
 func TestServerHealth(t *testing.T) {
 	path := "../config/exampleconfig.json"
-	s := New(path, false)
+	s := New(path, false, false)
 	s.SetupEndpoints()
 	ctx, cancel := context.WithCancel(context.Background())
 	var wg sync.WaitGroup

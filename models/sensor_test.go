@@ -15,7 +15,7 @@ var ctx context.Context
 
 func init() {
 	path := "../config/exampleconfig.json"
-	server = New(path, false)
+	server = New(path, false, false)
 	server.SetupEndpoints()
 	ctx = context.Background()
 	go server.Run(ctx)

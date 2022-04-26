@@ -17,13 +17,13 @@ import (
 func main() {
 	confPath := flag.String("conf", "", "path to your config")
 	automigrate := flag.Bool("automigrate", false, "allow program to run postgres automigration")
-
+	debug := flag.Bool("debug", false, "enable debug mode")
 	flag.Parse()
 
 	if *confPath == "" {
 		log.Fatalf("ERROR: missing configuration jsonfile")
 	}
-	server := models.New(*confPath, *automigrate)
+	server := models.New(*confPath, *automigrate, *debug)
 	datasets := models.GetDatasetsList(server.DB)
 
 	//_ = models.New(*confPath, *automigrate)
@@ -41,7 +41,7 @@ func main() {
 func runSim(ds models.Dataset) {
 	tick := 0
 	url := "http://localhost:6001/api/sensordata"
-	data := []byte(fmt.Sprintf(`{"sensor_id": %d,"dataset_id": %d,"data": [123.00,12.00]}`, ds.SensorID, ds.ID))
+	data := []byte(fmt.Sprintf(`{"sensor_id": %d,"dataset_id": %d,"data": ["123.00","12.00"]}`, ds.SensorID, ds.ID))
 	for {
 		tick++
 		log.Printf("[RESULT] tick: %d %s", tick, ds.Title)
