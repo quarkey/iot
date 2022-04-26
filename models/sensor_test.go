@@ -74,7 +74,7 @@ func TestSensordata(t *testing.T) {
 			"POST",
 			"",
 			// sensor details
-			[]byte(`{"title": "wrom","description": "jalla"}`),
+			[]byte(`{"title": "wrom","description": "jalla", "sensor_ip": "10.0.0.123"}`),
 			nil,
 			200,
 		},
@@ -84,7 +84,7 @@ func TestSensordata(t *testing.T) {
 			"PUT",
 			"",
 			// sensor details
-			[]byte(`{"id":1,"title":"kongle","description":"suppe","arduino_key":"8a1bbddba98a8d8512787d311352d951"}`),
+			[]byte(`{"id":1,"title":"kongle","description":"suppe","arduino_key":"8a1bbddba98a8d8512787d311352d951", "sensor_ip": "10.0.0.99"}`),
 			nil,
 			200,
 		},

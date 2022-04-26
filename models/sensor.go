@@ -89,6 +89,7 @@ type Sensor struct {
 	// nullString because selecting a device without reference
 	// will produce records with empty values
 	DatasetTelem *sql.NullString `db:"dataset_telemetry" json:"dataset_telemetry"`
+	SensorIP     string          `db:"sensor_ip" json:"sensor_ip"`
 }
 
 // GetSensorsList fetches a list of all available sensors in the database
@@ -101,6 +102,7 @@ func (s *Server) GetSensorsListEndpoint(w http.ResponseWriter, r *http.Request) 
 		description,
 		arduino_key,
 		dataset_telemetry,
+		sensor_ip,
 		created_at 
 	from sensors`)
 	if err != nil {
@@ -119,6 +121,7 @@ func GetSensorsList(db *sqlx.DB) []Sensor {
 		description,
 		arduino_key,
 		dataset_telemetry,
+		sensor_ip,
 		created_at 
 	from sensors`)
 	if err != nil {
@@ -138,6 +141,7 @@ func (s *Server) GetSensorByReference(w http.ResponseWriter, r *http.Request) {
 		description,
 		arduino_key,
 		created_at,
+		sensor_ip,
 		dataset_telemetry
 	from sensors 
 	where arduino_key=$1`,
@@ -205,7 +209,8 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 		description,
 		arduino_key,
 		created_at,
-		dataset_telemetry
+		dataset_telemetry,
+		sensor_ip
 	from sensors 
 	where arduino_key=$1`, id)
 	if err != nil {
@@ -226,9 +231,10 @@ func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to decode body: ", err)
 		return
 	}
-	_, err = s.DB.Exec(`update iot.sensors set title=$1, description=$2 where arduino_key=$3`,
+	_, err = s.DB.Exec(`update iot.sensors set title=$1, description=$2, sensor_ip=$3 where arduino_key=$4`,
 		device.Title,
 		device.Description,
+		device.SensorIP,
 		device.ArduinoKey,
 	)
 	fmt.Println(device)

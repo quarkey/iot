@@ -1,1 +1,1 @@
-alter table sensors add column if not exists sensor_ip text;
+alter table sensors add column if not exists sensor_ip text not null default '0.0.0.0';
