@@ -1,1 +1,1 @@
-alter table datasets add column showcharts jsonb;
+alter table datasets add column if not exists showcharts jsonb;

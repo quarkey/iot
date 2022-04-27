@@ -20,7 +20,7 @@ Additional make features are available but not documented.
 Create a simple circuit that can capture data points, e.g., temperature sensor. Datapoint will be collected every n second and sent to the server with a JSON payload such as:
 
 ```
-{"sensor_id": 1, "dataset_id": "1,", "data": [123.00, 12.00]}
+{"sensor_id": 1, "dataset_id": "1,", "data": ["123.00", "12.00"]}
 ```
 
 ## docker setup
@@ -30,13 +30,14 @@ Create a simple circuit that can capture data points, e.g., temperature sensor. 
 An angular frontend is hosted with Nginx, but please note that additional configuration is required to host SPA. Read https://medium.com/@technicadil_001/deploy-an-angular-app-with-nginx-a79cc1a44b49 for more information.
 
 ```
-1. $ docker build -t iotng .
-2. $ docker run --name iotbackend -p 8080:80 -d n
+1. $ docker build -t ngimg .
+2. $ docker run --name frontend -p 8080:80 -d ngimg
 ```
 
 ### postgres database
 
-Not currently working, create a working docker file and testing is needed.
+````
+$ docker run --restart always --platform linux/amd64 -v /Users/slundin/iotsensorboard/pg_data:/var/lib/postgresql/data --name pg -p 5432:5432 -d -e POSTGRES_PASSWORD=password postgres:latest
 
 #### sqls
 
@@ -45,9 +46,10 @@ Useful sql-commands
 ```sql
 CREATE USER iot WITH PASSWORD 'iot';
 CREATE DATABASE iot WITH OWNER iot;
-alter user iot with password 'iot';
 GRANT ALL PRIVILEGES ON DATABASE iot TO iot;
-```
+
+alter user iot with password 'iot';
+````
 
 ## database auto migrate
 

@@ -89,10 +89,11 @@ type Sensor struct {
 	// nullString because selecting a device without reference
 	// will produce records with empty values
 	DatasetTelem *sql.NullString `db:"dataset_telemetry" json:"dataset_telemetry"`
+	SensorIP     string          `db:"sensor_ip" json:"sensor_ip"`
 }
 
 // GetSensorsList fetches a list of all available sensors in the database
-func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
+func (s *Server) GetSensorsListEndpoint(w http.ResponseWriter, r *http.Request) {
 	var sensors []Sensor
 	err := s.DB.Select(&sensors, `
 	select
@@ -101,6 +102,7 @@ func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 		description,
 		arduino_key,
 		dataset_telemetry,
+		sensor_ip,
 		created_at 
 	from sensors`)
 	if err != nil {
@@ -108,6 +110,24 @@ func (s *Server) GetSensorsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helper.Respond(w, r, 200, sensors)
+}
+
+func GetSensorsList(db *sqlx.DB) []Sensor {
+	var sensors []Sensor
+	err := db.Select(&sensors, `
+	select
+		id,
+		title,
+		description,
+		arduino_key,
+		dataset_telemetry,
+		sensor_ip,
+		created_at 
+	from sensors`)
+	if err != nil {
+		return nil
+	}
+	return sensors
 }
 
 // GetSensorByReference is looking up a particular sensor based on a arduino_key
@@ -121,6 +141,7 @@ func (s *Server) GetSensorByReference(w http.ResponseWriter, r *http.Request) {
 		description,
 		arduino_key,
 		created_at,
+		sensor_ip,
 		dataset_telemetry
 	from sensors 
 	where arduino_key=$1`,
@@ -188,7 +209,8 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 		description,
 		arduino_key,
 		created_at,
-		dataset_telemetry
+		dataset_telemetry,
+		sensor_ip
 	from sensors 
 	where arduino_key=$1`, id)
 	if err != nil {
@@ -196,6 +218,7 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)
 		return
 	}
+	s.Telemetry.UpdateTelemetryLists()
 	helper.Respond(w, r, 200, device)
 }
 
@@ -208,9 +231,10 @@ func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to decode body: ", err)
 		return
 	}
-	_, err = s.DB.Exec(`update iot.sensors set title=$1, description=$2 where arduino_key=$3`,
+	_, err = s.DB.Exec(`update iot.sensors set title=$1, description=$2, sensor_ip=$3 where arduino_key=$4`,
 		device.Title,
 		device.Description,
+		device.SensorIP,
 		device.ArduinoKey,
 	)
 	fmt.Println(device)
@@ -219,5 +243,6 @@ func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to update device: ", err)
 		return
 	}
+	s.Telemetry.UpdateTelemetryLists()
 	helper.RespondSuccess(w, r)
 }
