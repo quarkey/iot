@@ -83,7 +83,7 @@ func (t *Telemetry) init(updateTelemetry bool) {
 
 func (t *Telemetry) CheckSensorsTelemetry() {
 	log.Println("[INFO] UpdateSensorsTelemetry() NOT IMPLEMENTED")
-	// TODO: "ping" device by ip
+	// TODO: "ping" device by ip, waiting for arduino sketch
 }
 
 // UpdateDatasetTelemetry checks for duration between collected signals
