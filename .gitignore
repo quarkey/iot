@@ -20,3 +20,6 @@ Thumbs.db
 **/client/node_modules
 **/client/.angular
 **/client/dist
+**/resources/pg_data
+**/resources/qa/ng/dist
+
