@@ -1,16 +1,17 @@
 # iot sensorboard
 
-Iot sensorboard is a simple golang server that can store data points captured by Arduino devices. The system enables you to add new devices, configure datasets, and more.
+Iot sensorboard is a simple golang server that can store data points captured by Arduino devices. The system enables you to add new devices, configure datasets, and more. Setting up sensors and datasets can be done via an angular frontend.
+
 <insert drawing here>
 
-## building backend
+## building backend for dev
 
 The build process is governed by make commands and can be initialized by the steps below.
 
 ```
-1. $ make build
-2. $ make testdata
-3. $ make run
+1. $ make build     // building go bins
+2. $ make testdata  // adding testdata to db
+3. $ make run       // start up go backend
 ```
 
 Additional make features are available but not documented.
@@ -27,7 +28,7 @@ Create a simple circuit that can capture data points, e.g., temperature sensor. 
 
 ### nginx
 
-An angular frontend is hosted with Nginx, but please note that additional configuration is required to host SPA. Read https://medium.com/@technicadil_001/deploy-an-angular-app-with-nginx-a79cc1a44b49 for more information.
+The angular frontend is hosted with Nginx, but please note that additional configuration is required to host SPA. Read https://medium.com/@technicadil_001/deploy-an-angular-app-with-nginx-a79cc1a44b49 for more information.
 
 ```
 1. $ docker build -t ngimg .
@@ -35,6 +36,8 @@ An angular frontend is hosted with Nginx, but please note that additional config
 ```
 
 ### postgres database
+
+You can either start up a docker container directly or via the traditional Dockerfile.
 
 ```
 $ docker run --restart always --platform linux/amd64 -v /Users/slundin/iotsensorboard/pg_data:/var/lib/postgresql/data --name pg -p 5432:5432 -d -e POSTGRES_PASSWORD=password postgres:latest
@@ -47,12 +50,20 @@ $ docker run --restart always --name pgtwo -p 15432:5432 -d -e POSTGRES_USER=iot
 
 ```
 
-#### setup commands
+## Setup commands QA environment.
 
-steps needed to configure qa environment.
+steps needed to configure qa environment, from go backend, ng and docker containers. Read docker_install.qa.sh for more details
 
 ```
+part 1
+$ git clone git@github.com:quarkey/iot.git
+$ cd iot
+$ cd client
+$ ng build --configuration qa-m1mini
+$ cp dist ../../resources/qa/ng/dist
+$ make build
 
+part 2 can be done by running docker_install.qa.sh
 $ docker network create qa-network
 $ docker build -t qa_iot_backend .
 $ cd resources/ng
@@ -64,23 +75,11 @@ $ docker run --restart always --name qa_iot_pg --net qa-network -p 15432:5432 -d
 $ docker run --restart always --name qa_iot_frontend --net qa-network -p 8081:80 -d qa_iot_frontend
 $ docker run --name qa_iot_backend --net qa-network -p 6001:6001 -d qa_iot_backend
 
-docker stop qa_iot_backend
-docker stop qa_iot_frontend
-docker stop qa_iot_pg
-
-docker rm qa_iot_backend
-docker rm qa_iot_frontend
-docker rm qa_iot_pg
-
-docker image rm qa_iot_backend
-docker image rm qa_iot_frontend
-docker image rm qa_iot_pg
-
-docker network rm qa-network
+done!
 
 ```
 
-#### sqls
+#### sqls for troubleshooting
 
 Useful sql-commands
 
@@ -123,4 +122,3 @@ Commands used to set up raspberry pi
 ```
 
 ## Future ideas
-
