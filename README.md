@@ -36,8 +36,49 @@ An angular frontend is hosted with Nginx, but please note that additional config
 
 ### postgres database
 
-````
+```
 $ docker run --restart always --platform linux/amd64 -v /Users/slundin/iotsensorboard/pg_data:/var/lib/postgresql/data --name pg -p 5432:5432 -d -e POSTGRES_PASSWORD=password postgres:latest
+
+$ docker run --restart always --platform linux/amd64 -v /Users/slundin/iotsensorboard/pg_data:/var/lib/postgresql/data --name pg -p 15432:5432 -d -e POSTGRES_PASSWORD=password pgtest
+
+// build from Dockerfile
+$ docker build -t pgserverimg
+$ docker run --restart always --name pgtwo -p 15432:5432 -d -e POSTGRES_USER=iot -e POSTGRES_DB=iot -e POSTGRES_PASSWORD=iot pgserver
+
+```
+
+#### setup commands
+
+steps needed to configure qa environment.
+
+```
+
+$ docker network create qa-network
+$ docker build -t qa_iot_backend .
+$ cd resources/ng
+$ docker build -t qa_iot_frontend .
+$ cd ../pg
+$ docker build -t qa_iot_pg .
+$ cd ..
+$ docker run --restart always --name qa_iot_pg --net qa-network -p 15432:5432 -d -e POSTGRES_USER=iot -e POSTGRES_DB=iot -e POSTGRES_PASSWORD=iot qa_iot_pg
+$ docker run --restart always --name qa_iot_frontend --net qa-network -p 8081:80 -d qa_iot_frontend
+$ docker run --name qa_iot_backend --net qa-network -p 6001:6001 -d qa_iot_backend
+
+docker stop qa_iot_backend
+docker stop qa_iot_frontend
+docker stop qa_iot_pg
+
+docker rm qa_iot_backend
+docker rm qa_iot_frontend
+docker rm qa_iot_pg
+
+docker image rm qa_iot_backend
+docker image rm qa_iot_frontend
+docker image rm qa_iot_pg
+
+docker network rm qa-network
+
+```
 
 #### sqls
 
@@ -49,7 +90,7 @@ CREATE DATABASE iot WITH OWNER iot;
 GRANT ALL PRIVILEGES ON DATABASE iot TO iot;
 
 alter user iot with password 'iot';
-````
+```
 
 ## database auto migrate
 
@@ -82,3 +123,4 @@ Commands used to set up raspberry pi
 ```
 
 ## Future ideas
+
