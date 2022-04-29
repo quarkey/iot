@@ -88,6 +88,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	data, err := loadData(s.DB, ref)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
+		return
 	}
 	// decoding jsonRawMessage data column
 	raw, err := helper.DecodeRawJSON(data[0].Data)
