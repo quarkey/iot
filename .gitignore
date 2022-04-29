@@ -22,4 +22,5 @@ Thumbs.db
 **/client/dist
 **/resources/pg_data
 **/resources/qa/ng/dist
+**/resources/prod/ng/dist
 
