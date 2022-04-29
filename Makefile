@@ -20,10 +20,10 @@ downup:
 	migrate -database ${POSTGRESQL_URL} -path database/migrations down
 	migrate -database ${POSTGRESQL_URL} -path database/migrations up
 
-make down:
+down:
 	migrate -database ${POSTGRESQL_URL} -path database/migrations down
 
-make up:
+up:
 	migrate -database ${POSTGRESQL_URL} -path database/migrations up
 
 run:

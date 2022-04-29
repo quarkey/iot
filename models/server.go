@@ -38,6 +38,7 @@ type Server struct {
 // New initialize server and opens a database connection.
 func New(path string, automigrate bool, debug bool) *Server {
 	srv := &Server{}
+	log.Printf("[INFO] Loading config: %v", path)
 	err := srv.loadcfg(path)
 	if err != nil {
 		log.Fatalf("unable to load config : %v", err)
