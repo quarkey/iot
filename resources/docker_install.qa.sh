@@ -1,4 +1,12 @@
 #!/bin/bash
+
+echo "building dist file"
+cd ../client
+ng build --configuration qa-m1mini
+
+cp -r dist/* ../resources/qa/ng/dist
+cd ../resources
+
 echo "creating QA docker network"
 docker network create qa-network
 
