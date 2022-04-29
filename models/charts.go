@@ -26,6 +26,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	data, err := loadData(s.DB, ref)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
+		return
 	}
 	if len(data) == 0 {
 		helper.RespondErr(w, r, 500, "no data avalable with reference: ", ref)
