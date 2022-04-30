@@ -145,7 +145,7 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 	}
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent("dataset", "dataset '%s' updated", dat.Title)
+	s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
 	helper.RespondSuccess(w, r)
 }
 
@@ -179,7 +179,7 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	}
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent("dataset", "dataset '%s' updated", dataset.Title)
+	s.NewEvent(DatasetEvent, "dataset '%s' updated", dataset.Title)
 	helper.Respond(w, r, 200, dataset)
 }
 
