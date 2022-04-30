@@ -81,6 +81,7 @@ import { ErrorHandlingDialogComponent } from "./dialogs/error-handling-dialog/er
   providers: [
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
+    ErrorHandlingDialogComponent,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpErrorInterceptor,
