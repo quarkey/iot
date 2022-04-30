@@ -8,16 +8,26 @@
     >
       <mat-spinner *ngIf="loading"></mat-spinner>
 
-      <mat-card fxFlex="20%" style="cursor: pointer" class="link">
+      <mat-card
+        fxFlex="20%"
+        style="cursor: pointer"
+        class="link"
+        routerLink="/devices"
+      >
         <mat-card-title>
-          <span class="title-text"> Sensors</span>
+          <span class="title-text"> Devices</span>
         </mat-card-title>
         <mat-card-content>
           <span class="title-count"> {{ infoItems.sensors }} </span>
         </mat-card-content>
       </mat-card>
 
-      <mat-card fxFlex="20%" style="cursor: pointer" class="link">
+      <mat-card
+        fxFlex="20%"
+        style="cursor: pointer"
+        class="link"
+        routerLink="/datasets"
+      >
         <mat-card-title>
           <span class="title-text"> Datasets </span>
         </mat-card-title>
