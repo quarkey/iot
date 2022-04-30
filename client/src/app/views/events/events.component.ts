@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { EventList } from "src/app/models/event";
+import { EventsList } from "src/app/models/event";
 import { EventsService } from "src/app/services/events.service";
 import { MatSort, Sort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
