@@ -14,7 +14,7 @@ import { MatListModule } from "@angular/material/list";
 import { DashboardComponent } from "./views/dashboard/dashboard.component";
 import { DevicesComponent } from "./views/devices/devices.component";
 import { DatasetsComponent } from "./views/datasets/datasets.component";
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { DeviceComponent } from "./views/devices/device/device.component";
 import { DatasetComponent } from "./views/datasets/dataset/dataset.component";
 import { DetailsComponent } from "./views/datasets/dataset/details/details.component";
@@ -34,7 +34,8 @@ import { NgChartsModule } from "ng2-charts";
 import { EventsComponent } from "./views/events/events.component";
 import { MatTableModule } from "@angular/material/table";
 import { MatSortModule } from "@angular/material/sort";
-
+import { HttpErrorInterceptor } from "./services/httperrorinterceptor.service";
+import { ErrorHandlingDialogComponent } from "./dialogs/error-handling-dialog/error-handling-dialog.component";
 @NgModule({
   declarations: [
     AppComponent,
@@ -51,6 +52,7 @@ import { MatSortModule } from "@angular/material/sort";
     NewDatasetDialogComponent,
     LineChartComponent,
     EventsComponent,
+    ErrorHandlingDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -76,7 +78,15 @@ import { MatSortModule } from "@angular/material/sort";
     MatTableModule,
     MatSortModule,
   ],
-  providers: [NewDeviceDialogComponent, NewDatasetDialogComponent],
+  providers: [
+    NewDeviceDialogComponent,
+    NewDatasetDialogComponent,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpErrorInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
