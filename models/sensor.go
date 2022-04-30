@@ -219,6 +219,7 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.Telemetry.UpdateTelemetryLists()
+	s.NewEvent("sensor", "sensor '%s' added", device.Title)
 	helper.Respond(w, r, 200, device)
 }
 
@@ -244,5 +245,6 @@ func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.Telemetry.UpdateTelemetryLists()
+	s.NewEvent("sensor", "sensor '%s' updated", device.Title)
 	helper.RespondSuccess(w, r)
 }

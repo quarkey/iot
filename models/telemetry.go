@@ -57,13 +57,13 @@ func (t *Telemetry) UpdateTelemetryLists() {
 func (t *Telemetry) init(updateTelemetry bool) {
 	// loading sensor into memory
 	t.sensors = GetSensorsList(t.db)
-	log.Printf("[INFO] loading telemetry list for sensors ...")
+	log.Printf("[INFO] loading telemetry sensor list...")
 	if len(t.sensors) == 0 {
 		log.Printf("[WARNING] no sensors available in database")
 	}
 	// loading dataset into memory
 	t.datasets = GetDatasetsList(t.db)
-	log.Printf("[INFO] loading telemetry list for datasets ...")
+	log.Printf("[INFO] loading telemetry dataset list...")
 	if len(t.datasets) == 0 {
 		log.Printf("[WARNING] No datasets available in database")
 	}

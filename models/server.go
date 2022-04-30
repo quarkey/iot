@@ -25,6 +25,11 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
+// system event such as start, stop etc
+var SystemEvent = "system"
+var SernsorEvent = "sensor"
+var DatasetEvent = "dataset"
+
 // Server ....
 type Server struct {
 	DB         *sqlx.DB
@@ -111,6 +116,7 @@ func (srv *Server) Run(ctx context.Context) {
 	}
 
 	log.Printf("[INFO] Starting to listen on %s", srv.Config["api_addr"].(string))
+	srv.NewEvent(SystemEvent, "Server started")
 
 	// server ticker timer for scheduled tasks
 	srv.Telemetry = newTelemetryTicker(srv.DB)
@@ -135,6 +141,7 @@ func (srv *Server) Run(ctx context.Context) {
 	err := srv.httpServer.ListenAndServe()
 	if err != nil {
 		log.Printf("[INFO] Service stopped")
+		srv.NewEvent(SystemEvent, "Server stopped")
 	}
 }
 
