@@ -35,10 +35,11 @@ func (s *Server) EventLogEndpoint(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, err)
 		return
 	}
-	var eventes []EventLogMessage
-	err = s.DB.Get(&eventes, "select id, category, message, event_time from events order by id desc limit $1", n)
+	var events []EventLogMessage
+	err = s.DB.Select(&events, "select id, category, message, event_time from events order by id desc limit $1", n)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
 	}
+	helper.Respond(w, r, 200, events)
 }
