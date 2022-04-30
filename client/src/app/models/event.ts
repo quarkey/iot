@@ -1,4 +1,4 @@
-export interface EventList {
+export interface EventsList {
   id: number;
   category: string;
   message: string;
