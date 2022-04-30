@@ -31,6 +31,9 @@ import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { LineChartComponent } from "./views/datasets/dataset/line-chart/line-chart.component";
 import { NgChartsModule } from "ng2-charts";
+import { EventsComponent } from "./views/events/events.component";
+import { MatTableModule } from "@angular/material/table";
+import { MatSortModule } from "@angular/material/sort";
 
 @NgModule({
   declarations: [
@@ -47,6 +50,7 @@ import { NgChartsModule } from "ng2-charts";
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
     LineChartComponent,
+    EventsComponent,
   ],
   imports: [
     BrowserModule,
@@ -69,6 +73,8 @@ import { NgChartsModule } from "ng2-charts";
     NgxChartsModule,
     MatProgressSpinnerModule,
     NgChartsModule,
+    MatTableModule,
+    MatSortModule,
   ],
   providers: [NewDeviceDialogComponent, NewDatasetDialogComponent],
   bootstrap: [AppComponent],
