@@ -25,6 +25,7 @@ func (s *Server) SetupEndpoints() {
 	// events
 	s.Router.HandleFunc("/api/events/{count}", s.EventLogEndpoint).Methods("GET")
 
+	s.Router.HandleFunc("/api/dashboard", s.DashboardInfoEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/health", s.HealthCheckHandler).Methods("GET")
 
 }
