@@ -1,19 +1,21 @@
-<p>devices works!</p>
-<mat-nav-list *ngFor="let item of devices">
-  <mat-list-item [routerLink]="item.arduino_key">
-    <!-- [ngClass]="{
-      ok: item.dataset_telemetry,
-      error: item.dataset_telemetry === null
-    }" -->
-    <a matLine routerLinkActive
-      >{{ item.title }}
-      <small *ngIf="item.dataset_telemetry"
-        >({{ item.dataset_telemetry.String }})</small
-      ></a
-    >
-  </mat-list-item>
-</mat-nav-list>
-<button mat-raised-button color="primary" (click)="newDeviceDialog()">
-  <mat-icon>add</mat-icon>
-  <span>ADD NEW DEVICE</span>
-</button>
+<mat-card>
+  <span class="title-text">Devices</span>
+  <mat-nav-list *ngFor="let item of devices">
+    <mat-list-item [routerLink]="item.arduino_key">
+      <!-- [ngClass]="{
+        ok: item.dataset_telemetry,
+        error: item.dataset_telemetry === null
+      }" -->
+      <a matLine routerLinkActive
+        >{{ item.title }}
+        <small *ngIf="item.dataset_telemetry"
+          >({{ item.dataset_telemetry.String }})</small
+        ></a
+      >
+    </mat-list-item>
+  </mat-nav-list>
+  <button mat-raised-button color="primary" (click)="newDeviceDialog()">
+    <mat-icon>add</mat-icon>
+    <span>ADD NEW DEVICE</span>
+  </button>
+</mat-card>

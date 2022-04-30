@@ -1,1 +1,49 @@
-<p>dashboard works!</p>
+<div class="backgroundImage">
+  <div style="padding: 20px">
+    <div
+      fxLayout="column"
+      fxLayout.gt-md="row"
+      fxLayoutGap="20px"
+      fxLayoutAlign="space-evenly center"
+    >
+      <mat-spinner *ngIf="loading"></mat-spinner>
+
+      <mat-card
+        fxFlex="20%"
+        style="cursor: pointer"
+        class="link"
+        routerLink="/devices"
+      >
+        <mat-card-title>
+          <span class="title-text"> Devices</span>
+        </mat-card-title>
+        <mat-card-content>
+          <span class="title-count"> {{ infoItems.sensors }} </span>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card
+        fxFlex="20%"
+        style="cursor: pointer"
+        class="link"
+        routerLink="/datasets"
+      >
+        <mat-card-title>
+          <span class="title-text"> Datasets </span>
+        </mat-card-title>
+        <mat-card-content>
+          <span class="title-count"> {{ infoItems.datasets }} </span>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card fxFlex="20%" style="cursor: pointer" class="link">
+        <mat-card-title>
+          <span class="title-text"> Controllers </span>
+        </mat-card-title>
+        <mat-card-content>
+          <span class="title-count"> {{ infoItems.controllers }} </span>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

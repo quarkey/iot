@@ -1,0 +1,28 @@
+mat-card {
+  width: 250px;
+}
+.title-header {
+  font-size: 35px;
+  font-weight: 200;
+}
+.title-text {
+  font-size: 20px;
+  font-weight: 200;
+}
+.title-count {
+  font-size: 20px;
+  font-weight: 200;
+}
+
+.mat-card:hover {
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 8px 8px rgba(0, 0, 0, 0.22);
+}
+.backgroundImage {
+  // top: 0;
+  background-image: url("../../../assets/img/background/unnamed.jpg");
+  height: calc(100vh - 64px);
+  // width: 100wv;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}

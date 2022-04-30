@@ -36,6 +36,7 @@ import { MatTableModule } from "@angular/material/table";
 import { MatSortModule } from "@angular/material/sort";
 import { HttpErrorInterceptor } from "./services/httperrorinterceptor.service";
 import { ErrorHandlingDialogComponent } from "./dialogs/error-handling-dialog/error-handling-dialog.component";
+import { FlexLayoutModule } from "@angular/flex-layout";
 @NgModule({
   declarations: [
     AppComponent,
@@ -77,6 +78,7 @@ import { ErrorHandlingDialogComponent } from "./dialogs/error-handling-dialog/er
     NgChartsModule,
     MatTableModule,
     MatSortModule,
+    FlexLayoutModule,
   ],
   providers: [
     NewDeviceDialogComponent,
