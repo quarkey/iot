@@ -3,6 +3,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Dataset } from "src/app/models/dataset";
 import { DatasetsService } from "src/app/services/datasets.service";
+import { GeneralService } from "src/app/services/general.service";
 
 @Component({
   selector: "app-dataset-details",
@@ -12,10 +13,12 @@ import { DatasetsService } from "src/app/services/datasets.service";
 export class DetailsComponent implements OnInit {
   @Input() dataset: Dataset;
   form: FormGroup;
+  loadingdownloadFile = false;
 
   constructor(
     private formBuilder: FormBuilder,
-    private datasetService: DatasetsService
+    private datasetService: DatasetsService,
+    private generalService: GeneralService
   ) {}
 
   ngOnInit(): void {
@@ -73,5 +76,18 @@ export class DetailsComponent implements OnInit {
         this.form.markAsPristine();
       }
     });
+  }
+  downloadCSV() {
+    this.loadingdownloadFile = true;
+    this.datasetService
+      .LoadCSVDatasetByReference(this.dataset.reference)
+      .subscribe((res) => {
+        if (res) {
+          this.loadingdownloadFile = false;
+          const date = Date.now();
+          const filename = `export_dataset_id_${this.dataset.id}_${date}.csv`;
+          this.generalService.DownloadFile(res, filename);
+        }
+      });
   }
 }
