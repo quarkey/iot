@@ -190,19 +190,21 @@ func getSensorDataByReference(db *sqlx.DB, ref string) ([]Data, error) {
 	return data, nil
 }
 
-// ExportSensorDataToCSV generates a csv dataset with corresponding columns.
-// Columns: id, time, x , x
-func ExportSensorDataToCSV(ref string, db *sqlx.DB) interface{} {
+// ExportSensorDataToCSV generates a csv dataset with corresponding columns
+// Exported data will include id, and time columns and then data points
+func ExportSensorDataToCSV(ref string, db *sqlx.DB) (interface{}, error) {
 	datalabel, _, err := DatasetFieldAndShowCartList(ref, db)
 	if err != nil {
-		log.Printf("ERROR: unable to get datasetfields: %v", err)
+		return nil, fmt.Errorf("unable to get datasetfields: %v", err)
+
 	}
 	dat, err := getSensorDataByReference(db, ref)
 	if err != nil {
-		log.Printf("ERROR: unable to get sensordata by reference: %v", err)
+		return nil, fmt.Errorf("unable to get data: %v", err)
 	}
 	var csv [][]string
 	var header []string
+	// adding id and time columns
 	header = append(header, "id", "time")
 	header = append(header, datalabel...)
 	csv = append(csv, header)
@@ -212,11 +214,17 @@ func ExportSensorDataToCSV(ref string, db *sqlx.DB) interface{} {
 		row = append(row, slice...)
 		csv = append(csv, row)
 	}
-	return csv
+	return csv, nil
 }
+
+// ExportSensorDataToCSVEndpoint for exporting datasets used to create CSV report
 func (s *Server) ExportSensorDataToCSVEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	result := ExportSensorDataToCSV(vars["reference"], s.DB)
+	result, err := ExportSensorDataToCSV(vars["reference"], s.DB)
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to export dataset to csv:", err)
+		return
+	}
 	helper.Respond(w, r, 200, result)
 }
 
