@@ -190,7 +190,7 @@ func getSensorDataByReference(db *sqlx.DB, ref string) ([]Data, error) {
 	return data, nil
 }
 
-// ExportSensorDataToCSV generates a csv dataset with dataset columns.
+// ExportSensorDataToCSV generates a csv dataset with corresponding columns.
 // Columns: id, time, x , x
 func ExportSensorDataToCSV(ref string, db *sqlx.DB) interface{} {
 	datalabel, _, err := DatasetFieldAndShowCartList(ref, db)
