@@ -25,11 +25,11 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	ref := vars["reference"]
 	data, err := loadData(s.DB, ref)
 	if err != nil {
-		helper.RespondErr(w, r, 500, err)
+		helper.RespondErr(w, r, 500, "unable to load data: ", err)
 		return
 	}
 	if len(data) == 0 {
-		helper.RespondErr(w, r, 500, "no data avalable with reference: ", ref)
+		helper.RespondErr(w, r, http.StatusServiceUnavailable, "dataset is empty with reference: ", ref)
 		return
 	}
 	// decoding jsonRawMessage data column
@@ -143,9 +143,6 @@ func loadData(db *sqlx.DB, ref string) ([]Data, error) {
 	`, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get dataset from db: %v", err)
-	}
-	if len(data) == 0 {
-		return nil, fmt.Errorf("no data")
 	}
 	return data, nil
 }

@@ -27,10 +27,13 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             );
             break;
           case 400:
-            this.openDialog("Bad request", error.message);
+            this.openDialog("Bad request", error.error.error.message);
             break;
           case 500:
             this.openDialog("Internal server error", error.error.description);
+            break;
+          case 503:
+            this.openDialog("Service unavailable", error.error.error.message);
             break;
           default:
             this.openDialog("Unexpected error", error.statusText);
