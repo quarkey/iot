@@ -28,6 +28,7 @@ export class DeviceComponent implements OnInit {
     this.form = this.formBuilder.group({
       title: ["", Validators.required],
       description: ["", Validators.required],
+      sensor_ip: ["", Validators.required],
     });
     this.activeRoute.params.subscribe((key) => {
       this.deviceService.LoadDevice(key.arduino_key).subscribe((res) => {
