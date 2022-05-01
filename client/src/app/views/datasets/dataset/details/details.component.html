@@ -51,6 +51,14 @@
     >
       UPDATE
     </button>
+    <button
+      mat-raised-button
+      (click)="downloadCSV()"
+      [class.spinner]="loadingdownloadFile"
+      [disabled]="loadingdownloadFile"
+    >
+      EXPORT
+    </button>
   </mat-card-actions>
 </mat-card>
 <pre

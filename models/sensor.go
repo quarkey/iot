@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -165,7 +166,16 @@ type Data struct {
 func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var data []Data
-	err := s.DB.Select(&data, `
+	data, err := getSensorDataByReference(s.DB, vars["reference"])
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
+		return
+	}
+	helper.Respond(w, r, 200, data)
+}
+func getSensorDataByReference(db *sqlx.DB, ref string) ([]Data, error) {
+	var data []Data
+	err := db.Select(&data, `
 	select 
 		a.id,
 		a.data,
@@ -173,12 +183,49 @@ func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request
 	from sensordata a, datasets b 
 	where b.reference=$1 
 	and b.id = a.dataset_id`,
-		vars["reference"])
+		ref)
 	if err != nil {
-		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
+		return nil, fmt.Errorf("unable to get sensor data")
+	}
+	return data, nil
+}
+
+// ExportSensorDataToCSV generates a csv dataset with corresponding columns
+// Exported data will include id, and time columns and then data points
+func ExportSensorDataToCSV(ref string, db *sqlx.DB) (interface{}, error) {
+	datalabel, _, err := DatasetFieldAndShowCartList(ref, db)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get datasetfields: %v", err)
+
+	}
+	dat, err := getSensorDataByReference(db, ref)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get data: %v", err)
+	}
+	var csv [][]string
+	var header []string
+	// adding id and time columns
+	header = append(header, "id", "time")
+	header = append(header, datalabel...)
+	csv = append(csv, header)
+	for _, x := range dat {
+		slice, _ := helper.DecodeRawJSON(x.Data)
+		row := []string{strconv.Itoa(x.ID), x.Time.Format("2006-02-01 15:04:05")}
+		row = append(row, slice...)
+		csv = append(csv, row)
+	}
+	return csv, nil
+}
+
+// ExportSensorDataToCSVEndpoint for exporting datasets used to create CSV report
+func (s *Server) ExportSensorDataToCSVEndpoint(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	result, err := ExportSensorDataToCSV(vars["reference"], s.DB)
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to export dataset to csv:", err)
 		return
 	}
-	helper.Respond(w, r, 200, data)
+	helper.Respond(w, r, 200, result)
 }
 
 type NewDevice struct {

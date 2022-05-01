@@ -23,6 +23,11 @@ export class DatasetsService {
       `${environment.apiUrl}/api/sensordata/${reference}`
     );
   }
+  public LoadCSVDatasetByReference(reference: string) {
+    return this.http.get<any[]>(
+      `${environment.apiUrl}/api/exportdataset/${reference}`
+    );
+  }
   public LoadAreaChartDatasetByReference(reference: string) {
     return this.http.get<any[]>(
       `${environment.apiUrl}/api/chart/area/${reference}`
