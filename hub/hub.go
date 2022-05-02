@@ -10,10 +10,10 @@ import "fmt"
 // clients.
 type Hub struct {
 	// Registered clients.
-	clients map[*Client]bool
+	Clients map[*Client]bool
 
 	// Inbound messages from the clients.
-	broadcast chan []byte
+	Broadcast chan []byte
 
 	// Register requests from the clients.
 	register chan *Client
@@ -24,10 +24,10 @@ type Hub struct {
 
 func NewHub() *Hub {
 	return &Hub{
-		broadcast:  make(chan []byte),
+		Broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
+		Clients:    make(map[*Client]bool),
 	}
 }
 
@@ -35,21 +35,21 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
-			h.clients[client] = true
+			h.Clients[client] = true
 			fmt.Println("client connected ...")
 		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
+			if _, ok := h.Clients[client]; ok {
+				delete(h.Clients, client)
 				close(client.send)
 				fmt.Println("client disconnected  ...")
 			}
-		case message := <-h.broadcast:
-			for client := range h.clients {
+		case message := <-h.Broadcast:
+			for client := range h.Clients {
 				select {
 				case client.send <- message:
 				default:
 					close(client.send)
-					delete(h.clients, client)
+					delete(h.Clients, client)
 				}
 			}
 		}

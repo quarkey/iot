@@ -37,6 +37,10 @@ func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to save reading:", err)
 		return
 	}
+	// broadcasting only when clients is connected
+	if len(s.Hub.Clients) > 0 {
+		s.Hub.Broadcast <- []byte(fmt.Sprintf("%v", dat.Data))
+	}
 }
 
 func saveReadings(datapoints []SensorData, db *sqlx.DB) error {
