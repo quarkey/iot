@@ -8,6 +8,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
+	github.com/gorilla/websocket v1.5.0
 	github.com/jmoiron/sqlx v1.3.1
 	github.com/lib/pq v1.10.0
 )

@@ -16,6 +16,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
+	"github.com/quarkey/iot/hub"
 	helper "github.com/quarkey/iot/json"
 
 	"github.com/golang-migrate/migrate"
@@ -32,12 +33,16 @@ var DatasetEvent = "dataset"
 
 // Server ....
 type Server struct {
-	DB         *sqlx.DB
+	DB *sqlx.DB
+	// Server JSON config file
 	Config     map[string]interface{}
 	Router     *mux.Router
 	httpServer *http.Server
-	Telemetry  *Telemetry
-	Debug      bool
+	//Hub to keep track of socket connection
+	// for live monitoring of datasets.
+	Hub       *hub.Hub
+	Telemetry *Telemetry
+	Debug     bool
 }
 
 // New initialize server and opens a database connection.
@@ -117,7 +122,10 @@ func (srv *Server) Run(ctx context.Context) {
 
 	log.Printf("[INFO] Starting to listen on %s", srv.Config["api_addr"].(string))
 	srv.NewEvent(SystemEvent, "Server started")
-
+	// socket hub for live monitoring
+	hub := hub.NewHub()
+	srv.Hub = hub
+	go srv.Hub.Run()
 	// server ticker timer for scheduled tasks
 	srv.Telemetry = newTelemetryTicker(srv.DB)
 	srv.Telemetry.startTelemetryTicker(srv.Config, srv.Debug)
