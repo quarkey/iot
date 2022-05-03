@@ -14,7 +14,6 @@ export class DetailsComponent implements OnInit {
   @Input() dataset: Dataset;
   form: FormGroup;
   loadingdownloadFile = false;
-  socket: any;
   liveSensordata: Sensordata;
   constructor(
     private formBuilder: FormBuilder,
@@ -32,7 +31,6 @@ export class DetailsComponent implements OnInit {
       showcharts: this.formBuilder.array([]),
     });
     this.populateFormArray();
-    this.start(); // socket
   }
   populateFormArray() {
     this.dataset.types.forEach((x) => {
@@ -91,21 +89,5 @@ export class DetailsComponent implements OnInit {
           this.generalService.DownloadFile(res, filename);
         }
       });
-  }
-  start() {
-    const socket = new WebSocket(`ws://localhost:6001/api/live`);
-    var id = this.dataset.id;
-    socket.onopen = function (e) {
-      console.log("WebSocket Opened");
-      // socket.send(`dataset`);
-    };
-    this.socket = socket;
-    var self = this;
-    socket.onmessage = function (e) {
-      const data = JSON.parse(e.data) as Sensordata;
-      if (self.dataset.id == data.dataset_id) {
-        self.liveSensordata = data;
-      }
-    };
   }
 }
