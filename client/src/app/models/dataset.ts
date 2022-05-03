@@ -18,6 +18,7 @@ export interface Sensordata {
   id: number;
   data: string[];
   time: string;
+  dataset_id?: number;
 }
 
 export interface Ng2Dataset {

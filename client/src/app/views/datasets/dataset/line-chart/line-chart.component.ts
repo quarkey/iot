@@ -10,6 +10,8 @@ import { DatasetsService } from "src/app/services/datasets.service";
 })
 export class LineChartComponent implements OnInit {
   @Input() dataset: Dataset;
+  @Input() live?: Sensordata;
+
   data: Ng2Dataset;
   constructor(private datasetService: DatasetsService) {}
   lineChartData: ChartDataset[];

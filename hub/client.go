@@ -6,6 +6,7 @@ package hub
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -46,6 +47,8 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
+
+	// dataset_id int
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -70,7 +73,9 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.Broadcast <- message
+		fmt.Println("[SOCKET]", message)
+		// we are not broadcasting message back to clients
+		// c.hub.Broadcast <- message
 	}
 }
 
@@ -128,6 +133,13 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
+	// we need to add dataset_id here to keep track
+	// vars := mux.Vars(r)
+	// fmt.Println("vars", vars["dataset_id"])
+	// id, err := strconv.Atoi(vars["dataset_id"])
+	// if err != nil {
+	// 	id = 0
+	// }
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
 	client.hub.register <- client
 

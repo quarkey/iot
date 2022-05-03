@@ -1,7 +1,7 @@
 import { TOUCH_BUFFER_MS } from "@angular/cdk/a11y/input-modality/input-modality-detector";
 import { Component, Input, OnInit } from "@angular/core";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Dataset } from "src/app/models/dataset";
+import { Dataset, Sensordata } from "src/app/models/dataset";
 import { DatasetsService } from "src/app/services/datasets.service";
 import { GeneralService } from "src/app/services/general.service";
 
@@ -15,6 +15,7 @@ export class DetailsComponent implements OnInit {
   form: FormGroup;
   loadingdownloadFile = false;
   socket: any;
+  liveSensordata: Sensordata;
   constructor(
     private formBuilder: FormBuilder,
     private datasetService: DatasetsService,
@@ -92,15 +93,19 @@ export class DetailsComponent implements OnInit {
       });
   }
   start() {
-    const socket = new WebSocket(`ws://localhost:6001/ws`);
+    const socket = new WebSocket(`ws://localhost:6001/api/live`);
     var id = this.dataset.id;
     socket.onopen = function (e) {
-      console.log('WebSocket Opened. Sending "Hello"');
-      socket.send(`{"dataset_id": "${id}"}  `);
+      console.log("WebSocket Opened");
+      // socket.send(`dataset`);
     };
     this.socket = socket;
+    var self = this;
     socket.onmessage = function (e) {
-      console.log("Received:", e.data);
+      const data = JSON.parse(e.data) as Sensordata;
+      if (self.dataset.id == data.dataset_id) {
+        self.liveSensordata = data;
+      }
     };
   }
 }

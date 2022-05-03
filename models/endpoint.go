@@ -30,7 +30,8 @@ func (s *Server) SetupEndpoints() {
 	// events
 	s.Router.HandleFunc("/api/events/{count}", s.EventLogEndpoint).Methods("GET")
 
-	s.Router.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	// s.Router.HandleFunc("/ws/{dataset_id}", func(w http.ResponseWriter, r *http.Request) {
+	s.Router.HandleFunc("/api/live", func(w http.ResponseWriter, r *http.Request) {
 		hub.ServeWs(s.Hub, w, r)
 	})
 	// export
