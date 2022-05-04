@@ -116,6 +116,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 				helper.RespondErr(w, r, 500, err)
 				return
 			}
+			fmt.Println("decoded", decoded)
 			// converting data point from string to float
 			toFloatValue, err := strconv.ParseFloat(decoded[i], 64)
 			if err != nil {
