@@ -139,7 +139,7 @@ func loadData(db *sqlx.DB, ref string) ([]Data, error) {
 	from sensordata a, datasets b 
 	where b.reference=$1 
 	and b.id = a.dataset_id
-	and a.time BETWEEN NOW() - INTERVAL '24 HOURS' AND NOW()
+	and a.time BETWEEN NOW() - INTERVAL '3 HOURS' AND NOW()
 	`, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get dataset from db: %v", err)
