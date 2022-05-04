@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: "http://localhost:6001",
+  wsUrl: "ws://localhost:6001",
   title: "local",
 };
 
