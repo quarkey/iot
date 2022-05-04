@@ -3,6 +3,7 @@ import { ChartDataset, ChartOptions, Color } from "chart.js";
 import { BaseChartDirective } from "ng2-charts";
 import { Dataset, Ng2Dataset, Sensordata } from "src/app/models/dataset";
 import { DatasetsService } from "src/app/services/datasets.service";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: "app-line-chart",
@@ -44,11 +45,12 @@ export class LineChartComponent implements OnInit {
         if (res) {
           this.lineChartLabels = res.labels;
           this.lineChartData = res.lineChartdataset;
+          this.lineChartOptions.plugins.title.text = this.dataset.title;
         }
       });
   }
   runLive() {
-    const socket = new WebSocket(`ws://localhost:6001/api/live`);
+    const socket = new WebSocket(`${environment.wsUrl}/api/live`);
     var id = this.dataset.id;
     socket.onopen = function (e) {
       console.log("WebSocket Opened");
