@@ -37,8 +37,16 @@ func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to save reading:", err)
 		return
 	}
-}
 
+	// broadcasting only when clients are connected
+	if len(s.Hub.Clients) > 0 {
+		b, err := json.Marshal(&dat)
+		if err != nil {
+			helper.RespondErr(w, r, 500, "unable to marshal sensor", err)
+		}
+		s.Hub.Broadcast <- b
+	}
+}
 func saveReadings(datapoints []SensorData, db *sqlx.DB) error {
 	for _, r := range datapoints {
 		_, err := db.Exec("insert into sensordata(sensor_id, dataset_id, data) values($1,$2,$3)", r.SensorID, r.DatasetID, r.Data)

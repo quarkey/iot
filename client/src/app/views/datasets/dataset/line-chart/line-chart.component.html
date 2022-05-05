@@ -3,6 +3,11 @@
     
 -->
 <div class="chart-wrapper">
+  <button mat-button (click)="runLive()">Enable live feed</button>
+  <span *ngIf="liveSensordata">
+    {{ liveSensordata.data | json }}
+  </span>
+
   <canvas
     baseChart
     [labels]="lineChartLabels"
@@ -14,6 +19,3 @@
   >
   </canvas>
 </div>
-<pre
-  >{{ data | json }}
-</pre>

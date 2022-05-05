@@ -1,7 +1,7 @@
 import { TOUCH_BUFFER_MS } from "@angular/cdk/a11y/input-modality/input-modality-detector";
 import { Component, Input, OnInit } from "@angular/core";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Dataset } from "src/app/models/dataset";
+import { Dataset, Sensordata } from "src/app/models/dataset";
 import { DatasetsService } from "src/app/services/datasets.service";
 import { GeneralService } from "src/app/services/general.service";
 
@@ -14,7 +14,7 @@ export class DetailsComponent implements OnInit {
   @Input() dataset: Dataset;
   form: FormGroup;
   loadingdownloadFile = false;
-
+  liveSensordata: Sensordata;
   constructor(
     private formBuilder: FormBuilder,
     private datasetService: DatasetsService,

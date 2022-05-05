@@ -1,6 +1,11 @@
 package models
 
-import "github.com/gorilla/mux"
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/quarkey/iot/hub"
+)
 
 func (s *Server) SetupEndpoints() {
 	s.Router = mux.NewRouter()
@@ -25,6 +30,10 @@ func (s *Server) SetupEndpoints() {
 	// events
 	s.Router.HandleFunc("/api/events/{count}", s.EventLogEndpoint).Methods("GET")
 
+	// s.Router.HandleFunc("/ws/{dataset_id}", func(w http.ResponseWriter, r *http.Request) {
+	s.Router.HandleFunc("/api/live", func(w http.ResponseWriter, r *http.Request) {
+		hub.ServeWs(s.Hub, w, r)
+	})
 	// export
 	s.Router.HandleFunc("/api/exportdataset/{reference}", s.ExportSensorDataToCSVEndpoint).Methods("GET")
 
