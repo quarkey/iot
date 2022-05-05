@@ -105,8 +105,8 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 		order by id desc limit 1`, dset.ID, dset.SensorID)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				msg := fmt.Sprintf("[WARNING] no data points (dataset_id: %d - %s)\n", dset.ID, dset.SensorTitle)
-				log.Print(msg)
+				msg := "no data points"
+				log.Printf("[WARNING] no data points for dataset_id: %d with name '%s'\n", dset.ID, dset.SensorTitle)
 				_, err := t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, dset.SensorID)
 				if err != nil {
 					log.Printf("[ERROR] unable to update dataset telemetry status: %v", err)
@@ -117,16 +117,10 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 		}
 		now := time.Now()
 		tx := unixdiff(now, sd.RecordingTime)
-		// checking the difference between now and last recording time,
-		// if value is over intervalSec we can say that the sensor is running late.
-		// This could indicate issues with the sensor device itself or performance.
-		if tx.diff() > int64(dset.IntervalSec) {
-			msg := fmt.Sprintf("since last telemetry %s", tx.duration())
-			log.Printf("[WARNING] %s (sensor_id: %d - %s)\n", msg, sd.SensorID, dset.SensorTitle)
-			_, err := t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, sd.SensorID)
-			if err != nil {
-				log.Printf("[ERROR] unable to update dataset telemetry status: %v", err)
-			}
+		msg := fmt.Sprintf("since last telemetry %s", tx.duration())
+		_, err = t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, sd.SensorID)
+		if err != nil {
+			log.Printf("[ERROR] unable to update dataset telemetry status: %v", err)
 		}
 	}
 }

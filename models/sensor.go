@@ -113,7 +113,7 @@ func (s *Server) GetSensorsListEndpoint(w http.ResponseWriter, r *http.Request) 
 		dataset_telemetry,
 		sensor_ip,
 		created_at 
-	from sensors`)
+	from sensors order by id`)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to select sensorlist: ", err)
 		return
