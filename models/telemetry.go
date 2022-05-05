@@ -115,7 +115,7 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 			}
 			log.Printf("[ERROR] problems with selecting sensordata: %v", err)
 		}
-		now := time.Now()
+		now := time.Now().UTC()
 		tx := unixdiff(now, sd.RecordingTime)
 		msg := fmt.Sprintf("since last telemetry %s", tx.duration())
 		_, err = t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, sd.SensorID)
