@@ -38,7 +38,7 @@ func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// broadcasting only when clients is connected
+	// broadcasting only when clients are connected
 	if len(s.Hub.Clients) > 0 {
 		b, err := json.Marshal(&dat)
 		if err != nil {
