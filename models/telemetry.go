@@ -117,7 +117,7 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 		}
 		// now := time.Now()
 		// tx := unixdiff(now, sd.RecordingTime)
-		msg := fmt.Sprintf("since last telemetry %s", time.Now().Sub(sd.RecordingTime))
+		msg := fmt.Sprintf("since last telemetry %s", time.Since(sd.RecordingTime))
 		_, err = t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, sd.SensorID)
 		if err != nil {
 			log.Printf("[ERROR] unable to update dataset telemetry status: %v", err)
