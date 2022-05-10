@@ -1,4 +1,28 @@
-<mat-card>
+<div class="backgroundImage">
+  <button
+    mat-fab
+    color="primary"
+    class="bottom-right"
+    matTooltip="Add new dataset"
+    (click)="newDatasetDialog()"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+
+  <div style="padding: 20px">
+    <div
+      fxLayout="column"
+      fxLayout.gt-md="row"
+      fxLayoutGap="20px"
+      fxLayoutAlign="space-evenly center"
+    >
+      <section *ngFor="let item of datasets">
+        <app-dataset-card [dataset]="item"></app-dataset-card>
+      </section>
+    </div>
+  </div>
+</div>
+<!-- <mat-card>
   <span class="title-text"> Datasets</span>
 
   <mat-nav-list *ngFor="let item of datasets">
@@ -10,4 +34,4 @@
     <mat-icon>add</mat-icon>
     <span>ADD NEW DATASET</span>
   </button>
-</mat-card>
+</mat-card> -->

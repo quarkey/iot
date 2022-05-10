@@ -37,6 +37,8 @@ import { HttpErrorInterceptor } from "./services/httperrorinterceptor.service";
 import { ErrorHandlingDialogComponent } from "./components/dialogs/error-handling-dialog/error-handling-dialog.component";
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { DatasetDetailsComponent } from "./components/dataset-details/dataset-details.component";
+import { DatasetCardComponent } from "./components/dataset-card/dataset-card.component";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({
   declarations: [
@@ -55,6 +57,7 @@ import { DatasetDetailsComponent } from "./components/dataset-details/dataset-de
     LineChartComponent,
     EventsComponent,
     ErrorHandlingDialogComponent,
+    DatasetCardComponent,
   ],
   imports: [
     BrowserModule,
@@ -80,6 +83,7 @@ import { DatasetDetailsComponent } from "./components/dataset-details/dataset-de
     MatTableModule,
     MatSortModule,
     FlexLayoutModule,
+    MatTooltipModule,
   ],
   providers: [
     NewDeviceDialogComponent,
