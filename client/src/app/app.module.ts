@@ -17,7 +17,6 @@ import { DatasetsComponent } from "./views/datasets/datasets.component";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { DeviceComponent } from "./views/devices/device/device.component";
 import { DatasetComponent } from "./views/datasets/dataset/dataset.component";
-import { DetailsComponent } from "./views/datasets/dataset/details/details.component";
 import { MatTabsModule } from "@angular/material/tabs";
 import { LineChartNgxComponent } from "./components/line-chart-ngx/line-chart-ngx.component";
 import { NewDeviceDialogComponent } from "./dialogs/new-device/new-device.component";
@@ -37,6 +36,8 @@ import { MatSortModule } from "@angular/material/sort";
 import { HttpErrorInterceptor } from "./services/httperrorinterceptor.service";
 import { ErrorHandlingDialogComponent } from "./dialogs/error-handling-dialog/error-handling-dialog.component";
 import { FlexLayoutModule } from "@angular/flex-layout";
+import { DatasetDetailsComponent } from "./components/dataset-details/dataset-details.component";
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -47,7 +48,7 @@ import { FlexLayoutModule } from "@angular/flex-layout";
     DatasetsComponent,
     DeviceComponent,
     DatasetComponent,
-    DetailsComponent,
+    DatasetDetailsComponent,
     LineChartNgxComponent,
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
