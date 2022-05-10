@@ -78,6 +78,31 @@ $ docker run --name qa_iot_backend --net qa-network -p 6001:6001 -d qa_iot_backe
 done!
 
 ```
+## migrate postgres database from server a to server b
+    
+```
+0. docker stop qa_iot_backend 
+1. dump rpi database and copy over to new server
+   pg_dump -Fc -f iot.dump.db -h localhost iot
+   scp iot.dump.db slundin@192.168.10.159:/Users/slundin/devel/iot/resources
+   docker cp iot.dump.db qa_iot_pg:/tmp
+
+2. restore database   
+   docker stop qa_iot_backend
+   docker exec -it qa_iot_pg sh
+   su - postgres
+   cd /tmp
+   dropdb -h localhost iot
+   createdb -h localhost -T template0 iot
+   pg_restore -d iot -h localhost iot.dump.db
+   psql -U iot   
+   update iot.schema_migrations set dirty='f';
+   exit
+   exit
+
+3. start up again
+    docker start qa_iot_backend
+```
 
 #### sqls for troubleshooting
 
