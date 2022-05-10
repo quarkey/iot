@@ -7,10 +7,10 @@ import { GeneralService } from "src/app/services/general.service";
 
 @Component({
   selector: "app-dataset-details",
-  templateUrl: "./details.component.html",
-  styleUrls: ["./details.component.scss"],
+  templateUrl: "./dataset-details.component.html",
+  styleUrls: ["./dataset-details.component.scss"],
 })
-export class DetailsComponent implements OnInit {
+export class DatasetDetailsComponent implements OnInit {
   @Input() dataset: Dataset;
   form: FormGroup;
   loadingdownloadFile = false;

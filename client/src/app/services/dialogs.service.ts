@@ -4,8 +4,8 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from "@angular/material/dialog";
-import { NewDatasetDialogComponent } from "../dialogs/new-dataset/new-dataset.component";
-import { NewDeviceDialogComponent } from "../dialogs/new-device/new-device.component";
+import { NewDatasetDialogComponent } from "../components/dialogs/new-dataset/new-dataset.component";
+import { NewDeviceDialogComponent } from "../components/dialogs/new-device/new-device.component";
 
 @Injectable({
   providedIn: "root",

@@ -17,26 +17,27 @@ import { DatasetsComponent } from "./views/datasets/datasets.component";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { DeviceComponent } from "./views/devices/device/device.component";
 import { DatasetComponent } from "./views/datasets/dataset/dataset.component";
-import { DetailsComponent } from "./views/datasets/dataset/details/details.component";
 import { MatTabsModule } from "@angular/material/tabs";
-import { DataComponent } from "./views/datasets/dataset/data/data.component";
-import { NewDeviceDialogComponent } from "./dialogs/new-device/new-device.component";
+import { LineChartNgxComponent } from "./components/line-chart-ngx/line-chart-ngx.component";
+import { NewDeviceDialogComponent } from "./components/dialogs/new-device/new-device.component";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
 import { MatInputModule } from "@angular/material/input";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { NewDatasetDialogComponent } from "./dialogs/new-dataset/new-dataset.component";
+import { NewDatasetDialogComponent } from "./components/dialogs/new-dataset/new-dataset.component";
 import { MatSelectModule } from "@angular/material/select";
 import { NgxChartsModule } from "@swimlane/ngx-charts";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { LineChartComponent } from "./views/datasets/dataset/line-chart/line-chart.component";
+import { LineChartComponent } from "./components/line-chart/line-chart.component";
 import { NgChartsModule } from "ng2-charts";
 import { EventsComponent } from "./views/events/events.component";
 import { MatTableModule } from "@angular/material/table";
 import { MatSortModule } from "@angular/material/sort";
 import { HttpErrorInterceptor } from "./services/httperrorinterceptor.service";
-import { ErrorHandlingDialogComponent } from "./dialogs/error-handling-dialog/error-handling-dialog.component";
+import { ErrorHandlingDialogComponent } from "./components/dialogs/error-handling-dialog/error-handling-dialog.component";
 import { FlexLayoutModule } from "@angular/flex-layout";
+import { DatasetDetailsComponent } from "./components/dataset-details/dataset-details.component";
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -47,8 +48,8 @@ import { FlexLayoutModule } from "@angular/flex-layout";
     DatasetsComponent,
     DeviceComponent,
     DatasetComponent,
-    DetailsComponent,
-    DataComponent,
+    DatasetDetailsComponent,
+    LineChartNgxComponent,
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
     LineChartComponent,
