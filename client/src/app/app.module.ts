@@ -19,7 +19,7 @@ import { DeviceComponent } from "./views/devices/device/device.component";
 import { DatasetComponent } from "./views/datasets/dataset/dataset.component";
 import { DetailsComponent } from "./views/datasets/dataset/details/details.component";
 import { MatTabsModule } from "@angular/material/tabs";
-import { LineChartNgxComponent } from "./views/datasets/dataset/line-chart-ngx/line-chart-ngx.component";
+import { LineChartNgxComponent } from "./components/line-chart-ngx/line-chart-ngx.component";
 import { NewDeviceDialogComponent } from "./dialogs/new-device/new-device.component";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
