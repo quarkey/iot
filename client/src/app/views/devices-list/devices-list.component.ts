@@ -6,10 +6,10 @@ import { DialogsService } from "src/app/services/dialogs.service";
 
 @Component({
   selector: "app-devices",
-  templateUrl: "./devices.component.html",
-  styleUrls: ["./devices.component.scss"],
+  templateUrl: "./devices-list.component.html",
+  styleUrls: ["./devices-list.component.scss"],
 })
-export class DevicesComponent implements OnInit {
+export class DevicesListComponent implements OnInit {
   devices$: Observable<Device[]>;
   devices: Device[];
 

@@ -12,11 +12,11 @@ import { ToolbarComponent } from "./navigation/toolbar/toolbar.component";
 import { SidenavComponent } from "./navigation/sidenav/sidenav.component";
 import { MatListModule } from "@angular/material/list";
 import { DashboardComponent } from "./views/dashboard/dashboard.component";
-import { DevicesComponent } from "./views/devices/devices.component";
-import { DatasetsComponent } from "./views/datasets/datasets.component";
+import { DevicesListComponent } from "./views/devices-list/devices-list.component";
+import { DatasetsListComponent } from "./views/dataset-list/dataset-list.component";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { DeviceComponent } from "./views/devices/device/device.component";
-import { DatasetComponent } from "./views/datasets/dataset/dataset.component";
+import { DeviceComponent } from "./views/device/device.component";
+import { DatasetComponent } from "./views/dataset/dataset.component";
 import { MatTabsModule } from "@angular/material/tabs";
 import { LineChartNgxComponent } from "./components/line-chart-ngx/line-chart-ngx.component";
 import { NewDeviceDialogComponent } from "./components/dialogs/new-device/new-device.component";
@@ -44,8 +44,8 @@ import { DatasetDetailsComponent } from "./components/dataset-details/dataset-de
     ToolbarComponent,
     SidenavComponent,
     DashboardComponent,
-    DevicesComponent,
-    DatasetsComponent,
+    DevicesListComponent,
+    DatasetsListComponent,
     DeviceComponent,
     DatasetComponent,
     DatasetDetailsComponent,

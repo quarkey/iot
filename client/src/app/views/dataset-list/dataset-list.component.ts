@@ -8,10 +8,10 @@ import { GeneralService } from "src/app/services/general.service";
 
 @Component({
   selector: "app-datasets",
-  templateUrl: "./datasets.component.html",
-  styleUrls: ["./datasets.component.scss"],
+  templateUrl: "./dataset-list.component.html",
+  styleUrls: ["./dataset-list.component.scss"],
 })
-export class DatasetsComponent implements OnInit {
+export class DatasetsListComponent implements OnInit {
   datasets$: Observable<Dataset[]>;
   datasets: Dataset[];
 
