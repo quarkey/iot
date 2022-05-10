@@ -28,7 +28,7 @@ Create a simple circuit that can capture data points, e.g., temperature sensor. 
 
 ### nginx
 
-The angular frontend is hosted with Nginx, but please note that additional configuration is required to host SPA. Read https://medium.com/@technicadil_001/deploy-an-angular-app-with-nginx-a79cc1a44b49 for more information.
+The angular frontend is hosted with Nginx, but please note that additional configuration is required to host SPA. However this is taken care of in the Dockerfile. Read https://medium.com/@technicadil_001/deploy-an-angular-app-with-nginx-a79cc1a44b49 for more information.
 
 ```
 1. $ docker build -t ngimg .
