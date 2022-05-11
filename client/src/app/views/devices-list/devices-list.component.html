@@ -1,11 +1,11 @@
-<mat-card>
+<!-- <mat-card>
   <span class="title-text">Devices</span>
   <mat-nav-list *ngFor="let item of devices">
     <mat-list-item [routerLink]="item.arduino_key">
-      <!-- [ngClass]="{
+      [ngClass]="{
         ok: item.dataset_telemetry,
         error: item.dataset_telemetry === null
-      }" -->
+      }"
       <a matLine routerLinkActive
         >{{ item.title }}
         <small *ngIf="item.dataset_telemetry"
@@ -18,4 +18,30 @@
     <mat-icon>add</mat-icon>
     <span>ADD NEW DEVICE</span>
   </button>
-</mat-card>
+</mat-card> -->
+
+<div class="backgroundImage">
+  <button
+    mat-fab
+    color="primary"
+    class="bottom-right"
+    matTooltip="Add new device"
+    (click)="newDeviceDialog()"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+
+  <div style="padding: 20px">
+    <div
+      fxLayout="column"
+      fxLayout.gt-md="row"
+      fxLayoutGap="15px"
+      fxLayoutAlign="space-evenly center"
+    >
+      <app-device-card
+        *ngFor="let item of devices"
+        [device]="item"
+      ></app-device-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<mat-card>
+  <mat-card-header>
+    <div mat-card-avatar class="example-header-image">
+      <mat-icon>sensors</mat-icon>
+    </div>
+    <mat-card-title>{{ device.title }}</mat-card-title>
+    <mat-card-subtitle>{{ device.created_at }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    {{ device.description }}
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-raised-button color="primary" [routerLink]="device.arduino_key">
+      DETAILS
+    </button>
+  </mat-card-actions>
+</mat-card>

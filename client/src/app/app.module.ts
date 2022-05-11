@@ -39,6 +39,7 @@ import { FlexLayoutModule } from "@angular/flex-layout";
 import { DatasetDetailsComponent } from "./components/dataset-details/dataset-details.component";
 import { DatasetCardComponent } from "./components/dataset-card/dataset-card.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { DeviceCardComponent } from "./components/device-card/device-card.component";
 
 @NgModule({
   declarations: [
@@ -58,6 +59,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
     EventsComponent,
     ErrorHandlingDialogComponent,
     DatasetCardComponent,
+    DeviceCardComponent,
   ],
   imports: [
     BrowserModule,
