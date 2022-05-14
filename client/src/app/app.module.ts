@@ -44,6 +44,7 @@ import { DashComponent } from './views/dash/dash.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatMenuModule } from '@angular/material/menu';
 import { LayoutModule } from '@angular/cdk/layout';
+import { SystemComponent } from './views/system/system.component';
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { LayoutModule } from '@angular/cdk/layout';
     DatasetCardComponent,
     DeviceCardComponent,
     DashComponent,
+    SystemComponent,
   ],
   imports: [
     BrowserModule,
