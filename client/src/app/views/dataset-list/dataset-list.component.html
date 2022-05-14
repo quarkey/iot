@@ -1,13 +1,26 @@
-<mat-card>
-  <span class="title-text"> Datasets</span>
-
-  <mat-nav-list *ngFor="let item of datasets">
-    <mat-list-item [routerLink]="item.reference">
-      <a matLine routerLinkActive>{{ item.title }}</a>
-    </mat-list-item>
-  </mat-nav-list>
-  <button mat-raised-button color="primary" (click)="newDatasetDialog()">
-    <mat-icon>add</mat-icon>
-    <span>ADD NEW DATASET</span>
-  </button>
-</mat-card>
+<div class="backgroundImage">
+  <div
+    fxLayout="row wrap"
+    fxLayoutGap="16px grid"
+    fxLayoutAlign="space-evenly center"
+    style="padding: 20px"
+  >
+    <div
+      fxFlex="25%"
+      fxFlex.xs="90%"
+      fxFlex.sm="50%"
+      *ngFor="let item of datasets"
+    >
+      <app-dataset-card [dataset]="item"></app-dataset-card>
+    </div>
+  </div>
+</div>
+<button
+  mat-fab
+  color="primary"
+  class="bottom-right"
+  matTooltip="Add new dataset"
+  (click)="newDatasetDialog()"
+>
+  <mat-icon>add</mat-icon>
+</button>

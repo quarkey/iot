@@ -6,9 +6,11 @@ import { DatasetsListComponent } from "./views/dataset-list/dataset-list.compone
 import { DeviceComponent } from "./views/device/device.component";
 import { DevicesListComponent } from "./views/devices-list/devices-list.component";
 import { EventsComponent } from "./views/events/events.component";
+import { DashComponent } from "./views/dash/dash.component";
 
 const routes: Routes = [
   { path: "dashboard", component: DashboardComponent },
+  { path: "dash", component: DashComponent },
   { path: "devices", component: DevicesListComponent },
   { path: "devices/:arduino_key", component: DeviceComponent },
   { path: "datasets", component: DatasetsListComponent },

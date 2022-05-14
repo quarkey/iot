@@ -37,6 +37,13 @@ import { HttpErrorInterceptor } from "./services/httperrorinterceptor.service";
 import { ErrorHandlingDialogComponent } from "./components/dialogs/error-handling-dialog/error-handling-dialog.component";
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { DatasetDetailsComponent } from "./components/dataset-details/dataset-details.component";
+import { DatasetCardComponent } from "./components/dataset-card/dataset-card.component";
+import { MatTooltipModule } from "@angular/material/tooltip";
+import { DeviceCardComponent } from "./components/device-card/device-card.component";
+import { DashComponent } from './views/dash/dash.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatMenuModule } from '@angular/material/menu';
+import { LayoutModule } from '@angular/cdk/layout';
 
 @NgModule({
   declarations: [
@@ -55,6 +62,9 @@ import { DatasetDetailsComponent } from "./components/dataset-details/dataset-de
     LineChartComponent,
     EventsComponent,
     ErrorHandlingDialogComponent,
+    DatasetCardComponent,
+    DeviceCardComponent,
+    DashComponent,
   ],
   imports: [
     BrowserModule,
@@ -80,6 +90,10 @@ import { DatasetDetailsComponent } from "./components/dataset-details/dataset-de
     MatTableModule,
     MatSortModule,
     FlexLayoutModule,
+    MatTooltipModule,
+    MatGridListModule,
+    MatMenuModule,
+    LayoutModule,
   ],
   providers: [
     NewDeviceDialogComponent,
