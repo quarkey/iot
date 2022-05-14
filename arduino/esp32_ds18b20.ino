@@ -11,8 +11,8 @@ esp32 sketch with ds18b20 sensor and light sensor (not implemented, but installe
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-const char *ssid = "QMANROXOR";
-const char *password = "aaaaabbbbb";
+const char *ssid = "";
+const char *password = "";
 
 String serverName = "http://192.168.10.159:6002/api/sensordata";
 unsigned long lastTime = 0;
