@@ -14,6 +14,7 @@ import { GeneralService } from "src/app/services/general.service";
 export class DatasetsListComponent implements OnInit {
   datasets$: Observable<Dataset[]>;
   datasets: Dataset[];
+  loading: boolean = true;
 
   constructor(
     private datasetsService: DatasetsService,
@@ -22,7 +23,10 @@ export class DatasetsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.datasetsService.LoadDatasets().subscribe((res) => {
-      this.datasets = res;
+      if (res) {
+        this.datasets = res;
+        this.loading = false;
+      }
     });
   }
   newDatasetDialog() {

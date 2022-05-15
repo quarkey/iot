@@ -17,12 +17,14 @@ export class EventsComponent implements OnInit {
   ) {}
   displayedColumns: string[] = ["id", "category", "message", "event_time"];
   dataSource: any;
+  loading: boolean = true;
   @ViewChild(MatSort) sort: MatSort;
   ngOnInit(): void {
     this.eventsService.LoadEvents(50).subscribe((res) => {
       if (res) {
         this.dataSource = new MatTableDataSource(res);
         this.dataSource.sort = this.sort;
+        this.loading = false;
       }
     });
   }

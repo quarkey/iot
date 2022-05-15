@@ -2,6 +2,15 @@
   <mat-card-title>System information</mat-card-title>
   <mat-card-content>
     <br />
-    <pre>{{ stats | json }}</pre>
+    <div
+      fxLayoutAlign="center"
+      style="padding-top: 20px"
+      *ngIf="loading; else show"
+    >
+      <mat-spinner></mat-spinner>
+    </div>
+    <ng-template #show>
+      <pre>{{ stats | json }}</pre>
+    </ng-template>
   </mat-card-content>
 </mat-card>
