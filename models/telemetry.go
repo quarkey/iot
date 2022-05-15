@@ -120,11 +120,17 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 		if err != nil {
 			log.Printf("[ERROR] unable to update dataset telemetry status: %v", err)
 		}
-		// determine if dataset telemetry is "offline":
-		// if (current time - next interval time) - intervalSec are more than 60 seconds
-		// we can consider the telemetry to be offline
+		// determine if dataset telemetry is "offline"
+
 		timeFuture := sd.RecordingTime.Unix() + int64(dset.IntervalSec)
-		if (time.Now().Unix()-timeFuture)-int64(dset.IntervalSec) > 60 {
+
+		// fmt.Println("current", time.Now().Unix())
+		// fmt.Println("future", timeFuture)
+		// fmt.Println("ti-tf", time.Now().Unix()-timeFuture)
+
+		// if (current time - next interval time) are more than 60 seconds
+		// we can consider the telemetry to be offline
+		if (time.Now().Unix() - timeFuture) > 60 {
 			SetDatasetIDOffline(t.db, dset.ID)
 		}
 	}
