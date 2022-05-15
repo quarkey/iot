@@ -52,6 +52,8 @@ type Server struct {
 
 // New initialize server and opens a database connection.
 func New(path string, automigrate bool, debug bool) *Server {
+	//TODO move timezone to config
+	SetTimeZone("Europe/Oslo")
 	srv := &Server{}
 	srv.startTime = time.Now()
 	log.Printf("[INFO] Loading config: %v", path)
@@ -232,4 +234,14 @@ func (s *Server) pgTableStats() []pgStats {
 		return nil
 	}
 	return pgStats
+}
+
+func SetTimeZone(tz string) {
+	loc, err := time.LoadLocation(tz)
+	if err != nil {
+		log.Printf("[ERROR] unable to set timezone to '%s': %v", tz, err)
+		return
+	}
+	time.Local = loc
+	log.Printf("[INFO] Timezone set to '%s'", loc.String())
 }

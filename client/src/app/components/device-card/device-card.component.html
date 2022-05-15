@@ -7,7 +7,10 @@
     <mat-card-subtitle
       >Last telemetry:
       <span *ngIf="device.dataset_telemetry">
-        {{ device.dataset_telemetry.String || "no values" }}
+        {{
+          device.dataset_telemetry.String
+            | date: "YYYY-MM-dd HH:mm:ss" || "no values"
+        }}
       </span>
     </mat-card-subtitle>
   </mat-card-header>
