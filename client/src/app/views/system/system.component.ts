@@ -8,12 +8,14 @@ import { GeneralService } from "src/app/services/general.service";
 })
 export class SystemComponent implements OnInit {
   stats: any;
+  loading: boolean = true;
   constructor(private generalService: GeneralService) {}
 
   ngOnInit(): void {
     this.generalService.ServerHealth().subscribe((res) => {
       if (res) {
         this.stats = res;
+        this.loading = false;
       }
     });
   }

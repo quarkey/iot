@@ -37,8 +37,8 @@ func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 500, "unable to save reading:", err)
 		return
 	}
-
-	// broadcasting only when clients are connected
+	// setting dataset to online and broadcasting only when clients are connected
+	SetDatasetIDOnline(s.DB, dat.DatasetID)
 	if len(s.Hub.Clients) > 0 {
 		b, err := json.Marshal(&dat)
 		if err != nil {

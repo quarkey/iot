@@ -1,10 +1,15 @@
 <mat-card>
   <mat-card-header>
     <div mat-card-avatar class="example-header-image">
-      <mat-icon>sensors</mat-icon>
+      <mat-icon>settings_input_component</mat-icon>
     </div>
     <mat-card-title>{{ device.title }}</mat-card-title>
-    <mat-card-subtitle>{{ device.created_at }}</mat-card-subtitle>
+    <mat-card-subtitle
+      >Last telemetry:
+      <span *ngIf="device.dataset_telemetry">
+        {{ device.dataset_telemetry.String || "no values" }}
+      </span>
+    </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     {{ device.description }}

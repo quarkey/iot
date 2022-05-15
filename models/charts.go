@@ -29,7 +29,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(data) == 0 {
-		helper.RespondErr(w, r, http.StatusServiceUnavailable, "dataset is empty with reference: ", ref)
+		helper.RespondErr(w, r, 400, "no data for line chart")
 		return
 	}
 	// decoding jsonRawMessage data column
@@ -89,6 +89,10 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	data, err := loadData(s.DB, ref)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	if len(data) == 0 {
+		helper.RespondErr(w, r, 400, "no data for area chart")
 		return
 	}
 	// decoding jsonRawMessage data column

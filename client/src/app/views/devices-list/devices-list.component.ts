@@ -12,6 +12,7 @@ import { DialogsService } from "src/app/services/dialogs.service";
 export class DevicesListComponent implements OnInit {
   devices$: Observable<Device[]>;
   devices: Device[];
+  loading: boolean = true;
 
   constructor(
     private deviceService: DevicesService,
@@ -21,7 +22,10 @@ export class DevicesListComponent implements OnInit {
   ngOnInit(): void {
     this.deviceService.LoadDevices().subscribe((res) => {
       console.log("fetching devices");
-      this.devices = res;
+      if (res) {
+        this.devices = res;
+        this.loading = false;
+      }
     });
   }
   newDeviceDialog() {

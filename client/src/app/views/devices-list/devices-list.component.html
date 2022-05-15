@@ -1,19 +1,24 @@
 <div class="backgroundImage">
-  <div
-    fxLayout="row wrap"
-    fxLayoutGap="16px grid"
-    fxLayoutAlign="space-evenly center"
-    style="padding: 20px"
-  >
-    <div
-      fxFlex="25%"
-      fxFlex.xs="90%"
-      fxFlex.sm="50%"
-      *ngFor="let item of devices"
-    >
-      <app-device-card [device]="item"></app-device-card>
-    </div>
+  <div fxLayoutAlign="center" style="padding-top: 20px">
+    <mat-spinner *ngIf="loading; else show"></mat-spinner>
   </div>
+  <ng-template #show>
+    <div
+      fxLayout="row wrap"
+      fxLayoutGap="16px grid"
+      fxLayoutAlign="space-evenly center"
+      style="padding: 20px"
+    >
+      <div
+        fxFlex="25%"
+        fxFlex.xs="90%"
+        fxFlex.sm="50%"
+        *ngFor="let item of devices"
+      >
+        <app-device-card [device]="item"></app-device-card>
+      </div>
+    </div>
+  </ng-template>
 </div>
 <button
   mat-fab
