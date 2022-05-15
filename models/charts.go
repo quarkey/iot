@@ -129,17 +129,21 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, out)
 }
 
+// loadData fetches the last 1000 records in the correct order
 func loadData(db *sqlx.DB, ref string) ([]Data, error) {
 	var data []Data
 	err := db.Select(&data, `
-	select 
+	select * from (select 
 		a.id,
 		a.data,
 		a.time 
-	from sensordata a, datasets b 
-	where b.reference=$1 
-	and b.id = a.dataset_id
-	order by id desc limit 1000
+		from sensordata a, datasets b 
+		where b.reference=$1 
+		and b.id = a.dataset_id
+		order by id desc limit 1000
+	) as storedItems
+	order by id asc;
+
 	--and a.time BETWEEN NOW() - INTERVAL '3 HOURS' AND NOW()
 	`, ref)
 	if err != nil {

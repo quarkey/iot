@@ -7,6 +7,7 @@ import { DeviceComponent } from "./views/device/device.component";
 import { DevicesListComponent } from "./views/devices-list/devices-list.component";
 import { EventsComponent } from "./views/events/events.component";
 import { DashComponent } from "./views/dash/dash.component";
+import { SystemComponent } from "./views/system/system.component";
 
 const routes: Routes = [
   { path: "dashboard", component: DashboardComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: "datasets", component: DatasetsListComponent },
   { path: "datasets/:reference", component: DatasetComponent },
   { path: "events", component: EventsComponent },
+  { path: "system", component: SystemComponent },
 
   {
     path: "**",

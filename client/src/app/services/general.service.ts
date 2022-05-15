@@ -13,6 +13,9 @@ export class GeneralService {
   public Dashboard() {
     return this.http.get<Dashboard>(`${environment.apiUrl}/api/dashboard`);
   }
+  public ServerHealth() {
+    return this.http.get<any>(`${environment.apiUrl}/api/health`);
+  }
   DownloadFile(data: Object, filename: string) {
     let csvData = this.convertToCSV(data);
     let blob = new Blob(["\ufeff" + csvData], {
