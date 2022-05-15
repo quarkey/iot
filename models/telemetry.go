@@ -86,8 +86,8 @@ func (t *Telemetry) CheckSensorsTelemetry() {
 	// TODO: "ping" device by ip, waiting for arduino sketch
 }
 
-// UpdateDatasetTelemetry checks for duration between collected signals
-// and tries to determine connectivity.
+// UpdateDatasetTelemetry updates dataset telemetry,
+// but also set dataset to offline if telemetry due are over 60 seconds.
 func (t *Telemetry) CheckDatasetTelemetry() {
 	for _, dset := range t.datasets {
 		// running query to get last signal received
@@ -115,35 +115,17 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 			}
 			log.Printf("[ERROR] problems with selecting sensordata: %v", err)
 		}
-		// now := time.Now()
-		// tx := unixdiff(now, sd.RecordingTime)
-		msg := fmt.Sprintf("since last telemetry %s", time.Since(sd.RecordingTime.UTC()))
-		_, err = t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", msg, sd.SensorID)
+		// updating sensor dataset telemetry with last recorded time
+		_, err = t.db.Exec("update iot.sensors set dataset_telemetry=$1 where id=$2", sd.RecordingTime, sd.SensorID)
 		if err != nil {
 			log.Printf("[ERROR] unable to update dataset telemetry status: %v", err)
 		}
+		// determine if dataset telemetry is "offline":
+		// if (current time - next interval time) - intervalSec are more than 60 seconds
+		// we can consider the telemetry to be offline
+		timeFuture := sd.RecordingTime.Unix() + int64(dset.IntervalSec)
+		if (time.Now().Unix()-timeFuture)-int64(dset.IntervalSec) > 60 {
+			SetDatasetIDOffline(t.db, dset.ID)
+		}
 	}
-}
-
-type diffunix struct {
-	t1 int64
-	t2 int64
-}
-
-// unixdiff ...
-func unixdiff(t1, t2 time.Time) *diffunix {
-	return &diffunix{
-		t1: t1.Unix(),
-		t2: t2.Unix(),
-	}
-}
-
-// diff ...
-func (d *diffunix) diff() int64 {
-	return d.t1 - d.t2
-}
-
-// duration ...
-func (d *diffunix) duration() time.Duration {
-	return time.Duration(d.diff() * int64(time.Second))
 }

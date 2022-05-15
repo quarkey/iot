@@ -1,7 +1,9 @@
 <mat-card class="mat-elevation-z4">
   <mat-card-header>
     <div mat-card-avatar class="example-header-image">
-      <mat-icon>sensors</mat-icon>
+      <mat-icon [ngClass]="dataset.telemetry == 'online' ? 'online' : 'offline'"
+        >input</mat-icon
+      >
     </div>
     <mat-card-title>{{ dataset.title }}</mat-card-title>
     <mat-card-subtitle>{{ dataset.sensor_title }}</mat-card-subtitle>

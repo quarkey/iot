@@ -127,6 +127,13 @@ func (srv *Server) Run(ctx context.Context) {
 	}
 
 	log.Printf("[INFO] Starting to listen on %s", srv.Config["api_addr"].(string))
+
+	// resetting dataset connectivity on start to offline
+	err := srv.ResetDatasetConnectivity()
+	if err != nil {
+		log.Printf("[ERROR] %v", err)
+	}
+
 	srv.NewEvent(SystemEvent, "Server started")
 	// socket hub for live monitoring
 	hub := hub.NewHub()
@@ -152,7 +159,7 @@ func (srv *Server) Run(ctx context.Context) {
 			}
 		}
 	}(ctx)
-	err := srv.httpServer.ListenAndServe()
+	err = srv.httpServer.ListenAndServe()
 	if err != nil {
 		log.Printf("[INFO] Service stopped")
 		srv.NewEvent(SystemEvent, "Server stopped")

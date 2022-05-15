@@ -26,6 +26,7 @@ type Dataset struct {
 	Showcharts  *json.RawMessage `db:"showcharts" json:"showcharts"`
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 	SensorTitle string           `db:"sensor_title" json:"sensor_title"`
+	Telemetry   string           `db:"telemetry" json:"telemetry"`
 }
 
 // GetDatasetsList fetches a list of all datasets
@@ -43,7 +44,8 @@ func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request)
 			a.types,
 			a.showcharts,
 			a.created_at,
-			b.title as sensor_title
+			b.title as sensor_title,
+			a.telemetry
 		from datasets a, sensors b
 		where a.sensor_id = b.id`)
 	if err != nil {
@@ -68,7 +70,8 @@ func GetDatasetsList(db *sqlx.DB) []Dataset {
 			a.types,
 			a.showcharts,
 			a.created_at,
-			b.title as sensor_title
+			b.title as sensor_title,
+			a.telemetry
 		from datasets a, sensors b
 		where a.sensor_id = b.id`)
 	if err != nil {
@@ -103,7 +106,8 @@ func (s Server) getDsetByRef(ref string) (Dataset, error) {
 		a.types,
 		a.showcharts,
 		a.created_at,
-		b.title as sensor_title
+		b.title as sensor_title,
+		a.telemetry
 	from datasets a, sensors b
 	where reference=$1
 	and a.sensor_id = b.id
@@ -265,4 +269,28 @@ func datasetShowChartBools(ref string, db *sqlx.DB) ([]bool, error) {
 		}
 	}
 	return nextOut, nil
+}
+
+// ResetDatasetConnectivity sets all dataset telemetry status to offline.
+func (s *Server) ResetDatasetConnectivity() error {
+	_, err := s.DB.Exec(`update datasets set telemetry='offline'`)
+	if err != nil {
+		return fmt.Errorf("unable to set dataset telemetry to 'offline': %v", err)
+	}
+	return nil
+}
+
+func SetDatasetIDOnline(db *sqlx.DB, id int) {
+	_, err := db.Exec(`update datasets set telemetry='online' where id=$1`, id)
+	if err != nil {
+		log.Printf("[ERROR] unable to set dataset telemetry to 'online': %v", err)
+		return
+	}
+}
+func SetDatasetIDOffline(db *sqlx.DB, id int) {
+	_, err := db.Exec(`update datasets set telemetry='offline' where id=$1`, id)
+	if err != nil {
+		log.Printf("[ERROR] unable to set dataset telemetry to 'offline': %v", err)
+		return
+	}
 }

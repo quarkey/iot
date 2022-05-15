@@ -1,0 +1,1 @@
+alter table datasets add column if not exists telemetry text not null default 'offline';
