@@ -124,9 +124,9 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 
 		timeFuture := sd.RecordingTime.Unix() + int64(dset.IntervalSec)
 
-		fmt.Println("current", time.Now().Unix())
-		fmt.Println("future", timeFuture)
-		fmt.Println("ti-tf", time.Now().Unix()-timeFuture)
+		// fmt.Println("current", time.Now().Unix())
+		// fmt.Println("future", timeFuture)
+		// fmt.Println("ti-tf", time.Now().Unix()-timeFuture)
 
 		// if (current time - next interval time) are more than 60 seconds
 		// we can consider the telemetry to be offline
