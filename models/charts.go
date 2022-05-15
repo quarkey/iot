@@ -29,7 +29,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(data) == 0 {
-		helper.Respond(w, r, 200, "[]")
+		helper.RespondErr(w, r, 400, "no data for line chart")
 		return
 	}
 	// decoding jsonRawMessage data column
@@ -92,7 +92,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(data) == 0 {
-		helper.Respond(w, r, 200, "[]")
+		helper.RespondErr(w, r, 400, "no data for area chart")
 		return
 	}
 	// decoding jsonRawMessage data column
