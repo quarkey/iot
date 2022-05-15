@@ -135,3 +135,22 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 		}
 	}
 }
+
+// AutomaticUpdateSensorIPAdress will automatically update the current ip address for given sensor id,
+// but only if the current value is 0.0.0.0.
+func (t *Telemetry) AutomaticUpdateSensorIPAdress(ipaddr string, sensor_id int) {
+	var cip string // current ip
+	err := t.db.Get(&cip, "select sensor_ip from sensors where id=$1", sensor_id)
+	if err != nil {
+		log.Printf("[ERROR] unable to select sensor ip: %v", err)
+	}
+
+	if cip == "0.0.0.0" {
+		_, err = t.db.Exec("update sensors set sensor_ip=$1", ipaddr)
+		if err != nil {
+			log.Printf("[ERROR] unable to update sensor ip: %v", err)
+			return
+		}
+		log.Printf("[INFO] setting ip '%s' (previously: 0.0.0.0) for sensor with id '%d'", ipaddr, sensor_id)
+	}
+}
