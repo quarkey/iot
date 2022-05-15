@@ -9,8 +9,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -31,6 +33,8 @@ var SystemEvent = "system"
 var SernsorEvent = "sensor"
 var DatasetEvent = "dataset"
 
+var TimeFormat = "2006-02-01 15:04:05"
+
 // Server ....
 type Server struct {
 	DB *sqlx.DB
@@ -43,11 +47,13 @@ type Server struct {
 	Hub       *hub.Hub
 	Telemetry *Telemetry
 	Debug     bool
+	startTime time.Time
 }
 
 // New initialize server and opens a database connection.
 func New(path string, automigrate bool, debug bool) *Server {
 	srv := &Server{}
+	srv.startTime = time.Now()
 	log.Printf("[INFO] Loading config: %v", path)
 	err := srv.loadcfg(path)
 	if err != nil {
@@ -183,11 +189,40 @@ func logRequest(handler http.Handler) http.Handler {
 }
 
 func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	helper.Respond(w, r, 200, "it's alive!")
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+
+	out := map[string]interface{}{
+		"start_time":         s.startTime.Local().Format(TimeFormat),
+		"uptime":             time.Since(s.startTime).String(),
+		"memory_alloc":       helper.BytesToHuman(int64(m.Alloc)),
+		"memory_tot_alloc":   helper.BytesToHuman(int64(m.TotalAlloc)),
+		"system_mem":         helper.BytesToHuman(int64(m.Sys)),
+		"garbage_collection": m.NumGC,
+		"pg_table_stats":     s.pgTableStats(),
+	}
+	helper.Respond(w, r, 200, out)
 }
 func (s *Server) API_URL() string {
 	return fmt.Sprintf("http://%s/api", s.Config["api_addr"].(string))
 }
 func (s *Server) SERVER_URL() string {
 	return fmt.Sprintf("http://%s", s.Config["api_addr"].(string))
+}
+
+type pgStats struct {
+	Relname    string `db:"relname" json:"relname"`
+	Full_size  string `db:"full_size" json:"full_size"`
+	Table_size string `db:"table_size" json:"table_size"`
+	Index_size string `db:"index_size" json:"index_size"`
+}
+
+func (s *Server) pgTableStats() []pgStats {
+	var pgStats []pgStats
+	err := s.DB.Select(&pgStats, `select relname, pg_size_pretty(pg_total_relation_size(relname::regclass)) as full_size, pg_size_pretty(pg_relation_size(relname::regclass)) as table_size, pg_size_pretty(pg_total_relation_size(relname::regclass) - pg_relation_size(relname::regclass)) as index_size from pg_stat_user_tables order by pg_total_relation_size(relname::regclass) desc limit 10;`)
+	if err != nil {
+		log.Printf("[ERROR] unable to get pg stats: %v", err)
+		return nil
+	}
+	return pgStats
 }
