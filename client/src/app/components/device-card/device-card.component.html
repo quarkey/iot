@@ -5,7 +5,8 @@
     </div>
     <mat-card-title>{{ device.title }}</mat-card-title>
     <mat-card-subtitle
-      >Last telemetry: {{ device.dataset_telemetry.String }}</mat-card-subtitle
+      >Last telemetry:
+      {{ device.dataset_telemetry.String | 'no values' }}</mat-card-subtitle
     >
   </mat-card-header>
   <mat-card-content>
