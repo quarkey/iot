@@ -12,7 +12,7 @@ export interface Dataset {
   types: string[];
   showcharts: boolean[];
   sensor_title: string;
-  telemetry: string;
+  telemetry?: string;
 }
 
 export interface Sensordata {
