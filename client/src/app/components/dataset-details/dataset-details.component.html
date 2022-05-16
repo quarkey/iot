@@ -1,19 +1,23 @@
 <mat-card [formGroup]="form">
   <mat-card-title><h2>Dataset configuration</h2></mat-card-title>
   <mat-card-subtitle>{{ dataset.sensor_title }}</mat-card-subtitle>
-  <mat-form-field appearance="fill">
-    <input matInput formControlName="title" placeholder="Title" />
-  </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Description</mat-label>
-    <textarea matInput formControlName="description"></textarea>
-  </mat-form-field>
+  <div fxLayout="row" fxFlexFill fxLayout.lt-md="column" fxLayoutGap="16px">
+    <mat-form-field fxFlex appearance="fill">
+      <input matInput formControlName="title" placeholder="Title" />
+    </mat-form-field>
+    <mat-form-field fxFlex appearance="fill">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
+  </div>
+
   <br />
   <h3>Datapoint collection interval in seconds</h3>
   <mat-form-field appearance="fill" class="smaller">
     <input matInput formControlName="intervalsec" type="number" />
   </mat-form-field>
+
   <h3>Datapoint types and fields</h3>
   <div formArrayName="types">
     <button mat-icon-button (click)="addTypeField()">
@@ -27,7 +31,7 @@
       <input matInput [formControlName]="i" />
     </mat-form-field>
   </div>
-
+  <h3>Field name</h3>
   <div formArrayName="fields">
     <mat-form-field
       *ngFor="let field of fields.controls; let i = index"
@@ -36,9 +40,14 @@
       <input matInput [formControlName]="i" />
     </mat-form-field>
   </div>
+  <h3>Show data in graph</h3>
   <div formArrayName="showcharts">
     <mat-form-field *ngFor="let show of showcharts.controls; let i = index">
-      <input matInput [formControlName]="i" />
+      <mat-label>{{ fields.controls[i].value }}</mat-label>
+      <mat-select [formControlName]="i">
+        <mat-option value="true"> true </mat-option>
+        <mat-option value="false"> false </mat-option>
+      </mat-select>
     </mat-form-field>
   </div>
   <mat-card-actions>

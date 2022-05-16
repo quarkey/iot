@@ -40,12 +40,11 @@ import { DatasetDetailsComponent } from "./components/dataset-details/dataset-de
 import { DatasetCardComponent } from "./components/dataset-card/dataset-card.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { DeviceCardComponent } from "./components/device-card/device-card.component";
-import { DashComponent } from './views/dash/dash.component';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatMenuModule } from '@angular/material/menu';
-import { LayoutModule } from '@angular/cdk/layout';
-import { SystemComponent } from './views/system/system.component';
-
+import { DashComponent } from "./views/dash/dash.component";
+import { MatGridListModule } from "@angular/material/grid-list";
+import { MatMenuModule } from "@angular/material/menu";
+import { LayoutModule } from "@angular/cdk/layout";
+import { SystemComponent } from "./views/system/system.component";
 @NgModule({
   declarations: [
     AppComponent,

@@ -61,7 +61,13 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 				helper.RespondErr(w, r, 500, err)
 				return
 			}
-			ps.Data = append(ps.Data, toFloatValueFn(decoded[i]))
+			toFloatValue, err := strconv.ParseFloat(decoded[i], 64)
+			if err != nil {
+				msg := fmt.Sprintf("LineChartDataSeries(): unable to parse data point '%v', check type for column '%d'", decoded[i], i)
+				helper.RespondErr(w, r, 500, msg)
+				return
+			}
+			ps.Data = append(ps.Data, toFloatValue)
 		}
 		out = append(out, ps)
 	}
@@ -123,7 +129,8 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 			// converting data point from string to float
 			toFloatValue, err := strconv.ParseFloat(decoded[i], 64)
 			if err != nil {
-				helper.RespondErr(w, r, 500, err)
+				msg := fmt.Sprintf("AreaChartDataSeries(): unable to parse data point '%v', check type for column '%d'", decoded[i], i)
+				helper.RespondErr(w, r, 500, msg)
 				return
 			}
 			ps = append(ps, Point{Name: set.Time.String(), Value: toFloatValue})
@@ -154,12 +161,4 @@ func loadData(db *sqlx.DB, ref string) ([]Data, error) {
 		return nil, fmt.Errorf("unable to get dataset from db: %v", err)
 	}
 	return data, nil
-}
-
-func toFloatValueFn(str string) float64 {
-	toFloatValue, err := strconv.ParseFloat(str, 64)
-	if err != nil {
-		return 0
-	}
-	return toFloatValue
 }
