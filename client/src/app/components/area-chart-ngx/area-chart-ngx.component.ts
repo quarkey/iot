@@ -1,14 +1,14 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Dataset, Sensordata } from "src/app/models/dataset";
 import { DatasetsService } from "src/app/services/datasets.service";
-import { multi, SAMPLEDATA } from "./line-chart-ngx";
+import { multi, SAMPLEDATA } from "./area-chart-ngx";
 
 @Component({
   selector: "app-dataset-data",
-  templateUrl: "./line-chart-ngx.component.html",
-  styleUrls: ["./line-chart-ngx.component.scss"],
+  templateUrl: "./area-chart-ngx.component.html",
+  styleUrls: ["./area-chart-ngx.component.scss"],
 })
-export class LineChartNgxComponent implements OnInit {
+export class AreaChartNgxComponent implements OnInit {
   @Input() dataset: Dataset;
   data: any;
   loading: boolean = true;

@@ -18,7 +18,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { DeviceComponent } from "./views/device/device.component";
 import { DatasetComponent } from "./views/dataset/dataset.component";
 import { MatTabsModule } from "@angular/material/tabs";
-import { LineChartNgxComponent } from "./components/line-chart-ngx/line-chart-ngx.component";
+import { AreaChartNgxComponent } from "./components/area-chart-ngx/area-chart-ngx.component";
 import { NewDeviceDialogComponent } from "./components/dialogs/new-device/new-device.component";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatCardModule } from "@angular/material/card";
@@ -56,7 +56,7 @@ import { SystemComponent } from "./views/system/system.component";
     DeviceComponent,
     DatasetComponent,
     DatasetDetailsComponent,
-    LineChartNgxComponent,
+    AreaChartNgxComponent,
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
     LineChartComponent,
