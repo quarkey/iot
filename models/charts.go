@@ -46,7 +46,11 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 400, err)
 		return
 	}
-
+	// if we encounter more data points than columns we'll just add a unknown one
+	if len(raw) > len(fields) {
+		fields = append(fields, "unknow column")
+		showcharts = append(showcharts, true)
+	}
 	var series LineChart
 	var out []LineChartDataset
 	for i := 0; i < len(raw); i++ {
@@ -63,7 +67,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 			}
 			toFloatValue, err := strconv.ParseFloat(decoded[i], 64)
 			if err != nil {
-				msg := fmt.Sprintf("LineChartDataSeries(): unable to parse data point '%v', check type for column '%d'", decoded[i], i)
+				msg := fmt.Sprintf("LineChartDataSeries(): unable to parse data point '%v', check type for column %d", decoded[i], i)
 				helper.RespondErr(w, r, 500, msg)
 				return
 			}
@@ -112,6 +116,11 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 400, err)
 		return
 	}
+	// if we encounter more data points than columns we'll just add a unknown one
+	if len(raw) > len(fields) {
+		fields = append(fields, "unknow field")
+		showcharts = append(showcharts, true)
+	}
 	// populate data structure fitted for ngx-charts
 	var out []AreaChart
 	for i := 0; i < len(raw); i++ {
@@ -129,7 +138,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 			// converting data point from string to float
 			toFloatValue, err := strconv.ParseFloat(decoded[i], 64)
 			if err != nil {
-				msg := fmt.Sprintf("AreaChartDataSeries(): unable to parse data point '%v', check type for column '%d'", decoded[i], i)
+				msg := fmt.Sprintf("AreaChartDataSeries(): unable to parse data point '%v', check type for column %d", decoded[i], i)
 				helper.RespondErr(w, r, 500, msg)
 				return
 			}
