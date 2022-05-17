@@ -20,7 +20,11 @@
 
   <h3>Datapoint types and fields</h3>
   <div formArrayName="types">
-    <button mat-icon-button (click)="addTypeField()">
+    <button
+      mat-icon-button
+      matTooltip="Add field column"
+      (click)="addTypeField()"
+    >
       <mat-icon>add</mat-icon>
     </button>
     <mat-form-field
