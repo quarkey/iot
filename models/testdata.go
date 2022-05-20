@@ -36,6 +36,29 @@ func (s *Server) InsertTestdata() error {
 		{"adding dataset 3", `insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types) 
 		values(3,'Bicycle to work 2','Battery-driven lat/long tracker','dummykey',4,'["lat (n)", "long (e)", "direction"]','["float","float","string"]');`},
 		{"data point 1", `insert into sensordata(sensor_id, dataset_id, data) values(3,currval(pg_get_serial_sequence('datasets', 'id')),'["58.8533","5.7329","e"]');`},
+
+		// controllers
+		{"sensor with on off relay", `insert into sensors(title, description, arduino_key)
+		values ('Arduino on off relay', 'roof fan', 'arduino_key123');
+		`},
+		{"controller threshold switch 1", `insert into controllers(sensor_id, category, title, description, items, alert, active) values
+		(
+			4,
+			'thresholdswitch',
+			'turn on fan above 25c',
+			'when temperature is above 25c turn on roof fan',
+			'{
+				"description": "dataset col 0 > 25c", 
+				"datasource": "d1c0", 
+				"operation": 
+				"greather than", 
+				"threshold_limit": 25, 
+				"on": true 
+			}',
+			't',
+			't'
+		);
+		`},
 	}
 	runCommandsDescr(testdata, s.DB)
 
