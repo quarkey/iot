@@ -170,8 +170,8 @@ type Data struct {
 	Time time.Time        `json:"time"`
 }
 
-// GetSensorDataByReference fetches a dataset by a reference
-func (s *Server) GetSensorDataByReference(w http.ResponseWriter, r *http.Request) {
+// GetSensorDataByReferenceEndpoint fetches a dataset by a reference
+func (s *Server) GetSensorDataByReferenceEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var data []Data
 	data, err := getSensorDataByReference(s.DB, vars["reference"])
@@ -206,7 +206,7 @@ func ExportSensorDataToCSV(ref string, db *sqlx.DB) (interface{}, error) {
 		return nil, fmt.Errorf("unable to get datasetfields: %v", err)
 
 	}
-	dat, err := getSensorDataByReference(db, ref)
+	dat, err := loadSensorData(db, ref)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get data: %v", err)
 	}

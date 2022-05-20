@@ -14,7 +14,7 @@ func (s *Server) SetupEndpoints() {
 	s.Router.HandleFunc("/api/sensors", s.GetSensorsListEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/sensors/{reference}", s.GetSensorByReference).Methods("GET")
 
-	s.Router.HandleFunc("/api/sensordata/{reference}", s.GetSensorDataByReference).Methods("GET")
+	s.Router.HandleFunc("/api/sensordata/{reference}", s.GetSensorDataByReferenceEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/sensordata", s.SaveSensorReading).Methods("POST")
 	s.Router.HandleFunc("/api/syncdata", s.SyncSensorData).Methods("POST")
 
