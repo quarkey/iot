@@ -30,7 +30,10 @@ func (s *Server) SetupEndpoints() {
 	// events
 	s.Router.HandleFunc("/api/events/{count}", s.EventLogEndpoint).Methods("GET")
 
-	// s.Router.HandleFunc("/ws/{dataset_id}", func(w http.ResponseWriter, r *http.Request) {
+	// controllers
+	s.Router.HandleFunc("/api/controllers", s.GetControllersListEndpoint).Methods("GET")
+
+	// socket upgrader for live dataset monitoring
 	s.Router.HandleFunc("/api/live", func(w http.ResponseWriter, r *http.Request) {
 		hub.ServeWs(s.Hub, w, r)
 	})

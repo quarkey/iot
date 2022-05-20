@@ -3,9 +3,11 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	helper "github.com/quarkey/iot/json"
 )
 
 type Controllers struct {
@@ -40,6 +42,10 @@ func GetControllersList(db *sqlx.DB) ([]Controllers, error) {
 	}
 	return cs, nil
 }
-func (s *Server) GetControllersListEndpoint() {
-
+func (s *Server) GetControllersListEndpoint(w http.ResponseWriter, r *http.Request) {
+	cs, err := GetControllersList(s.DB)
+	if err != nil {
+		helper.RespondErr(w, r, 500, err)
+	}
+	helper.Respond(w, r, 200, cs)
 }

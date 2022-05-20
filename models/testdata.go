@@ -47,14 +47,14 @@ func (s *Server) InsertTestdata() error {
 			'thresholdswitch',
 			'turn on fan above 25c',
 			'when temperature is above 25c turn on roof fan',
-			'{
+			'[{
 				"description": "dataset col 0 > 25c", 
 				"datasource": "d1c0", 
 				"operation": 
 				"greather than", 
 				"threshold_limit": 25, 
-				"on": true 
-			}',
+				"on": false 
+			}]',
 			't',
 			't'
 		);
