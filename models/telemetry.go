@@ -9,11 +9,13 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// A telemetry struct holds the telemetry components in memory.
 type Telemetry struct {
-	done     chan bool
-	db       *sqlx.DB
-	datasets []Dataset
-	sensors  []Sensor
+	done        chan bool // closes the time.Ticker go routine.
+	db          *sqlx.DB
+	datasets    []Dataset     // in memory datasets
+	sensors     []Sensor      // in memory sensors
+	controllers []Controllers // in memory controllers
 }
 
 // newTelemetryTicker ...
@@ -27,9 +29,11 @@ func newTelemetryTicker(db *sqlx.DB) *Telemetry {
 // startTicker starts telemetry ticker, running a initial check on startup.
 func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, debug bool) {
 	// for some reason map[string]interface{} thinks value is float64
-	durfloat64 := cfg["checkTelemetryTimer"].(float64)
-	ticker := time.NewTicker(time.Duration(int(durfloat64)) * time.Second)
-	log.Printf("[INFO] Telemetry check every %d seconds\n", int(durfloat64))
+	checkTelemetryTimer := cfg["checkTelemetryTimer"].(float64)
+	duration := 0
+
+	ticker := time.NewTicker(time.Duration(1 * time.Second))
+	log.Printf("[INFO] Telemetry check every %d seconds\n", int(checkTelemetryTimer))
 	telemetry.init(true)
 	done := make(chan bool)
 	go func() {
@@ -37,12 +41,18 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 			select {
 			case <-done:
 				return
-			case t := <-ticker.C:
-				if len(telemetry.datasets) > 0 {
-					log.Println("[INFO] Telemetry check", t)
-					telemetry.CheckDatasetTelemetry()
-					telemetry.CheckSensorsTelemetry()
+			case <-ticker.C:
+				if duration > int(checkTelemetryTimer) {
+					if len(telemetry.datasets) > 0 {
+						log.Println("[INFO] Telemetry check")
+						telemetry.CheckDatasetTelemetry()
+						telemetry.CheckSensorsTelemetry()
+					}
+					duration = 0
 				}
+				// controllers require extra precision so check is done every second
+				telemetry.CheckControllersTelemetry()
+				duration++
 			}
 		}
 	}()
@@ -53,7 +63,8 @@ func (t *Telemetry) UpdateTelemetryLists() {
 	t.init(false)
 }
 
-// init loads sensors and dataset into memory, caller can initiate telemetry check.
+// init loads sensors, dataset and controllers into memory, caller can initiate telemetry check
+// by passing true.
 func (t *Telemetry) init(updateTelemetry bool) {
 	// loading sensor into memory
 	t.sensors = GetSensorsList(t.db)
@@ -61,11 +72,19 @@ func (t *Telemetry) init(updateTelemetry bool) {
 	if len(t.sensors) == 0 {
 		log.Printf("[WARNING] no sensors available in database")
 	}
+
 	// loading dataset into memory
 	t.datasets = GetDatasetsList(t.db)
 	log.Printf("[INFO] loading telemetry dataset list...")
 	if len(t.datasets) == 0 {
 		log.Printf("[WARNING] No datasets available in database")
+	}
+
+	// loading controllers into memory
+	t.controllers = GetControllersList(t.db)
+	log.Printf("[INFO] loading telemetry controllers list...")
+	if len(t.controllers) == 0 {
+		log.Printf("[WARNING] No active controllers")
 	}
 
 	for _, dset := range t.sensors {
@@ -75,9 +94,15 @@ func (t *Telemetry) init(updateTelemetry bool) {
 	for _, dset := range t.datasets {
 		fmt.Printf("=> monitoring dataset telemetry for '%s'\n", dset.Title)
 	}
+
+	for _, c := range t.controllers {
+		fmt.Printf("=> monitoring controllers telemetry for '%v'\n", c.Title)
+	}
+
 	if updateTelemetry {
 		t.CheckSensorsTelemetry()
 		t.CheckDatasetTelemetry()
+		t.CheckControllersTelemetry()
 	}
 }
 
@@ -134,4 +159,8 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 			SetDatasetIDOffline(t.db, dset.ID)
 		}
 	}
+}
+
+func (t *Telemetry) CheckControllersTelemetry() {
+	// log.Println("[INFO] CheckControllerTelemetry() NOT IMPLEMENTED")
 }
