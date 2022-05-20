@@ -122,6 +122,7 @@ func (s *Server) GetSensorsListEndpoint(w http.ResponseWriter, r *http.Request) 
 }
 
 func GetSensorsList(db *sqlx.DB) []Sensor {
+	// TODO: add error handling
 	var sensors []Sensor
 	err := db.Select(&sensors, `
 	select
@@ -174,28 +175,12 @@ type Data struct {
 func (s *Server) GetSensorDataByReferenceEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var data []Data
-	data, err := getSensorDataByReference(s.DB, vars["reference"])
+	data, err := loadSensorData(s.DB, vars["reference"])
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
 		return
 	}
 	helper.Respond(w, r, 200, data)
-}
-func getSensorDataByReference(db *sqlx.DB, ref string) ([]Data, error) {
-	var data []Data
-	err := db.Select(&data, `
-	select 
-		a.id,
-		a.data,
-		a.time 
-	from sensordata a, datasets b 
-	where b.reference=$1 
-	and b.id = a.dataset_id`,
-		ref)
-	if err != nil {
-		return nil, fmt.Errorf("unable to get sensor data")
-	}
-	return data, nil
 }
 
 // ExportSensorDataToCSV generates a csv dataset with corresponding columns

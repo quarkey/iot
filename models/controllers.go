@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -20,7 +21,7 @@ type Controllers struct {
 }
 
 // GetControllersList fetches a list of controllers. All types of errors will return empty a slice.
-func GetControllersList(db *sqlx.DB) []Controllers {
+func GetControllersList(db *sqlx.DB) ([]Controllers, error) {
 	var cs []Controllers
 	err := db.Select(&cs, `
 	select
@@ -35,7 +36,10 @@ func GetControllersList(db *sqlx.DB) []Controllers {
 		created_at 
 	from controllers`)
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("unable to get list of controllers: %v", err)
 	}
-	return cs
+	return cs, nil
+}
+func (s *Server) GetControllersListEndpoint() {
+
 }

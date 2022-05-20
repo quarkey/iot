@@ -81,7 +81,8 @@ func (t *Telemetry) init(updateTelemetry bool) {
 	}
 
 	// loading controllers into memory
-	t.controllers = GetControllersList(t.db)
+	t.controllers, _ = GetControllersList(t.db)
+	// TODO handle error
 	log.Printf("[INFO] loading telemetry controllers list...")
 	if len(t.controllers) == 0 {
 		log.Printf("[WARNING] No active controllers")
