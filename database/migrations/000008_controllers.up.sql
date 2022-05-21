@@ -9,6 +9,7 @@ create table if not exists controllers (
     */
     title text,
     description text,
+    switch integer default 0,
     items jsonb,
     /*
         switch:
@@ -25,7 +26,6 @@ create table if not exists controllers (
             operations grather than, less than, equal, not equal
             threshold_limit
             on=true
-        
     */
     alert boolean,
     active boolean,
