@@ -13,9 +13,9 @@ import (
 type Telemetry struct {
 	done        chan bool // closes the time.Ticker go routine.
 	db          *sqlx.DB
-	datasets    []Dataset     // in memory datasets
-	sensors     []Sensor      // in memory sensors
-	controllers []Controllers // in memory controllers
+	datasets    []Dataset      // in memory datasets
+	sensors     []SensorDevice // in memory sensors
+	controllers []Controllers  // in memory controllers
 }
 
 // newTelemetryTicker ...
@@ -65,7 +65,7 @@ func (t *Telemetry) UpdateTelemetryLists() {
 
 // init loads sensors, dataset and controllers into memory, caller can initiate telemetry check
 // by passing true.
-func (t *Telemetry) init(updateTelemetry bool) {
+func (t *Telemetry) init(runTelemetryCheck bool) {
 	// loading sensor into memory
 	t.sensors = GetSensorsList(t.db)
 	log.Printf("[INFO] loading telemetry sensor list...")
@@ -100,7 +100,7 @@ func (t *Telemetry) init(updateTelemetry bool) {
 		fmt.Printf("=> monitoring controllers telemetry for '%v'\n", c.Title)
 	}
 
-	if updateTelemetry {
+	if runTelemetryCheck {
 		t.CheckSensorsTelemetry()
 		t.CheckDatasetTelemetry()
 		t.CheckControllersTelemetry()
@@ -117,6 +117,7 @@ func (t *Telemetry) CheckSensorsTelemetry() {
 func (t *Telemetry) CheckDatasetTelemetry() {
 	for _, dset := range t.datasets {
 		// running query to get last signal received
+		//TODO: use loadSensorData
 		var sd SensorData
 		err := t.db.Get(&sd, `
 		select
@@ -164,4 +165,7 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 
 func (t *Telemetry) CheckControllersTelemetry() {
 	// log.Println("[INFO] CheckControllerTelemetry() NOT IMPLEMENTED")
+	for _, c := range t.controllers {
+		c.Check()
+	}
 }
