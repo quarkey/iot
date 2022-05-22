@@ -2,11 +2,15 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	helper "github.com/quarkey/iot/json"
 )
 
 // A telemetry struct holds the telemetry components in memory.
@@ -163,9 +167,54 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 	}
 }
 
+// CheckControllersTelemetry ...
 func (t *Telemetry) CheckControllersTelemetry() {
-	// log.Println("[INFO] CheckControllerTelemetry() NOT IMPLEMENTED")
 	for _, c := range t.controllers {
-		c.Check()
+		var ts []Thresholdswitch
+		err := json.Unmarshal(*c.Items, &ts)
+		if err != nil {
+			log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
+		}
+		for _, item := range ts {
+			dset, column := getSpecificSensorDataPoint(item.Datasource)
+			var data *json.RawMessage
+			err := t.db.Get(&data, `
+			select data from sensordata
+			where dataset_id=$1 
+			order by id desc limit 1`, dset)
+			if err != nil {
+				fmt.Println("something failed...", err)
+			}
+			//fmt.Printf("checking datasource '%s'\n", item.Datasource)
+			//fmt.Printf("dataset: %v and column: %v \n", dset, column)
+			slice, err := helper.DecodeRawJSONtoSlice(data)
+			if err != nil {
+				fmt.Printf("something went wrong... %v\n", err)
+			}
+			if len(slice) == 0 {
+				fmt.Println("controller skipped, empty dataset")
+			}
+			// fmt.Printf("Data: %v\n", slice)
+			datapoint, err := strconv.ParseFloat(slice[column], 64)
+			if err != nil {
+				fmt.Printf("something went wrong... %v\n", err)
+				datapoint = 0
+			}
+			c.Check(datapoint, t.db)
+		}
 	}
+}
+
+func getSpecificSensorDataPoint(datasource string) (dataset_id, column int64) {
+	re := regexp.MustCompile("[0-9]+")
+	slice := re.FindAllString(datasource, -1)
+	s0, err := strconv.ParseInt(slice[0], 10, 64)
+	if err != nil {
+		return 0, 0
+	}
+	s1, err := strconv.ParseInt(slice[1], 10, 64)
+	if err != nil {
+		return 0, 0
+	}
+	return s0, s1
 }

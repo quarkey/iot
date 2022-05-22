@@ -38,21 +38,42 @@ func (s *Server) InsertTestdata() error {
 		{"data point 1", `insert into sensordata(sensor_id, dataset_id, data) values(3,currval(pg_get_serial_sequence('datasets', 'id')),'["58.8533","5.7329","e"]');`},
 
 		// controllers
-		{"sensor with on off relay", `insert into sensors(title, description, arduino_key)
+		{"sensor with on off relay 1", `insert into sensors(title, description, arduino_key)
 		values ('Arduino on off relay', 'roof fan', 'arduino_key123');
+		`},
+		{"sensor with on off relay 2", `insert into sensors(title, description, arduino_key)
+		values ('Arduino on off relay', 'heater fan', 'arduino_key345');
 		`},
 		{"controller threshold switch 1", `insert into controllers(sensor_id, category, title, description, items, alert, active) values
 		(
 			4,
 			'thresholdswitch',
-			'turn on fan above 25c',
-			'when temperature is above 25c turn on roof fan',
+			'turn on fan > 45c',
+			'when temperature is above 45c turn on roof fan',
 			'[{
-				"description": "dataset col 0 > 25c", 
+				"description": "dataset col 0 > 45c", 
 				"datasource": "d1c0", 
 				"operation": 
 				"greather than", 
-				"threshold_limit": 25, 
+				"threshold_limit": 45, 
+				"on": false 
+			}]',
+			't',
+			't'
+		);
+		`},
+		{"controller threshold switch 2", `insert into controllers(sensor_id, category, title, description, items, alert, active) values
+		(
+			5,
+			'thresholdswitch',
+			'turn on heater < 20c',
+			'when temperature is below 20c turn on heater',
+			'[{
+				"description": "dataset col 0 < 20c", 
+				"datasource": "d1c0", 
+				"operation": 
+				"less than", 
+				"threshold_limit": 20, 
 				"on": false 
 			}]',
 			't',
