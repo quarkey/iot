@@ -32,6 +32,8 @@ func (s *Server) SetupEndpoints() {
 
 	// controllers
 	s.Router.HandleFunc("/api/controllers", s.GetControllersListEndpoint).Methods("GET")
+	s.Router.HandleFunc("/api/controllers/{cid}", s.GetControllerByIDEndpoint).Methods("GET")
+	s.Router.HandleFunc("/api/controllers", s.UpdateControllerByIDEndpoint).Methods("PUT")
 
 	// socket upgrader for live dataset monitoring
 	s.Router.HandleFunc("/api/live", func(w http.ResponseWriter, r *http.Request) {

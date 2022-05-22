@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
 )
 
-type Controllers struct {
+type Controller struct {
 	ID          int              `db:"id" json:"id"`
 	SensorID    int              `db:"sensor_id" json:"sensor_id"`
 	Category    string           `db:"category" json:"category"`
@@ -31,8 +33,8 @@ type Thresholdswitch struct {
 }
 
 // GetControllersList fetches a list of controllers. All types of errors will return empty a slice.
-func GetControllersList(db *sqlx.DB) ([]Controllers, error) {
-	var cs []Controllers
+func GetControllersList(db *sqlx.DB) ([]Controller, error) {
+	var cs []Controller
 	err := db.Select(&cs, `
 	select
 		id,
@@ -52,6 +54,29 @@ func GetControllersList(db *sqlx.DB) ([]Controllers, error) {
 	return cs, nil
 }
 
+// GetControllerByID loads a specific controller from database by given id
+func GetControllerByID(db *sqlx.DB, cid int) (Controller, error) {
+	var c Controller
+	err := db.Get(&c, `
+	select
+		id,
+		sensor_id,
+		category,
+		title,
+		description,
+		switch,
+		items,
+		alert,
+		active,
+		created_at 
+	from controllers where id=$1`, cid)
+	if err != nil {
+		return c, fmt.Errorf("unable to get '%d' controllers: %v", cid, err)
+	}
+	return c, nil
+}
+
+// GetControllersListEndpoint loads all available controllers
 func (s *Server) GetControllersListEndpoint(w http.ResponseWriter, r *http.Request) {
 	cs, err := GetControllersList(s.DB)
 	if err != nil {
@@ -60,7 +85,93 @@ func (s *Server) GetControllersListEndpoint(w http.ResponseWriter, r *http.Reque
 	helper.Respond(w, r, 200, cs)
 }
 
-func (c Controllers) Check(dataPoint float64, db *sqlx.DB) {
+// GetControllerByIDEndpoint loads a specific controller from database by given id
+func (s *Server) GetControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	n, _ := strconv.Atoi(vars["cid"])
+	c, err := GetControllerByID(s.DB, n)
+	if err != nil {
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	helper.Respond(w, r, 200, c)
+}
+
+// AddControllerEndpoint adds a new controller to the database with initial switch state set to false
+func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request) {
+	var dat Controller
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		log.Printf("unable to decode body: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	_, err = s.DB.Exec(`insert into controllers(sensor_id, category, title, description, switch, items, alert, active)
+	values($1, $2, $3, $4, $5, $6, $7, $8)
+	`,
+		dat.SensorID,
+		dat.Category,
+		dat.Title,
+		dat.Description,
+		dat.Switch,
+		dat.Items,
+		dat.Alert,
+		dat.Active,
+	)
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	// also update telemetry dataset list
+	s.Telemetry.UpdateTelemetryLists()
+	s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
+	helper.RespondSuccess(w, r)
+
+}
+
+// UpdateControllerByIDEndpoint updates the entire row including json items
+func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
+	dat := Controller{}
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		log.Printf("unable to decode body: %v", err)
+		helper.RespondHTTPErr(w, r, 500)
+		return
+	}
+	_, err = s.DB.Exec(`
+	update iot.controllers set 
+		sensor_id=$1,
+		category=$2,
+		title=$3,
+		description=$4,
+		switch=$5,
+		items=$6,
+		alert=$7,
+		active=$8
+	where id=$9`,
+		dat.SensorID,
+		dat.Category,
+		dat.Title,
+		dat.Description,
+		dat.Switch,
+		dat.Items,
+		dat.Alert,
+		dat.Active,
+		dat.ID,
+	)
+	if err != nil {
+		log.Printf("unable to run query: %v", err)
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	// also update telemetry dataset list
+	s.Telemetry.UpdateTelemetryLists()
+	s.NewEvent(DatasetEvent, "controller '%s' updated", dat.Title)
+	helper.Respond(w, r, 200, "updated")
+}
+
+func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
 	var ts []Thresholdswitch
 	err := json.Unmarshal(*c.Items, &ts)
 	if err != nil {
@@ -124,7 +235,7 @@ func (c Controllers) Check(dataPoint float64, db *sqlx.DB) {
 	}
 }
 
-func (c Controllers) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
+func (c Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
 	_, err := db.Exec(`update controllers set
 		switch=$1
 		where id=$2

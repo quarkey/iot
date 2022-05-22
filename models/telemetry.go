@@ -19,7 +19,7 @@ type Telemetry struct {
 	db          *sqlx.DB
 	datasets    []Dataset      // in memory datasets
 	sensors     []SensorDevice // in memory sensors
-	controllers []Controllers  // in memory controllers
+	controllers []Controller   // in memory controllers
 }
 
 // newTelemetryTicker ...
@@ -117,7 +117,7 @@ func (t *Telemetry) CheckSensorsTelemetry() {
 }
 
 // UpdateDatasetTelemetry updates dataset telemetry,
-// but also set dataset to offline if telemetry due are over 60 seconds.
+// but also setting dataset to offline if telemetry due are over 60 seconds.
 func (t *Telemetry) CheckDatasetTelemetry() {
 	for _, dset := range t.datasets {
 		// running query to get last signal received
@@ -205,6 +205,9 @@ func (t *Telemetry) CheckControllersTelemetry() {
 	}
 }
 
+// getSpecificSensorDataPoint takes a datasource string and returns dataset id and column.
+//
+// e.g. d0c1 will return dataset_id=0, column=1
 func getSpecificSensorDataPoint(datasource string) (dataset_id, column int64) {
 	re := regexp.MustCompile("[0-9]+")
 	slice := re.FindAllString(datasource, -1)
