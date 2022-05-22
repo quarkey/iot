@@ -134,7 +134,7 @@ func ExportSensorDataToCSV(ref string, db *sqlx.DB) (interface{}, error) {
 	header = append(header, datalabel...)
 	csv = append(csv, header)
 	for _, x := range dat {
-		slice, _ := helper.DecodeRawJSON(x.Data)
+		slice, _ := helper.DecodeRawJSONtoSlice(x.Data)
 		row := []string{strconv.Itoa(x.ID), x.Time.Format(TimeFormat)}
 		row = append(row, slice...)
 		csv = append(csv, row)

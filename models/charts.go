@@ -33,7 +33,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// decoding jsonRawMessage data column
-	raw, err := helper.DecodeRawJSON(data[0].Data)
+	raw, err := helper.DecodeRawJSONtoSlice(data[0].Data)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
@@ -60,7 +60,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		var ps LineChartDataset
 		ps.Label = fields[i]
 		for _, set := range data {
-			decoded, err := helper.DecodeRawJSON(set.Data)
+			decoded, err := helper.DecodeRawJSONtoSlice(set.Data)
 			if err != nil {
 				helper.RespondErr(w, r, 500, err)
 				return
@@ -106,7 +106,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// decoding jsonRawMessage data column
-	raw, err := helper.DecodeRawJSON(data[0].Data)
+	raw, err := helper.DecodeRawJSONtoSlice(data[0].Data)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
@@ -130,7 +130,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		}
 		var ps []Point
 		for _, set := range data {
-			decoded, err := helper.DecodeRawJSON(set.Data)
+			decoded, err := helper.DecodeRawJSONtoSlice(set.Data)
 			if err != nil {
 				helper.RespondErr(w, r, 500, err)
 				return
