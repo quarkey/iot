@@ -17,4 +17,10 @@ export class ControllersService {
       `${environment.apiUrl}/api/controllers/${id}`
     );
   }
+  public UpdateControllerByID(citem: Controller) {
+    return this.http.put<Controller>(
+      `${environment.apiUrl}/api/controllers`,
+      citem
+    );
+  }
 }

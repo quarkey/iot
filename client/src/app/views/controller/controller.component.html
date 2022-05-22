@@ -1,4 +1,14 @@
-<p>controller works!</p>
-<pre>
-    {{ citem | json }}
-</pre>
+<mat-tab-group mat-align-tabs="start">
+  <mat-tab label="DETAILS">
+    <app-controller-details
+      [citem]="citem"
+      *ngIf="citem"
+    ></app-controller-details>
+  </mat-tab>
+  <mat-tab label="JSON">
+    <mat-card>
+      <h3>Raw JSON data</h3>
+      <pre>{{ citem | json }}</pre>
+    </mat-card>
+  </mat-tab>
+</mat-tab-group>

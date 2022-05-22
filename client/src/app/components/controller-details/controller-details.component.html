@@ -1,4 +1,71 @@
-<p>controller-details works!</p>
+<mat-card [formGroup]="form">
+  <mat-card-title class="title-text"
+    >Controller DETAILS
+    <span>
+      <mat-icon [ngClass]="citem.switch == 1 ? 'online' : 'offline'"
+        >circle</mat-icon
+      >
+    </span>
+  </mat-card-title>
+  <mat-card-content>
+    <div></div>
+    <mat-form-field appearance="fill">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" placeholder="Title" />
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="customer">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="category">
+        <mat-option *ngFor="let cat of categories" [value]="cat">{{
+          cat
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <input matInput formControlName="description" placeholder="Title" />
+    </mat-form-field>
+    <h3>Switch setup: {{ this.form.get("category").value }}</h3>
+    <div formGroupName="items">
+      <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <input
+          matInput
+          formControlName="item_description"
+          placeholder="Title"
+        />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Operation</mat-label>
+        <input matInput formControlName="operation" placeholder="Title" />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Datasource</mat-label>
+        <input matInput formControlName="datasource" placeholder="Title" />
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Threshold limit</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="threshold_limit"
+          placeholder="Title"
+        />
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <div style="flex: 1 1 auto"></div>
+    <button
+      mat-raised-button
+      color="primary"
+      [disabled]="form.pristine"
+      (click)="updateController()"
+    >
+      UPDATE
+    </button>
+  </mat-card-actions>
+</mat-card>
 <pre>
-    {{ citem | json }}
+  {{ form.value | json }}
 </pre>

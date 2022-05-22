@@ -26,7 +26,7 @@ type Controller struct {
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 }
 type Thresholdswitch struct {
-	Description    string  `json:"description"`
+	Description    string  `json:"item_description"`
 	Datasource     string  `json:"datasource"`
 	Operation      string  `json:"operation"`
 	ThresholdLimit float64 `json:"threshold_limit"`
@@ -141,23 +141,17 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	}
 	_, err = s.DB.Exec(`
 	update iot.controllers set 
-		sensor_id=$1,
-		category=$2,
-		title=$3,
-		description=$4,
-		switch=$5,
-		items=$6,
-		alert=$7,
-		active=$8
-	where id=$9`,
-		dat.SensorID,
+		category=$1,
+		title=$2,
+		description=$3,
+		switch=$4,
+		items=$5
+	where id=$6`,
 		dat.Category,
 		dat.Title,
 		dat.Description,
 		dat.Switch,
 		dat.Items,
-		dat.Alert,
-		dat.Active,
 		dat.ID,
 	)
 	if err != nil {
