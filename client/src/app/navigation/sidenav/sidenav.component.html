@@ -1,30 +1,6 @@
 <mat-nav-list dense>
-  <mat-list-item routerLink="/dashboard">
-    <a matLine routerLinkActive>DASHBOARD</a>
-    <mat-icon mat-list-icon>dashboard</mat-icon>
-  </mat-list-item>
-
-  <mat-list-item routerLink="/devices">
-    <a matLine>DEVICES</a>
-    <mat-icon mat-list-icon>sensors</mat-icon>
-  </mat-list-item>
-
-  <mat-list-item routerLink="/datasets">
-    <a matLine>DATASETS</a>
-    <mat-icon mat-list-icon>assignment</mat-icon>
-  </mat-list-item>
-
-  <mat-list-item routerLink="/events">
-    <a matLine>SYSTEM EVENTS</a>
-    <mat-icon mat-list-icon>
-      <span class="material-symbols-outlined">speaker_notes</span>
-    </mat-icon>
-  </mat-list-item>
-
-  <mat-list-item routerLink="/system">
-    <a matLine>SYSTEM INFORMATION</a>
-    <mat-icon mat-list-icon>
-      <span class="material-symbols-outlined"> info </span>
-    </mat-icon>
+  <mat-list-item *ngFor="let item of menuItems" [routerLink]="item.url">
+    <a matLine routerLinkActive>{{ item.descr }}</a>
+    <mat-icon mat-list-icon>{{ item.icon }}</mat-icon>
   </mat-list-item>
 </mat-nav-list>

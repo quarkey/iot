@@ -7,13 +7,12 @@
 }
 
 .backgroundImage {
-  // top: 0;
   background-image: url("../../../assets/img/background/simon_berger.jpg");
   height: calc(100vh - 64px);
-  // width: 100wv;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
+  overflow-y: auto;
 }
 
 .bottom-right {

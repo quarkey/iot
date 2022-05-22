@@ -1,0 +1,10 @@
+<mat-card>
+  <mat-card-title>{{ citem.title }}</mat-card-title>
+  <mat-card-subtitle>{{ citem.description }}</mat-card-subtitle>
+  <pre>{{ citem | json }}</pre>
+  <mat-card-actions align="end">
+    <button mat-raised-button color="primary" [routerLink]="citem.id">
+      DETAILS
+    </button>
+  </mat-card-actions>
+</mat-card>

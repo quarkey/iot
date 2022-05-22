@@ -45,6 +45,10 @@ import { MatGridListModule } from "@angular/material/grid-list";
 import { MatMenuModule } from "@angular/material/menu";
 import { LayoutModule } from "@angular/cdk/layout";
 import { SystemComponent } from "./views/system/system.component";
+import { ControllersListComponent } from "./views/controllers-list/controllers-list.component";
+import { ControllerCardComponent } from "./components/controller-card/controller-card.component";
+import { ControllerDetailsComponent } from "./components/controller-details/controller-details.component";
+import { ControllerComponent } from "./views/controller/controller.component";
 @NgModule({
   declarations: [
     AppComponent,
@@ -66,6 +70,10 @@ import { SystemComponent } from "./views/system/system.component";
     DeviceCardComponent,
     DashComponent,
     SystemComponent,
+    ControllersListComponent,
+    ControllerCardComponent,
+    ControllerDetailsComponent,
+    ControllerComponent,
   ],
   imports: [
     BrowserModule,

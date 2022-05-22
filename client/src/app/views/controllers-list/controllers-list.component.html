@@ -1,0 +1,16 @@
+<div class="backgroundImage" style="overflow-y: auto">
+  <div fxLayoutAlign="center" style="padding-top: 20px">
+    <mat-spinner *ngIf="loading; else show"></mat-spinner>
+  </div>
+  <ng-template #show>
+    <div
+      *ngFor="let item of citem"
+      fxLayout="row wrap"
+      fxLayoutGap="16px grid"
+      fxLayoutAlign="space-evenly center"
+      style="padding: 20px"
+    >
+      <app-controller-card [citem]="item"></app-controller-card>
+    </div>
+  </ng-template>
+</div>
