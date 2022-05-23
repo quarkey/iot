@@ -116,30 +116,34 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
-	_, err = s.DB.Exec(`insert into controllers(sensor_id, category, title, description, switch, items, alert, active)
-	values($1, $2, $3, $4, $5, $6, $7, $8)
+	var returning_id int
+	err = s.DB.QueryRow(`insert into controllers(sensor_id, category, title, description, items, alert, active)
+	values($1, $2, $3, $4, $5, $6, $7) returning id;
 	`,
 		dat.SensorID,
 		dat.Category,
 		dat.Title,
 		dat.Description,
-		dat.Switch,
+		//dat.Switch,
 		//dat.Items,
 		//dat.Alert,
 		//dat.Active,
 		ThresholdswitchDefaultValues,
 		false,
-		false,
-	)
+		false).Scan(&returning_id)
+
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
+
+	// out := fmt.Sprintf(`{"returning_id": "%d"}`, returning_id)
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
 	s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
-	helper.RespondSuccess(w, r, "")
+
+	helper.Respond(w, r, 200, returning_id)
 
 }
 
