@@ -25,6 +25,16 @@ type Controller struct {
 	Active      bool             `db:"active" json:"active"`
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 }
+
+var ThresholdswitchDefaultValues = `
+[{
+	"item_description": "",
+	"datasource": "",
+	"operation": "",
+	"threshold_limit": null,
+	"on": false
+}]`
+
 type Thresholdswitch struct {
 	Description    string  `json:"item_description"`
 	Datasource     string  `json:"datasource"`
@@ -114,9 +124,12 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		dat.Title,
 		dat.Description,
 		dat.Switch,
-		dat.Items,
-		dat.Alert,
-		dat.Active,
+		//dat.Items,
+		//dat.Alert,
+		//dat.Active,
+		ThresholdswitchDefaultValues,
+		false,
+		false,
 	)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
@@ -126,7 +139,7 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
 	s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
-	helper.RespondSuccess(w, r)
+	helper.RespondSuccess(w, r, "")
 
 }
 
@@ -166,15 +179,14 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 }
 
 func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
-	var ts []Thresholdswitch
-	err := json.Unmarshal(*c.Items, &ts)
-	if err != nil {
-		log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
-	}
-
 	switch c.Category {
 	case "switch":
 	case "thresholdswitch":
+		var ts []Thresholdswitch
+		err := json.Unmarshal(*c.Items, &ts)
+		if err != nil {
+			log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
+		}
 		for _, item := range ts {
 			// threshold switch operation
 			switch item.Operation {
@@ -198,6 +210,7 @@ func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
 				fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
 			case "less than":
 				// switching state based on threshold
+				fmt.Println("datapoint", dataPoint, "threshold", item.ThresholdLimit)
 				if dataPoint < item.ThresholdLimit {
 					err := c.UpdateControllerSwitchState(db, 1)
 					if err != nil {

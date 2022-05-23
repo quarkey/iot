@@ -1,6 +1,7 @@
 create table if not exists controllers (
     id serial primary key,
-    sensor_id integer references sensors (id),
+    sensor_id integer,
+    --sensor_id integer references sensors (id),
     category text not null,
     /*
         switch

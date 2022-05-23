@@ -176,11 +176,14 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
 		}
 		for _, item := range ts {
+			if item.Datasource == "" {
+				return
+			}
 			dset, column := getSpecificSensorDataPoint(item.Datasource)
 			var data *json.RawMessage
 			err := t.db.Get(&data, `
 			select data from sensordata
-			where dataset_id=$1 
+			where dataset_id=$1
 			order by id desc limit 1`, dset)
 			if err != nil {
 				fmt.Println("something failed...", err)

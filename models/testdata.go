@@ -51,7 +51,7 @@ func (s *Server) InsertTestdata() error {
 			'turn on fan > 45c',
 			'when temperature is above 45c turn on roof fan',
 			'[{
-				"description": "dataset col 0 > 45c", 
+				"item_description": "dataset col 0 > 45c", 
 				"datasource": "d1c0", 
 				"operation": 
 				"greather than", 
@@ -69,10 +69,9 @@ func (s *Server) InsertTestdata() error {
 			'turn on heater < 20c',
 			'when temperature is below 20c turn on heater',
 			'[{
-				"description": "dataset col 0 < 20c", 
+				"item_description": "dataset col 0 < 20c", 
 				"datasource": "d1c0", 
-				"operation": 
-				"less than", 
+				"operation": "less than", 
 				"threshold_limit": 20, 
 				"on": false 
 			}]',
