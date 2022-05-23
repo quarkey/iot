@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Controller } from "src/app/models/controllers";
+import { Sensordata } from "src/app/models/dataset";
 import { ControllersService } from "src/app/services/controllers.service";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: "app-controller-details",
@@ -12,7 +14,10 @@ export class ControllerDetailsComponent implements OnInit {
   @Input() citem: Controller;
   form: FormGroup;
   categories: string[] = ["switch", "thresholdswitch", "timeswitch"];
-
+  socket: any;
+  liveTelemetry: any;
+  loading: boolean = false;
+  datasource: any;
   constructor(
     private formBuilder: FormBuilder,
     private controllerService: ControllersService
@@ -40,6 +45,11 @@ export class ControllerDetailsComponent implements OnInit {
       items: thresholdForm,
       active: [this.citem.active],
     });
+    this.datasource = this.citem.items[0].datasource;
+    this.runLive(this.datasource);
+    this.form.get("items").valueChanges.subscribe((x) => {
+      this.runLive(this.datasource);
+    });
   }
   updateController() {
     var obj = {
@@ -54,5 +64,29 @@ export class ControllerDetailsComponent implements OnInit {
         this.form.markAsPristine();
       }
     });
+  }
+  runLive(datasource: string) {
+    this.loading = true;
+    this.liveTelemetry = "loading..";
+    const socket = new WebSocket(`${environment.wsUrl}/api/live`);
+    socket.onopen = function (e) {
+      console.log("WebSocket Opened");
+    };
+    this.socket = socket;
+    var self = this;
+    const regexpSize = /d([0-9]+)c([0-9]+)/;
+    const match = datasource.match(regexpSize);
+
+    socket.onmessage = function (e) {
+      const data = JSON.parse(e.data) as Sensordata;
+      // only showing current dataset
+      // console.log(data.dataset_id);
+      // console.log(match[1]);
+      if (data.dataset_id === parseInt(match[1])) {
+        console.log(data.data[match[2]]);
+        self.liveTelemetry = data.data[match[2]] | 0;
+        self.loading = false;
+      }
+    };
   }
 }

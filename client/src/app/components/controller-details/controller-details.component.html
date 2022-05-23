@@ -49,6 +49,12 @@
         <mat-label>Datasource</mat-label>
         <input matInput formControlName="datasource" />
       </mat-form-field>
+      <div>
+        <mat-icon class="online" [class.offline]="loading">cell_tower</mat-icon>
+        <span *ngIf="liveTelemetry">
+          {{ this.liveTelemetry }}
+        </span>
+      </div>
       <mat-form-field appearance="fill">
         <mat-label>Threshold limit</mat-label>
         <input matInput type="number" formControlName="threshold_limit" />
