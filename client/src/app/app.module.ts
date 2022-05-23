@@ -49,6 +49,7 @@ import { ControllersListComponent } from "./views/controllers-list/controllers-l
 import { ControllerCardComponent } from "./components/controller-card/controller-card.component";
 import { ControllerDetailsComponent } from "./components/controller-details/controller-details.component";
 import { ControllerComponent } from "./views/controller/controller.component";
+import { NewControllerComponent } from "./components/dialogs/new-controller/new-controller.component";
 @NgModule({
   declarations: [
     AppComponent,
@@ -74,6 +75,7 @@ import { ControllerComponent } from "./views/controller/controller.component";
     ControllerCardComponent,
     ControllerDetailsComponent,
     ControllerComponent,
+    NewControllerComponent,
   ],
   imports: [
     BrowserModule,

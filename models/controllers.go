@@ -157,14 +157,14 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 		category=$1,
 		title=$2,
 		description=$3,
-		switch=$4,
-		items=$5
+		items=$4,
+		active=$5
 	where id=$6`,
 		dat.Category,
 		dat.Title,
 		dat.Description,
-		dat.Switch,
 		dat.Items,
+		dat.Active,
 		dat.ID,
 	)
 	if err != nil {
@@ -179,6 +179,9 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 }
 
 func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
+	if !c.Active {
+		return
+	}
 	switch c.Category {
 	case "switch":
 	case "thresholdswitch":
@@ -199,7 +202,7 @@ func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
 						fmt.Println(err)
 					}
 					c.Switch = 1
-					fmt.Printf("gt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
+					fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 					return
 				}
 				err := c.UpdateControllerSwitchState(db, 0)
@@ -207,17 +210,21 @@ func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
 					fmt.Println(err)
 				}
 				c.Switch = 0
-				fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
+				// fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
+				fmt.Printf("gt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+
 			case "less than":
 				// switching state based on threshold
-				fmt.Println("datapoint", dataPoint, "threshold", item.ThresholdLimit)
+				// fmt.Println("datapoint", dataPoint, "threshold", item.ThresholdLimit)
 				if dataPoint < item.ThresholdLimit {
 					err := c.UpdateControllerSwitchState(db, 1)
 					if err != nil {
 						fmt.Println(err)
 					}
 					c.Switch = 1
-					fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
+					// fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
+					fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+
 					return
 				}
 				err := c.UpdateControllerSwitchState(db, 0)
@@ -225,7 +232,8 @@ func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
 					fmt.Println(err)
 				}
 				c.Switch = 0
-				fmt.Printf("ls switch off %v - state: %d\n", dataPoint, c.Switch)
+				fmt.Printf("lt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				// fmt.Printf("ls switch off %v - state: %d\n", dataPoint, c.Switch)
 			case "equal":
 				if dataPoint == item.ThresholdLimit {
 					fmt.Println("equal not implemented")

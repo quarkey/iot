@@ -19,17 +19,26 @@ export class ControllerDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const thresholdForm = this.formBuilder.group({
+      on: [this.citem.items[0].on],
+      item_description: [
+        this.citem.items[0].item_description,
+        Validators.required,
+      ],
+      operation: [this.citem.items[0].operation, Validators.required],
+      datasource: [this.citem.items[0].datasource, Validators.required],
+      threshold_limit: [
+        this.citem.items[0].threshold_limit,
+        Validators.required,
+      ],
+    });
+
     this.form = this.formBuilder.group({
       category: [this.citem.category, Validators.required],
       title: [this.citem.title, Validators.required],
       description: [this.citem.description, Validators.required],
-      items: this.formBuilder.group({
-        on: [this.citem.items[0].on],
-        item_description: [this.citem.items[0].item_description],
-        operation: [this.citem.items[0].operation],
-        datasource: [this.citem.items[0].datasource],
-        threshold_limit: +[this.citem.items[0].threshold_limit],
-      }),
+      items: thresholdForm,
+      active: [this.citem.active],
     });
   }
   updateController() {
