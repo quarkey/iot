@@ -170,41 +170,47 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 // CheckControllersTelemetry ...
 func (t *Telemetry) CheckControllersTelemetry() {
 	for _, c := range t.controllers {
-		var ts []Thresholdswitch
-		err := json.Unmarshal(*c.Items, &ts)
-		if err != nil {
-			log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
-		}
-		for _, item := range ts {
-			if item.Datasource == "" {
-				return
+		switch c.Category {
+		case "thresholdswitch":
+			var ts []Thresholdswitch
+			err := json.Unmarshal(*c.Items, &ts)
+			if err != nil {
+				log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
 			}
-			dset, column := getSpecificSensorDataPoint(item.Datasource)
-			var data *json.RawMessage
-			err := t.db.Get(&data, `
+			for _, item := range ts {
+				if item.Datasource == "" {
+					return
+				}
+				dset, column := getSpecificSensorDataPoint(item.Datasource)
+				var data *json.RawMessage
+				err := t.db.Get(&data, `
 			select data from sensordata
 			where dataset_id=$1
 			order by id desc limit 1`, dset)
-			if err != nil {
-				fmt.Println("something failed...", err)
-				return
+				if err != nil {
+					fmt.Println("something failed...", err)
+					return
+				}
+				//fmt.Printf("checking datasource '%s'\n", item.Datasource)
+				//fmt.Printf("dataset: %v and column: %v \n", dset, column)
+				slice, err := helper.DecodeRawJSONtoSlice(data)
+				if err != nil {
+					fmt.Printf("something went wrong... %v\n", err)
+				}
+				if len(slice) == 0 {
+					fmt.Println("controller skipped, empty dataset")
+				}
+				// fmt.Printf("Data: %v\n", slice)
+				datapoint, err := strconv.ParseFloat(slice[column], 64)
+				if err != nil {
+					fmt.Printf("something went wrong... %v\n", err)
+					datapoint = 0
+				}
+				c.Check(datapoint, t.db)
 			}
-			//fmt.Printf("checking datasource '%s'\n", item.Datasource)
-			//fmt.Printf("dataset: %v and column: %v \n", dset, column)
-			slice, err := helper.DecodeRawJSONtoSlice(data)
-			if err != nil {
-				fmt.Printf("something went wrong... %v\n", err)
-			}
-			if len(slice) == 0 {
-				fmt.Println("controller skipped, empty dataset")
-			}
-			// fmt.Printf("Data: %v\n", slice)
-			datapoint, err := strconv.ParseFloat(slice[column], 64)
-			if err != nil {
-				fmt.Printf("something went wrong... %v\n", err)
-				datapoint = 0
-			}
-			c.Check(datapoint, t.db)
+		case "timeswitch":
+		default:
+			log.Println("[ERROR] unsupported controller")
 		}
 	}
 }
