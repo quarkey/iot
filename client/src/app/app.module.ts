@@ -51,6 +51,7 @@ import { ControllerDetailsComponent } from "./components/controller-details/cont
 import { ControllerComponent } from "./views/controller/controller.component";
 import { NewControllerComponent } from "./components/dialogs/new-controller/new-controller.component";
 import { TwoColumnDivComponent } from './shared/auxiliary/components/two-column-div/two-column-div.component';
+import { StatusDotComponent } from './shared/auxiliary/components/status-dot/status-dot.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -78,6 +79,7 @@ import { TwoColumnDivComponent } from './shared/auxiliary/components/two-column-
     ControllerComponent,
     NewControllerComponent,
     TwoColumnDivComponent,
+    StatusDotComponent,
   ],
   imports: [
     BrowserModule,

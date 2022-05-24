@@ -11,10 +11,14 @@
     <mat-card-subtitle>{{ citem.description }}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <app-two-column-div
-      col1="Switch state:"
-      [col2]="citem.switch"
-    ></app-two-column-div>
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <div fxFlex="30">Switch state:</div>
+      <div fxFlex="70">
+        <app-status-dot
+          [state]="citem.switch == 1 ? 'online' : 'offline'"
+        ></app-status-dot>
+      </div>
+    </div>
     <app-two-column-div
       col1="Category:"
       [col2]="citem.category"
@@ -24,12 +28,12 @@
       [col2]="citem.active"
     ></app-two-column-div>
     <app-two-column-div
-      col1="Alert:"
-      [col2]="citem.active"
-    ></app-two-column-div>
-    <app-two-column-div
       col1="Created at:"
       [col2]="citem.created_at | date: 'YYYY-MM-dd HH:mm:ss'"
+    ></app-two-column-div>
+    <app-two-column-div
+      col1="Active"
+      [col2]="citem.active"
     ></app-two-column-div>
   </mat-card-content>
   <mat-card-actions align="end">
