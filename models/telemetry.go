@@ -187,6 +187,7 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			order by id desc limit 1`, dset)
 			if err != nil {
 				fmt.Println("something failed...", err)
+				return
 			}
 			//fmt.Printf("checking datasource '%s'\n", item.Datasource)
 			//fmt.Printf("dataset: %v and column: %v \n", dset, column)
