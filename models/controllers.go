@@ -144,7 +144,6 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 	s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
 
 	helper.Respond(w, r, 200, returning_id)
-
 }
 
 // UpdateControllerByIDEndpoint updates the entire row including json items
@@ -180,6 +179,54 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	s.Telemetry.UpdateTelemetryLists()
 	s.NewEvent(DatasetEvent, "controller '%s' updated", dat.Title)
 	helper.Respond(w, r, 200, "updated")
+}
+
+type switchState struct {
+	ID          int  `db:"id" json:"id"`
+	Active      bool `db:"active" json:"active"`
+	SwitchState int  `db:"switch" json:"switch"`
+}
+
+// SetControllerSwitchState allows caller to change switch state either on or off.
+// Inactive controllers will not be processed, and produce an error message.
+func (s *Server) SetControllerSwitchState(w http.ResponseWriter, r *http.Request) {
+	// check current status
+	vars := mux.Vars(r)
+	tmp := vars["id"]
+	reqID, _ := strconv.Atoi(tmp)
+	var sw switchState
+
+	err := s.DB.Get(&sw, `select id, active, switch from controllers where id=$1`, reqID)
+	if err != nil {
+		helper.RespondErr(w, r, 200, "unable to get data from db: ", err)
+		return
+	}
+	if !sw.Active {
+		helper.RespondErr(w, r, 200, "unable to change switch state: controller inactive")
+		return
+	}
+	switch vars["state"] {
+	case "on":
+		if sw.SwitchState == 1 {
+			helper.RespondErr(w, r, 200, "switch state already on!")
+			return
+		}
+		// update switch
+		updateControllerSwitchState(s.DB, reqID, 1)
+		sw.SwitchState = 1
+	case "off":
+		if sw.SwitchState == 0 {
+			helper.RespondErr(w, r, 200, "switch state already off!")
+			return
+		}
+		// update switch
+		updateControllerSwitchState(s.DB, reqID, 0)
+		sw.SwitchState = 0
+	default:
+		helper.RespondErr(w, r, 500, "unknown state")
+		return
+	}
+	helper.Respond(w, r, 200, sw)
 }
 
 func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
@@ -255,10 +302,25 @@ func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
 }
 
 func (c Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
+	// _, err := db.Exec(`update controllers set
+	// 	switch=$1
+	// 	where id=$2
+	// `, switchState, c.ID)
+	// if err != nil {
+	// 	return fmt.Errorf("unable to update controller: %v", err)
+	// }
+	// return nil
+	err := updateControllerSwitchState(db, c.ID, switchState)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func updateControllerSwitchState(db *sqlx.DB, id, switchState int) error {
 	_, err := db.Exec(`update controllers set
 		switch=$1
 		where id=$2
-	`, switchState, c.ID)
+	`, switchState, id)
 	if err != nil {
 		return fmt.Errorf("unable to update controller: %v", err)
 	}
