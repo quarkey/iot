@@ -1,7 +1,37 @@
-<mat-card>
-  <mat-card-title>{{ citem.title }}</mat-card-title>
-  <mat-card-subtitle>{{ citem.description }}</mat-card-subtitle>
-  <pre>{{ citem | json }}</pre>
+<mat-card class="mat-elevation-z4">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <div [ngSwitch]="citem.category">
+        <mat-icon *ngSwitchCase="'switch'">lightbulb</mat-icon>
+        <mat-icon *ngSwitchCase="'thresholdswitch'">data_thresholding</mat-icon>
+        <mat-icon *ngSwitchCase="'timeswitch'">schedule</mat-icon>
+      </div>
+    </div>
+    <mat-card-title>{{ citem.title }}</mat-card-title>
+    <mat-card-subtitle>{{ citem.description }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <app-two-column-div
+      col1="Switch state:"
+      [col2]="citem.switch"
+    ></app-two-column-div>
+    <app-two-column-div
+      col1="Category:"
+      [col2]="citem.category"
+    ></app-two-column-div>
+    <app-two-column-div
+      col1="Alert:"
+      [col2]="citem.active"
+    ></app-two-column-div>
+    <app-two-column-div
+      col1="Alert:"
+      [col2]="citem.active"
+    ></app-two-column-div>
+    <app-two-column-div
+      col1="Created at:"
+      [col2]="citem.created_at | date: 'YYYY-MM-dd HH:mm:ss'"
+    ></app-two-column-div>
+  </mat-card-content>
   <mat-card-actions align="end">
     <button mat-raised-button color="primary" [routerLink]="citem.id">
       DETAILS

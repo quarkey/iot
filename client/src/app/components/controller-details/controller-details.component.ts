@@ -47,7 +47,7 @@ export class ControllerDetailsComponent implements OnInit {
     });
     this.datasource = this.citem.items[0].datasource;
     this.runLive(this.datasource);
-    this.form.get("items").valueChanges.subscribe((x) => {
+    this.form.get("items.datasource").valueChanges.subscribe((x) => {
       this.runLive(this.datasource);
     });
   }

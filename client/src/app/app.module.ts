@@ -50,6 +50,7 @@ import { ControllerCardComponent } from "./components/controller-card/controller
 import { ControllerDetailsComponent } from "./components/controller-details/controller-details.component";
 import { ControllerComponent } from "./views/controller/controller.component";
 import { NewControllerComponent } from "./components/dialogs/new-controller/new-controller.component";
+import { TwoColumnDivComponent } from './shared/auxiliary/components/two-column-div/two-column-div.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -76,6 +77,7 @@ import { NewControllerComponent } from "./components/dialogs/new-controller/new-
     ControllerDetailsComponent,
     ControllerComponent,
     NewControllerComponent,
+    TwoColumnDivComponent,
   ],
   imports: [
     BrowserModule,
