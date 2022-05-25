@@ -202,13 +202,13 @@ func (s *Server) SetControllerSwitchState(w http.ResponseWriter, r *http.Request
 		return
 	}
 	if !sw.Active {
-		helper.RespondErr(w, r, 200, "unable to change switch state: controller inactive")
+		helper.RespondErr(w, r, 500, "unable to change switch state: controller inactive")
 		return
 	}
 	switch vars["state"] {
 	case "on":
 		if sw.SwitchState == 1 {
-			helper.RespondErr(w, r, 200, "switch state already on!")
+			helper.RespondErr(w, r, 500, "switch state already on!")
 			return
 		}
 		// update switch
@@ -216,7 +216,7 @@ func (s *Server) SetControllerSwitchState(w http.ResponseWriter, r *http.Request
 		sw.SwitchState = 1
 	case "off":
 		if sw.SwitchState == 0 {
-			helper.RespondErr(w, r, 200, "switch state already off!")
+			helper.RespondErr(w, r, 500, "switch state already off!")
 			return
 		}
 		// update switch
