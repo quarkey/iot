@@ -27,40 +27,41 @@
     </mat-form-field>
     <!-- THRESHOLD FORM -->
     <h3>Switch setup: {{ this.form.get("category").value }}</h3>
-    <ng-container
-      formGroupName="items"
-      *ngIf="this.form.get('category').value === 'thresholdswitch'"
-    >
-      <mat-form-field appearance="fill">
-        <mat-label>Description</mat-label>
-        <input matInput formControlName="item_description" />
-      </mat-form-field>
+    <ng-container *ngIf="citem.category === 'thresholdswitch'">
+      <ng-container
+        formArrayName="items"
+        *ngFor="let item of items.controls; let i = index"
+      >
+        <div [formGroupName]="i">
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="item_description" />
+          </mat-form-field>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Operation</mat-label>
-        <!-- <input matInput formControlName="operation" /> -->
-        <mat-select formControlName="operation">
-          <mat-option value="greather than">greather than</mat-option>
-          <mat-option value="less than">less than</mat-option>
-        </mat-select>
-      </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Operation</mat-label>
+            <!-- <input matInput formControlName="operation" /> -->
+            <mat-select formControlName="operation">
+              <mat-option value="greather than">greather than</mat-option>
+              <mat-option value="less than">less than</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Datasource</mat-label>
-        <input matInput formControlName="datasource" />
-      </mat-form-field>
-      <div>
-        <mat-icon class="online" [class.offline]="loading">cell_tower</mat-icon>
-        <span *ngIf="liveTelemetry">
-          {{ this.liveTelemetry }}
-        </span>
-      </div>
-      <mat-form-field appearance="fill">
-        <mat-label>Threshold limit</mat-label>
-        <input matInput type="number" formControlName="threshold_limit" />
-      </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Datasource</mat-label>
+            <input matInput formControlName="datasource" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Threshold limit</mat-label>
+            <input matInput type="number" formControlName="threshold_limit" />
+          </mat-form-field>
+        </div>
+      </ng-container>
     </ng-container>
     <mat-form-field appearance="fill">
+      <mat-label>Controller active</mat-label>
+
       <mat-select formControlName="active">
         <mat-option [value]="false">false</mat-option>
         <mat-option [value]="true">true</mat-option>

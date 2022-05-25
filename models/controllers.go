@@ -34,6 +34,7 @@ var ThresholdswitchDefaultValues = `
 	"threshold_limit": null,
 	"on": false
 }]`
+var SwitchDefaultVale = `[]`
 
 type Thresholdswitch struct {
 	Description    string  `json:"item_description"`
@@ -116,6 +117,14 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
+	var itemJSON string
+	if dat.Category == "thresholdswitch" {
+		itemJSON = ThresholdswitchDefaultValues
+	}
+	if dat.Category == "switch" {
+		itemJSON = SwitchDefaultVale
+	}
+
 	var returning_id int
 	err = s.DB.QueryRow(`insert into controllers(sensor_id, category, title, description, items, alert, active)
 	values($1, $2, $3, $4, $5, $6, $7) returning id;
@@ -128,7 +137,7 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		//dat.Items,
 		//dat.Alert,
 		//dat.Active,
-		ThresholdswitchDefaultValues,
+		itemJSON,
 		false,
 		false).Scan(&returning_id)
 
