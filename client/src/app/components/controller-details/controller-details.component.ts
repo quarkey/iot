@@ -37,15 +37,29 @@ export class ControllerDetailsComponent implements OnInit {
     return this.form.get("items") as FormArray;
   }
   addThresholdForm(item: thresholdswitch) {
-    const form = this.formBuilder.group({
-      item_description: [item.item_description],
-      operation: [item.operation],
-      datasource: [item.datasource],
-      threshold_limit: [item.threshold_limit],
-      on: [item.on],
-    });
+    let form;
+    if (item === null) {
+      form = this.formBuilder.group({
+        item_description: [null],
+        operation: [null],
+        datasource: [null],
+        threshold_limit: [null],
+        on: [null],
+      });
+    } else {
+      form = this.formBuilder.group({
+        item_description: [item.item_description],
+        operation: [item.operation],
+        datasource: [item.datasource],
+        threshold_limit: [item.threshold_limit],
+        on: [item.on],
+      });
+    }
     return form;
   }
+  // addNewThresholdForm() {
+  //   this.items.push(this.addThresholdForm(null));
+  // }
   updateController() {
     var obj = {
       ...this.form.value,

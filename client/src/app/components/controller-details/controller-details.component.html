@@ -40,7 +40,6 @@
 
           <mat-form-field appearance="fill">
             <mat-label>Operation</mat-label>
-            <!-- <input matInput formControlName="operation" /> -->
             <mat-select formControlName="operation">
               <mat-option value="greather than">greather than</mat-option>
               <mat-option value="less than">less than</mat-option>
@@ -67,6 +66,9 @@
         <mat-option [value]="true">true</mat-option>
       </mat-select>
     </mat-form-field>
+    <!-- <button mat-icon-button (click)="addNewThresholdForm()">
+      <mat-icon>add</mat-icon>
+    </button> -->
   </mat-card-content>
   <mat-card-actions>
     <div style="flex: 1 1 auto"></div>
