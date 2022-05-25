@@ -50,8 +50,10 @@ import { ControllerCardComponent } from "./components/controller-card/controller
 import { ControllerDetailsComponent } from "./components/controller-details/controller-details.component";
 import { ControllerComponent } from "./views/controller/controller.component";
 import { NewControllerComponent } from "./components/dialogs/new-controller/new-controller.component";
-import { TwoColumnDivComponent } from './shared/auxiliary/components/two-column-div/two-column-div.component';
-import { StatusDotComponent } from './shared/auxiliary/components/status-dot/status-dot.component';
+import { TwoColumnDivComponent } from "./shared/auxiliary/components/two-column-div/two-column-div.component";
+import { StatusDotComponent } from "./shared/auxiliary/components/status-dot/status-dot.component";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -109,6 +111,7 @@ import { StatusDotComponent } from './shared/auxiliary/components/status-dot/sta
     MatGridListModule,
     MatMenuModule,
     LayoutModule,
+    MatSlideToggleModule,
   ],
   providers: [
     NewDeviceDialogComponent,

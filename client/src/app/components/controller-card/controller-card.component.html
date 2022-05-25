@@ -37,6 +37,17 @@
     ></app-two-column-div>
   </mat-card-content>
   <mat-card-actions align="end">
+    <button
+      *ngIf="citem.category == 'switch'"
+      mat-raised-button
+      color="primary"
+      (click)="updateState()"
+      [class.spinner]="loading"
+      [disabled]="loading"
+      [ngClass]="{ primary: citem.switch == 1 }"
+    >
+      {{ citem.switch == 1 ? "TURN ON" : "TURN OFF" }}
+    </button>
     <button mat-raised-button color="primary" [routerLink]="citem.id">
       DETAILS
     </button>

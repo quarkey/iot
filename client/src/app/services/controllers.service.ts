@@ -26,4 +26,10 @@ export class ControllersService {
   public newController(citem: any) {
     return this.http.post<any>(`${environment.apiUrl}/api/controllers`, citem);
   }
+
+  public setContllerState(id: number, switchState: string) {
+    return this.http.get<any>(
+      `${environment.apiUrl}/api/controller/${id}/switch/${switchState}`
+    );
+  }
 }
