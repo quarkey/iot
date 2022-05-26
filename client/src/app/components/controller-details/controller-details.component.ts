@@ -28,15 +28,24 @@ export class ControllerDetailsComponent implements OnInit {
       items: this.formBuilder.array([]),
       active: [this.citem.active],
     });
-    // looping through thresholdswitch items
-    this.citem.items.forEach((item: thresholdswitch) => {
-      this.items.push(this.addThresholdForm(item));
+
+    this.citem.items.forEach((item: any) => {
+      switch (this.citem.category) {
+        case "thresholdswitch":
+          this.items.push(this.addThresholdSwitchForm(item as thresholdswitch));
+          break;
+        case "timeswitch":
+          this.items.push(this.addTimeSwitchForm(item as timeswitch));
+          break;
+        default:
+          break;
+      }
     });
   }
   get items() {
     return this.form.get("items") as FormArray;
   }
-  addThresholdForm(item: thresholdswitch) {
+  addThresholdSwitchForm(item: thresholdswitch) {
     let form;
     if (item === null) {
       form = this.formBuilder.group({
@@ -57,9 +66,29 @@ export class ControllerDetailsComponent implements OnInit {
     }
     return form;
   }
-  // addNewThresholdForm() {
-  //   this.items.push(this.addThresholdForm(null));
-  // }
+  addTimeSwitchForm(item: timeswitch) {
+    let form;
+    if (item === null) {
+      form = this.formBuilder.group({
+        on: [null],
+        repeat: [null],
+        time_on: [null],
+        time_off: [null],
+        duration: [null],
+        item_description: [null],
+      });
+    } else {
+      form = this.formBuilder.group({
+        on: [item.on],
+        repeat: [item.repeat],
+        time_on: [item.time_on],
+        time_off: [item.time_off],
+        duration: [item.duration],
+        item_description: [item.item_description],
+      });
+    }
+    return form;
+  }
   updateController() {
     var obj = {
       ...this.form.value,
@@ -80,4 +109,12 @@ interface thresholdswitch {
   datasource: string;
   threshold_limit: number;
   operation: string;
+}
+interface timeswitch {
+  on: boolean;
+  item_description: string;
+  time_on: string;
+  time_off: string;
+  duration: string;
+  repeat: number;
 }

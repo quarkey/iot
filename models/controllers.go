@@ -34,7 +34,17 @@ var ThresholdswitchDefaultValues = `
 	"threshold_limit": null,
 	"on": false
 }]`
-var SwitchDefaultVale = `[]`
+var SwitchDefaultValues = `[]`
+var TimesSwitchDefaultValues = `
+[{
+	"item_description": "",
+	"time_on": "",
+	"time_off": "",
+	"duration": null,
+	"repeat": null,
+	"on": false
+}]
+`
 
 type Thresholdswitch struct {
 	Description    string  `json:"item_description"`
@@ -122,7 +132,11 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		itemJSON = ThresholdswitchDefaultValues
 	}
 	if dat.Category == "switch" {
-		itemJSON = SwitchDefaultVale
+		itemJSON = SwitchDefaultValues
+	}
+	if dat.Category == "timeswitch" {
+		itemJSON = TimesSwitchDefaultValues
+
 	}
 
 	var returning_id int

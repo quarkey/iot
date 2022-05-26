@@ -58,6 +58,38 @@
         </div>
       </ng-container>
     </ng-container>
+
+    <!-- TIMESWITCH FORM -->
+    <ng-container *ngIf="citem.category === 'timeswitch'">
+      <ng-container
+        formArrayName="items"
+        *ngFor="let item of items.controls; let i = index"
+      >
+        <div [formGroupName]="i">
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="item_description" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Time on</mat-label>
+            <input matInput formControlName="time_on" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Time on</mat-label>
+            <input matInput formControlName="time_off" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Duration</mat-label>
+            <input matInput formControlName="duration" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Repeat</mat-label>
+            <input matInput formControlName="repeat" />
+          </mat-form-field>
+        </div>
+      </ng-container>
+    </ng-container>
+
     <mat-form-field appearance="fill">
       <mat-label>Controller active</mat-label>
 
@@ -66,9 +98,6 @@
         <mat-option [value]="true">true</mat-option>
       </mat-select>
     </mat-form-field>
-    <!-- <button mat-icon-button (click)="addNewThresholdForm()">
-      <mat-icon>add</mat-icon>
-    </button> -->
   </mat-card-content>
   <mat-card-actions>
     <div style="flex: 1 1 auto"></div>
