@@ -19,7 +19,15 @@ export class ControllerDetailsComponent implements OnInit {
     private formBuilder: FormBuilder,
     private controllerService: ControllersService
   ) {}
+  defaultValue = { hour: 13, minute: 30 };
 
+  timeChangeHandler(event: Event) {
+    console.log(event);
+  }
+
+  invalidInputHandler() {
+    // some error handling
+  }
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       category: [this.citem.category, Validators.required],

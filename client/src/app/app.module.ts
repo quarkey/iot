@@ -53,6 +53,8 @@ import { NewControllerComponent } from "./components/dialogs/new-controller/new-
 import { TwoColumnDivComponent } from "./shared/auxiliary/components/two-column-div/two-column-div.component";
 import { StatusDotComponent } from "./shared/auxiliary/components/status-dot/status-dot.component";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatTimepickerModule } from "mat-timepicker";
+import { MatDatepickerModule } from "@angular/material/datepicker";
 
 @NgModule({
   declarations: [
@@ -87,7 +89,9 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    MatTimepickerModule,
     MatSidenavModule,
+    MatDatepickerModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,

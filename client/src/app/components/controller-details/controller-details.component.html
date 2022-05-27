@@ -89,10 +89,8 @@
         </div>
       </ng-container>
     </ng-container>
-
     <mat-form-field appearance="fill">
       <mat-label>Controller active</mat-label>
-
       <mat-select formControlName="active">
         <mat-option [value]="false">false</mat-option>
         <mat-option [value]="true">true</mat-option>
@@ -104,7 +102,7 @@
     <button
       mat-raised-button
       color="primary"
-      [disabled]="form.invalid"
+      [disabled]="form.pristine"
       (click)="updateController()"
     >
       UPDATE
