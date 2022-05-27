@@ -206,7 +206,8 @@ func (t *Telemetry) CheckControllersTelemetry() {
 					fmt.Printf("something went wrong... %v\n", err)
 					datapoint = 0
 				}
-				c.Check(datapoint, t.db)
+
+				c.CheckThresholdEntries(datapoint, t.db)
 			}
 		case "timeswitch":
 		default:

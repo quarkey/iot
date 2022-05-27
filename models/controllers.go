@@ -52,6 +52,14 @@ type Thresholdswitch struct {
 	Operation      string  `json:"operation"`
 	ThresholdLimit float64 `json:"threshold_limit"`
 }
+type Timeswitch struct {
+	Description string `json:"item_description"`
+	TimeOn      string `json:"time_on"`
+	TimeOff     string `json:"time_off"`
+	Duration    int    `json:"duration"`
+	Repeat      string `json:"repeat"`
+	On          bool   `json:"on"`
+}
 
 // GetControllersList fetches a list of controllers. All types of errors will return empty a slice.
 func GetControllersList(db *sqlx.DB) ([]Controller, error) {
@@ -211,8 +219,8 @@ type switchState struct {
 }
 
 // SetControllerSwitchState allows caller to change switch state either on or off.
-// Inactive controllers will not be processed, and produce an error message.
-func (s *Server) SetControllerSwitchState(w http.ResponseWriter, r *http.Request) {
+// Inactive controllers will not be processed, and will produce an error message.
+func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
 	vars := mux.Vars(r)
 	tmp := vars["id"]
@@ -252,76 +260,69 @@ func (s *Server) SetControllerSwitchState(w http.ResponseWriter, r *http.Request
 	helper.Respond(w, r, 200, sw)
 }
 
-func (c Controller) Check(dataPoint float64, db *sqlx.DB) {
+func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 	if !c.Active {
 		return
 	}
-	switch c.Category {
-	case "switch":
-	case "thresholdswitch":
-		var ts []Thresholdswitch
-		err := json.Unmarshal(*c.Items, &ts)
-		if err != nil {
-			log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
-		}
-		for _, item := range ts {
-			// threshold switch operation
-			switch item.Operation {
-			// TODO: update controller active if threshold is met
-			case "greather than":
-				// switching state based on threshold
-				if dataPoint > item.ThresholdLimit {
-					err := c.UpdateControllerSwitchState(db, 1)
-					if err != nil {
-						fmt.Println(err)
-					}
-					c.Switch = 1
-					fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
-					return
-				}
-				err := c.UpdateControllerSwitchState(db, 0)
+	var ts []Thresholdswitch
+	err := json.Unmarshal(*c.Items, &ts)
+	if err != nil {
+		log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
+	}
+	for _, item := range ts {
+		// threshold switch operation
+		switch item.Operation {
+		case "greather than":
+			// switching state based on threshold
+			if dataPoint > item.ThresholdLimit {
+				err := c.UpdateControllerSwitchState(db, 1)
 				if err != nil {
 					fmt.Println(err)
 				}
-				c.Switch = 0
-				// fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
-				fmt.Printf("gt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				c.Switch = 1
+				fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				return
+			}
+			err := c.UpdateControllerSwitchState(db, 0)
+			if err != nil {
+				fmt.Println(err)
+			}
+			c.Switch = 0
+			// fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
+			fmt.Printf("gt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 
-			case "less than":
-				// switching state based on threshold
-				// fmt.Println("datapoint", dataPoint, "threshold", item.ThresholdLimit)
-				if dataPoint < item.ThresholdLimit {
-					err := c.UpdateControllerSwitchState(db, 1)
-					if err != nil {
-						fmt.Println(err)
-					}
-					c.Switch = 1
-					// fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
-					fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
-
-					return
-				}
-				err := c.UpdateControllerSwitchState(db, 0)
+		case "less than":
+			// switching state based on threshold
+			// fmt.Println("datapoint", dataPoint, "threshold", item.ThresholdLimit)
+			if dataPoint < item.ThresholdLimit {
+				err := c.UpdateControllerSwitchState(db, 1)
 				if err != nil {
 					fmt.Println(err)
 				}
-				c.Switch = 0
-				fmt.Printf("lt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
-				// fmt.Printf("ls switch off %v - state: %d\n", dataPoint, c.Switch)
-			case "equal":
-				if dataPoint == item.ThresholdLimit {
-					fmt.Println("equal not implemented")
-				}
-			case "not equal":
-				if dataPoint == item.ThresholdLimit {
-					fmt.Println("not equal not implemented")
-				}
+				c.Switch = 1
+				// fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
+				fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+
+				return
+			}
+			err := c.UpdateControllerSwitchState(db, 0)
+			if err != nil {
+				fmt.Println(err)
+			}
+			c.Switch = 0
+			fmt.Printf("lt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+			// fmt.Printf("ls switch off %v - state: %d\n", dataPoint, c.Switch)
+		case "equal":
+			if dataPoint == item.ThresholdLimit {
+				fmt.Println("equal not implemented")
+			}
+		case "not equal":
+			if dataPoint == item.ThresholdLimit {
+				fmt.Println("not equal not implemented")
 			}
 		}
-	case "timeswitch":
-	default:
-		return
 	}
+
 }
 
 func (c Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
