@@ -46,48 +46,23 @@ export class ControllerDetailsComponent implements OnInit {
     return this.form.get("items") as FormArray;
   }
   addThresholdSwitchForm(item: thresholdswitch) {
-    let form;
-    if (item === null) {
-      form = this.formBuilder.group({
-        item_description: [null],
-        operation: [null],
-        datasource: [null],
-        threshold_limit: [null],
-        on: [null],
-      });
-    } else {
-      form = this.formBuilder.group({
-        item_description: [item.item_description],
-        operation: [item.operation],
-        datasource: [item.datasource],
-        threshold_limit: [item.threshold_limit],
-        on: [item.on],
-      });
-    }
-    return form;
+    return this.formBuilder.group({
+      item_description: [item.item_description || null, Validators.required],
+      operation: [item.operation || null, Validators.required],
+      datasource: [item.datasource || null, Validators.required],
+      threshold_limit: [item.threshold_limit || null, Validators.required],
+      on: [item.on || null],
+    });
   }
   addTimeSwitchForm(item: timeswitch) {
-    let form;
-    if (item === null) {
-      form = this.formBuilder.group({
-        on: [null],
-        repeat: [null],
-        time_on: [null],
-        time_off: [null],
-        duration: [null],
-        item_description: [null],
-      });
-    } else {
-      form = this.formBuilder.group({
-        on: [item.on],
-        repeat: [item.repeat],
-        time_on: [item.time_on],
-        time_off: [item.time_off],
-        duration: [item.duration],
-        item_description: [item.item_description],
-      });
-    }
-    return form;
+    return this.formBuilder.group({
+      on: [item.on || null],
+      repeat: [item.repeat || null, Validators.required],
+      time_on: [item.time_on || null, Validators.required],
+      time_off: [item.time_off || null, Validators.required],
+      duration: [item.duration || null, Validators.required],
+      item_description: [item.item_description || null, Validators.required],
+    });
   }
   updateController() {
     var obj = {
