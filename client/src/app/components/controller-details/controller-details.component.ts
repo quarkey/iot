@@ -90,7 +90,6 @@ export class ControllerDetailsComponent implements OnInit {
       )
       .subscribe((res) => {
         if (res) {
-          alert("confirmed");
           this.showReloadbutton = false;
           this.updateController(); // save form
           window.location.reload();
@@ -106,7 +105,14 @@ export class ControllerDetailsComponent implements OnInit {
       .subscribe((res) => {
         if (res) {
           this.showReloadbutton = false;
-          this.router.navigate([`/controllers`]);
+          // do delete
+          this.controllerService
+            .DeleteControllerByID(this.citem.id)
+            .subscribe((res) => {
+              if (res) {
+                this.router.navigate([`/controllers`]);
+              }
+            });
         }
       });
   }
@@ -119,6 +125,17 @@ export class ControllerDetailsComponent implements OnInit {
       .subscribe((res) => {
         if (res) {
           this.showReloadbutton = false;
+          // do reset
+          this.controllerService
+            .LoadDefualtControllerSwitchValues(
+              this.citem.id,
+              this.citem.category
+            )
+            .subscribe((res) => {
+              if (res) {
+                window.location.reload();
+              }
+            });
         }
       });
   }

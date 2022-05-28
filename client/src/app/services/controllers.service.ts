@@ -24,16 +24,18 @@ export class ControllersService {
       citem
     );
   }
-  public DeleteControllerBy(id: number) {
-    return this.http.delete<any>(
-      `${environment.apiUrl}/api/controllers/${id}`,
-      null
+  public DeleteControllerByID(id: number) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/api/controllers/${id}/delete`,
+      {
+        id,
+      }
     );
   }
-  public LoadDefualtControllerItemsValues(id: number) {
+  public LoadDefualtControllerSwitchValues(id: number, category: string) {
     return this.http.post<any>(
       `${environment.apiUrl}/api/controllers/${id}/reset`,
-      null
+      { category }
     );
   }
   public newController(citem: any) {
