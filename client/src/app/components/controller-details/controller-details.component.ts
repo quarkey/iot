@@ -45,13 +45,20 @@ export class ControllerDetailsComponent implements OnInit {
         case "timeswitch":
           this.items.push(this.addTimeSwitchForm(item as timeswitch));
           break;
-        default:
+        case "switch":
+          this.items.push(this.addSwitchForm(item as normalswitch));
           break;
       }
     });
   }
   get items() {
     return this.form.get("items") as FormArray;
+  }
+  addSwitchForm(item: any) {
+    return this.formBuilder.group({
+      item_description: [item.item_description || null, Validators.required],
+      on: [item.on || null],
+    });
   }
   addThresholdSwitchForm(item: thresholdswitch) {
     return this.formBuilder.group({
@@ -100,4 +107,9 @@ interface timeswitch {
   time_off: string;
   duration: string;
   repeat: number;
+}
+
+interface normalswitch {
+  on: boolean;
+  item_description: string;
 }

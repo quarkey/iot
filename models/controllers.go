@@ -34,7 +34,10 @@ var ThresholdswitchDefaultValues = `
 	"threshold_limit": null,
 	"on": false
 }]`
-var SwitchDefaultValues = `[]`
+var SwitchDefaultValues = `[{
+	"item_description": "",
+	"on": false
+}]`
 var TimesSwitchDefaultValues = `
 [{
 	"item_description": "",
@@ -183,7 +186,7 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	err := helper.DecodeBody(r, &dat)
 	if err != nil {
 		log.Printf("unable to decode body: %v", err)
-		helper.RespondHTTPErr(w, r, 500)
+		helper.RespondErr(w, r, 500, err)
 		return
 	}
 	_, err = s.DB.Exec(`
@@ -280,7 +283,7 @@ func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 					fmt.Println(err)
 				}
 				c.Switch = 1
-				fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				// fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 				return
 			}
 			err := c.UpdateControllerSwitchState(db, 0)
@@ -289,7 +292,7 @@ func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 			}
 			c.Switch = 0
 			// fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
-			fmt.Printf("gt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+			// fmt.Printf("gt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 
 		case "less than":
 			// switching state based on threshold
@@ -301,7 +304,7 @@ func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 				}
 				c.Switch = 1
 				// fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
-				fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				// fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 
 				return
 			}
@@ -310,7 +313,7 @@ func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 				fmt.Println(err)
 			}
 			c.Switch = 0
-			fmt.Printf("lt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+			// fmt.Printf("lt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 			// fmt.Printf("ls switch off %v - state: %d\n", dataPoint, c.Switch)
 		case "equal":
 			if dataPoint == item.ThresholdLimit {
@@ -345,11 +348,11 @@ func (c Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
 		start := on.In(time.Now().Location())
 		end := off.In(time.Now().Location())
 
-		fmt.Printf("on   %v \noff: %v \nnow: %v \n",
-			start,
-			end,
-			time.Now(),
-		)
+		// fmt.Printf("on   %v \noff: %v \nnow: %v \n",
+		// 	start,
+		// 	end,
+		// 	time.Now(),
+		// )
 		// if start.Unix() > time.Now().Unix() || end.Unix() < time.Now().Unix() {
 		if inTimeSpan(start, end, time.Now()) {
 			fmt.Printf("timeswitch: %s status: on \n", item.Description)

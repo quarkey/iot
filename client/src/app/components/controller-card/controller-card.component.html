@@ -2,9 +2,16 @@
   <mat-card-header>
     <div mat-card-avatar>
       <div [ngSwitch]="citem.category">
-        <mat-icon *ngSwitchCase="'switch'">lightbulb</mat-icon>
-        <mat-icon *ngSwitchCase="'thresholdswitch'">data_thresholding</mat-icon>
-        <mat-icon *ngSwitchCase="'timeswitch'">schedule</mat-icon>
+        <!-- [class.online]="citem.switch === 1" -->
+        <mat-icon class="bigger-icon" *ngSwitchCase="'switch'"
+          >lightbulb</mat-icon
+        >
+        <mat-icon class="bigger-icon" *ngSwitchCase="'thresholdswitch'"
+          >data_thresholding</mat-icon
+        >
+        <mat-icon class="bigger-icon" *ngSwitchCase="'timeswitch'"
+          >schedule</mat-icon
+        >
       </div>
     </div>
     <mat-card-title>{{ citem.title }}</mat-card-title>

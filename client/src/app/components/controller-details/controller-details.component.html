@@ -25,8 +25,22 @@
       <mat-label>Description</mat-label>
       <input matInput formControlName="description" />
     </mat-form-field>
-    <!-- THRESHOLD FORM -->
     <h3>Switch setup: {{ this.form.get("category").value }}</h3>
+    <!-- SWITCH FORM -->
+    <ng-container *ngIf="citem.category === 'switch'">
+      <ng-container
+        formArrayName="items"
+        *ngFor="let item of items.controls; let i = index"
+      >
+        <div [formGroupName]="i">
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="item_description" />
+          </mat-form-field>
+        </div>
+      </ng-container>
+    </ng-container>
+    <!-- THRESHOLD FORM -->
     <ng-container *ngIf="citem.category === 'thresholdswitch'">
       <ng-container
         formArrayName="items"
