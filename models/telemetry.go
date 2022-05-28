@@ -210,8 +210,11 @@ func (t *Telemetry) CheckControllersTelemetry() {
 				c.CheckThresholdEntries(datapoint, t.db)
 			}
 		case "timeswitch":
+			c.ChecktimeSwitchEntries(t.db)
+		case "switch":
+			// do we need to track switches other than sensor telemetry?
 		default:
-			log.Println("[ERROR] unsupported controller")
+			log.Println("[ERROR] unsupported controller category:", c.Category)
 		}
 	}
 }

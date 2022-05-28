@@ -322,7 +322,51 @@ func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 			}
 		}
 	}
+}
 
+func (c Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
+	if !c.Active {
+		return
+	}
+	var ts []Timeswitch
+	err := json.Unmarshal(*c.Items, &ts)
+	if err != nil {
+		log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
+	}
+	for _, item := range ts {
+		on, err := time.ParseInLocation(TimeFormat, item.TimeOn, time.Now().Location())
+		if err != nil {
+			fmt.Printf("unable to parse time: %v\n", err)
+		}
+		off, err := time.ParseInLocation(TimeFormat, item.TimeOff, time.Now().Location())
+		if err != nil {
+			fmt.Printf("unable to parse time: %v\n", err)
+		}
+		start := on.In(time.Now().Location())
+		end := off.In(time.Now().Location())
+
+		fmt.Printf("on   %v \noff: %v \nnow: %v \n",
+			start,
+			end,
+			time.Now(),
+		)
+		// if start.Unix() > time.Now().Unix() || end.Unix() < time.Now().Unix() {
+		if inTimeSpan(start, end, time.Now()) {
+			fmt.Printf("timeswitch: %s status: on \n", item.Description)
+			err := c.UpdateControllerSwitchState(db, 1)
+			if err != nil {
+				fmt.Println(err)
+			}
+			return
+		}
+		err = c.UpdateControllerSwitchState(db, 0)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+func inTimeSpan(start, end, check time.Time) bool {
+	return check.After(start) && check.Before(end)
 }
 
 func (c Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
