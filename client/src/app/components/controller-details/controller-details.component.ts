@@ -1,6 +1,12 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Controller } from "src/app/models/controllers";
+import { Router } from "@angular/router";
+import {
+  Controller,
+  normalswitch,
+  thresholdswitch,
+  timeswitch,
+} from "src/app/models/controllers";
 import { Sensordata } from "src/app/models/dataset";
 import { ControllersService } from "src/app/services/controllers.service";
 import { DialogsService } from "src/app/services/dialogs.service";
@@ -20,7 +26,8 @@ export class ControllerDetailsComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private controllerService: ControllersService,
-    private dialogService: DialogsService
+    private dialogService: DialogsService,
+    private router: Router
   ) {}
   defaultValue = { hour: 13, minute: 30 };
 
@@ -32,24 +39,25 @@ export class ControllerDetailsComponent implements OnInit {
     // some error handling
   }
   ngOnInit(): void {
-    this.form = this.formBuilder.group({
-      category: [this.citem.category, Validators.required],
-      title: [this.citem.title, Validators.required],
-      description: [this.citem.description, Validators.required],
-      items: this.formBuilder.array([]),
-      active: [this.citem.active],
-    });
-
+    this.form = this.controllerService.addInitialForm(this.citem);
     this.citem.items.forEach((item: any) => {
       switch (this.citem.category) {
         case "thresholdswitch":
-          this.items.push(this.addThresholdSwitchForm(item as thresholdswitch));
+          this.items.push(
+            this.controllerService.addThresholdSwitchForm(
+              item as thresholdswitch
+            )
+          );
           break;
         case "timeswitch":
-          this.items.push(this.addTimeSwitchForm(item as timeswitch));
+          this.items.push(
+            this.controllerService.addTimeSwitchForm(item as timeswitch)
+          );
           break;
         case "switch":
-          this.items.push(this.addSwitchForm(item as normalswitch));
+          this.items.push(
+            this.controllerService.addSwitchForm(item as normalswitch)
+          );
           break;
       }
     });
@@ -60,31 +68,6 @@ export class ControllerDetailsComponent implements OnInit {
   }
   get items() {
     return this.form.get("items") as FormArray;
-  }
-  addSwitchForm(item: any) {
-    return this.formBuilder.group({
-      item_description: [item.item_description || null, Validators.required],
-      on: [item.on || null],
-    });
-  }
-  addThresholdSwitchForm(item: thresholdswitch) {
-    return this.formBuilder.group({
-      item_description: [item.item_description || null, Validators.required],
-      operation: [item.operation || null, Validators.required],
-      datasource: [item.datasource || null, Validators.required],
-      threshold_limit: [item.threshold_limit || null, Validators.required],
-      on: [item.on || null],
-    });
-  }
-  addTimeSwitchForm(item: timeswitch) {
-    return this.formBuilder.group({
-      on: [item.on || null],
-      repeat: [item.repeat || null, Validators.required],
-      time_on: [item.time_on || null, Validators.required],
-      time_off: [item.time_off || null, Validators.required],
-      duration: [item.duration || null, Validators.required],
-      item_description: [item.item_description || null, Validators.required],
-    });
   }
   updateController() {
     var obj = {
@@ -109,30 +92,34 @@ export class ControllerDetailsComponent implements OnInit {
         if (res) {
           alert("confirmed");
           this.showReloadbutton = false;
-          this.updateController();
+          this.updateController(); // save form
           window.location.reload();
         }
       });
   }
-}
-
-interface thresholdswitch {
-  on: boolean;
-  item_description: string;
-  datasource: string;
-  threshold_limit: number;
-  operation: string;
-}
-interface timeswitch {
-  on: boolean;
-  item_description: string;
-  time_on: string;
-  time_off: string;
-  duration: string;
-  repeat: number;
-}
-
-interface normalswitch {
-  on: boolean;
-  item_description: string;
+  deleteController() {
+    this.dialogService
+      .openConfirmationDialog(
+        "Delete controller?",
+        `Are you sure you want to permanently delete controller?`
+      )
+      .subscribe((res) => {
+        if (res) {
+          this.showReloadbutton = false;
+          this.router.navigate([`/controllers`]);
+        }
+      });
+  }
+  clearControllerItems() {
+    this.dialogService
+      .openConfirmationDialog(
+        "Reset item fields?",
+        `Are you sure you want to reset item values?`
+      )
+      .subscribe((res) => {
+        if (res) {
+          this.showReloadbutton = false;
+        }
+      });
+  }
 }

@@ -142,6 +142,17 @@
     >
       UPDATE
     </button>
+    <button mat-button [matMenuTriggerFor]="menu">MORE</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="clearControllerItems()">
+        <mat-icon>density_small</mat-icon>
+        <span>Reset item fields</span>
+      </button>
+      <button mat-menu-item (click)="deleteController()">
+        <mat-icon>delete_forever</mat-icon>
+        <span>Delete controller</span>
+      </button>
+    </mat-menu>
   </mat-card-actions>
 </mat-card>
 <pre>
