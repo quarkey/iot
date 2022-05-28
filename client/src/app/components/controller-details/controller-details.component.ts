@@ -3,6 +3,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Controller } from "src/app/models/controllers";
 import { Sensordata } from "src/app/models/dataset";
 import { ControllersService } from "src/app/services/controllers.service";
+import { DialogsService } from "src/app/services/dialogs.service";
 import { environment } from "src/environments/environment";
 
 @Component({
@@ -13,11 +14,13 @@ import { environment } from "src/environments/environment";
 export class ControllerDetailsComponent implements OnInit {
   @Input() citem: Controller;
   form: FormGroup;
+  showReloadbutton = false;
   categories: string[] = ["switch", "thresholdswitch", "timeswitch"];
 
   constructor(
     private formBuilder: FormBuilder,
-    private controllerService: ControllersService
+    private controllerService: ControllersService,
+    private dialogService: DialogsService
   ) {}
   defaultValue = { hour: 13, minute: 30 };
 
@@ -49,6 +52,10 @@ export class ControllerDetailsComponent implements OnInit {
           this.items.push(this.addSwitchForm(item as normalswitch));
           break;
       }
+    });
+    this.form.controls.category.valueChanges.subscribe((value) => {
+      this.showReloadbutton = true;
+      this.confirmReload();
     });
   }
   get items() {
@@ -90,6 +97,22 @@ export class ControllerDetailsComponent implements OnInit {
         this.form.markAsPristine();
       }
     });
+  }
+  confirmReload() {
+    this.dialogService
+      .openConfirmationDialog(
+        "Save and reload page?",
+        `To initiate new form values the page must be reloaded. 
+        Do you want to save values and reload page?`
+      )
+      .subscribe((res) => {
+        if (res) {
+          alert("confirmed");
+          this.showReloadbutton = false;
+          this.updateController();
+          window.location.reload();
+        }
+      });
   }
 }
 

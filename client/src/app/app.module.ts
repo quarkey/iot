@@ -55,6 +55,7 @@ import { StatusDotComponent } from "./shared/auxiliary/components/status-dot/sta
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTimepickerModule } from "mat-timepicker";
 import { MatDatepickerModule } from "@angular/material/datepicker";
+import { ConfirmationDialogComponent } from "./components/dialogs/confirmation-dialog/confirmation-dialog.component";
 
 @NgModule({
   declarations: [
@@ -84,6 +85,7 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
     NewControllerComponent,
     TwoColumnDivComponent,
     StatusDotComponent,
+    ConfirmationDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -121,6 +123,7 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
     ErrorHandlingDialogComponent,
+    ConfirmationDialogComponent,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpErrorInterceptor,

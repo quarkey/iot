@@ -8,31 +8,40 @@
     </span>
   </mat-card-title>
   <mat-card-content>
-    <div></div>
-    <mat-form-field appearance="fill">
-      <mat-label>Title</mat-label>
-      <input matInput formControlName="title" placeholder="Title" />
-    </mat-form-field>
-    <mat-form-field appearance="fill" class="customer">
-      <mat-label>Category</mat-label>
-      <mat-select formControlName="category">
-        <mat-option *ngFor="let cat of categories" [value]="cat">{{
-          cat
-        }}</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-      <mat-label>Description</mat-label>
-      <input matInput formControlName="description" />
-    </mat-form-field>
-    <h3>Switch setup: {{ this.form.get("category").value }}</h3>
+    <div fxLayout="row" fxFlexFill fxLayout.lt-md="column" fxLayoutGap="16px">
+      <mat-form-field appearance="fill">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" placeholder="Title" />
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="customer" fxFlex="grow">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="category">
+          <mat-option *ngFor="let cat of categories" [value]="cat">{{
+            cat
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description" />
+      </mat-form-field>
+    </div>
+    <h4>
+      Switch specific configuration: {{ this.form.get("category").value }}
+    </h4>
     <!-- SWITCH FORM -->
     <ng-container *ngIf="citem.category === 'switch'">
       <ng-container
         formArrayName="items"
         *ngFor="let item of items.controls; let i = index"
       >
-        <div [formGroupName]="i">
+        <div
+          [formGroupName]="i"
+          fxLayout="row"
+          fxFlexFill
+          fxLayout.lt-md="column"
+          fxLayoutGap="16px"
+        >
           <mat-form-field appearance="fill">
             <mat-label>Description</mat-label>
             <input matInput formControlName="item_description" />
@@ -46,7 +55,13 @@
         formArrayName="items"
         *ngFor="let item of items.controls; let i = index"
       >
-        <div [formGroupName]="i">
+        <div
+          [formGroupName]="i"
+          fxLayout="row"
+          fxFlexFill
+          fxLayout.lt-md="column"
+          fxLayoutGap="16px"
+        >
           <mat-form-field appearance="fill">
             <mat-label>Description</mat-label>
             <input matInput formControlName="item_description" />
@@ -79,7 +94,13 @@
         formArrayName="items"
         *ngFor="let item of items.controls; let i = index"
       >
-        <div [formGroupName]="i">
+        <div
+          [formGroupName]="i"
+          fxLayout="row"
+          fxFlexFill
+          fxLayout.lt-md="column"
+          fxLayoutGap="16px"
+        >
           <mat-form-field appearance="fill">
             <mat-label>Description</mat-label>
             <input matInput formControlName="item_description" />
