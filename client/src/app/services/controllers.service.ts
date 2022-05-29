@@ -25,18 +25,15 @@ export class ControllersService {
     );
   }
   public DeleteControllerByID(id: number) {
-    return this.http.post<any>(
-      `${environment.apiUrl}/api/controllers/${id}/delete`,
-      {
-        id,
-      }
-    );
+    return this.http.post<any>(`${environment.apiUrl}/api/controller/delete`, {
+      id,
+    });
   }
-  public LoadDefualtControllerSwitchValues(id: number, category: string) {
-    return this.http.post<any>(
-      `${environment.apiUrl}/api/controllers/${id}/reset`,
-      { category }
-    );
+  public ResetControllerSwitchValueEndpoint(id: number, category: string) {
+    return this.http.post<any>(`${environment.apiUrl}/api/controller/reset`, {
+      id,
+      category,
+    });
   }
   public newController(citem: any) {
     return this.http.post<any>(`${environment.apiUrl}/api/controllers`, citem);

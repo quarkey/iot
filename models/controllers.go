@@ -215,6 +215,50 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	helper.Respond(w, r, 200, "updated")
 }
 
+// ResetControllerSwitchValueEndpoint
+func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *http.Request) {
+	var dat Controller
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		log.Printf("unable to decode body: %v", err)
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	var defaultValues string
+	switch dat.Category {
+	case "switch":
+		defaultValues = SwitchDefaultValues
+	case "thresholdswitch":
+		defaultValues = ThresholdswitchDefaultValues
+	case "timeswitch":
+		defaultValues = TimesSwitchDefaultValues
+	}
+	_, err = s.DB.Exec(`update controllers set
+		items=$1
+		where id=$2
+	`, defaultValues, dat.ID)
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to update controller item: ", err)
+		return
+	}
+	helper.RespondSuccess(w, r, 200)
+}
+func (s *Server) DeleteControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
+	var dat Controller
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		log.Printf("unable to decode body: %v", err)
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	_, err = s.DB.Exec(`delete from controllers where id=$1`, dat.ID)
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to delete controller: ", err)
+		return
+	}
+	helper.RespondSuccess(w, r, 200)
+}
+
 type switchState struct {
 	ID          int  `db:"id" json:"id"`
 	Active      bool `db:"active" json:"active"`
@@ -372,6 +416,7 @@ func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
 }
 
+//
 func (c Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
 	// _, err := db.Exec(`update controllers set
 	// 	switch=$1

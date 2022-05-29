@@ -127,7 +127,7 @@ export class ControllerDetailsComponent implements OnInit {
           this.showReloadbutton = false;
           // do reset
           this.controllerService
-            .LoadDefualtControllerSwitchValues(
+            .ResetControllerSwitchValueEndpoint(
               this.citem.id,
               this.citem.category
             )
