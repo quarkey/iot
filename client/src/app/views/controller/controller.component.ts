@@ -17,7 +17,9 @@ export class ControllerComponent implements OnInit {
   ngOnInit(): void {
     this.activeRoute.params.subscribe((key) => {
       this.ControllersService.LoadControllerByID(key.id).subscribe((res) => {
-        this.citem = res;
+        if (res) {
+          this.citem = res;
+        }
       });
     });
   }
