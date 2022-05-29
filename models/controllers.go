@@ -234,7 +234,9 @@ func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *ht
 		defaultValues = TimesSwitchDefaultValues
 	}
 	_, err = s.DB.Exec(`update controllers set
-		items=$1
+		items=$1,
+		switch=0,
+		active='f'
 		where id=$2
 	`, defaultValues, dat.ID)
 	if err != nil {
@@ -243,6 +245,8 @@ func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *ht
 	}
 	helper.RespondSuccess(w, r, 200)
 }
+
+// DeleteControllerByIDEndpoint deletes entire controller record by and id. warning will delete without confirmation.
 func (s *Server) DeleteControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	var dat Controller
 	err := helper.DecodeBody(r, &dat)

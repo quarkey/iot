@@ -85,8 +85,11 @@ export class ControllerDetailsComponent implements OnInit {
     this.dialogService
       .openConfirmationDialog(
         "Save and reload page?",
-        `To initiate new form values the page must be reloaded. 
-        Do you want to save values and reload page?`
+        `Warning! To initiate new form values the page must be reloaded. 
+        Do you want to save values and reload page?`,
+        "CONFIRM",
+        "CANCEL",
+        true
       )
       .subscribe((res) => {
         if (res) {
@@ -100,7 +103,10 @@ export class ControllerDetailsComponent implements OnInit {
     this.dialogService
       .openConfirmationDialog(
         "Delete controller?",
-        `Are you sure you want to permanently delete controller?`
+        `Are you sure you want to permanently delete controller?`,
+        "CONFIRM",
+        "CANCEL",
+        true
       )
       .subscribe((res) => {
         if (res) {
@@ -116,11 +122,14 @@ export class ControllerDetailsComponent implements OnInit {
         }
       });
   }
-  clearControllerItems() {
+  resetControllerItemValues() {
     this.dialogService
       .openConfirmationDialog(
         "Reset item fields?",
-        `Are you sure you want to reset item values?`
+        `Are you sure you want to reset item values?`,
+        "CONFIRM",
+        "CANCEL",
+        false
       )
       .subscribe((res) => {
         if (res) {

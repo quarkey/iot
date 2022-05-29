@@ -1,4 +1,5 @@
 import { Component, Inject, OnInit } from "@angular/core";
+import { FormControl, Validators } from "@angular/forms";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 @Component({
@@ -15,9 +16,18 @@ export class ConfirmationDialogComponent implements OnInit {
       message: string;
       yes: string;
       cancel: string;
+      confirmForm: boolean;
     }
   ) {}
-  ngOnInit(): void {}
+  form: FormControl;
+  ngOnInit(): void {
+    if (this.data.confirmForm) {
+      this.form = new FormControl("", [
+        Validators.required,
+        Validators.pattern("confirm"),
+      ]);
+    }
+  }
   click(clickmessage: string): void {
     this.dialogRef.close(clickmessage);
   }

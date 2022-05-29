@@ -48,7 +48,8 @@ export class DialogsService {
     title: string,
     message: string,
     yesbutton?: string,
-    nobutton?: string
+    nobutton?: string,
+    writtenConfirmForm?: boolean
   ): Observable<boolean> {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
@@ -56,6 +57,7 @@ export class DialogsService {
         message: message,
         yes: yesbutton || "CONFIRM",
         cancel: nobutton || "CANCEL",
+        confirmForm: writtenConfirmForm || false,
       },
     });
     var out = new Subject<boolean>();
