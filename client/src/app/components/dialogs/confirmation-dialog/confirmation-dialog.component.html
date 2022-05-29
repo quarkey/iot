@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<mat-dialog-content>{{ data.message }} </mat-dialog-content>
+<mat-dialog-content>
+  <ng-container *ngIf="data.confirmForm">
+    <h4>Verify by writing 'confirm'</h4>
+    <mat-form-field appearance="outline" style="width: 100%">
+      <input matInput [formControl]="form" />
+    </mat-form-field>
+  </ng-container>
+</mat-dialog-content>
+<br />
+<mat-dialog-actions>
+  <div style="flex: 1 1 auto"></div>
+  <button mat-button color="warn" (click)="click('cancel')">
+    {{ data.cancel }}
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="click('yes')"
+    [disabled]="form.invalid"
+    *ngIf="data.confirmForm"
+  >
+    {{ data.yes }}
+    {{ form.status | json }}
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="click('yes')"
+    *ngIf="data.confirmForm === false"
+  >
+    {{ data.yes }}
+  </button>
+</mat-dialog-actions>

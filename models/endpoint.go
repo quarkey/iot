@@ -14,7 +14,7 @@ func (s *Server) SetupEndpoints() {
 	s.Router.HandleFunc("/api/sensors", s.GetSensorsListEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/sensors/{reference}", s.GetSensorByReference).Methods("GET")
 
-	s.Router.HandleFunc("/api/sensordata/{reference}", s.GetSensorDataByReference).Methods("GET")
+	s.Router.HandleFunc("/api/sensordata/{reference}", s.GetSensorDataByReferenceEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/sensordata", s.SaveSensorReading).Methods("POST")
 	s.Router.HandleFunc("/api/syncdata", s.SyncSensorData).Methods("POST")
 
@@ -30,7 +30,16 @@ func (s *Server) SetupEndpoints() {
 	// events
 	s.Router.HandleFunc("/api/events/{count}", s.EventLogEndpoint).Methods("GET")
 
-	// s.Router.HandleFunc("/ws/{dataset_id}", func(w http.ResponseWriter, r *http.Request) {
+	// controllers
+	s.Router.HandleFunc("/api/controllers", s.GetControllersListEndpoint).Methods("GET")
+	s.Router.HandleFunc("/api/controllers/{cid}", s.GetControllerByIDEndpoint).Methods("GET")
+	s.Router.HandleFunc("/api/controllers", s.AddNewControllerEndpoint).Methods("POST")
+	s.Router.HandleFunc("/api/controllers", s.UpdateControllerByIDEndpoint).Methods("PUT")
+	s.Router.HandleFunc("/api/controller/{id}/switch/{state}", s.SetControllerSwitchStateEndpoint).Methods("GET")
+	s.Router.HandleFunc("/api/controller/reset", s.ResetControllerSwitchValueEndpoint).Methods("POST")
+	s.Router.HandleFunc("/api/controller/delete", s.DeleteControllerByIDEndpoint).Methods("POST")
+
+	// socket upgrader for live dataset monitoring
 	s.Router.HandleFunc("/api/live", func(w http.ResponseWriter, r *http.Request) {
 		hub.ServeWs(s.Hub, w, r)
 	})

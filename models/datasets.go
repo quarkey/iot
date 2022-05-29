@@ -57,6 +57,7 @@ func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request)
 }
 
 func GetDatasetsList(db *sqlx.DB) []Dataset {
+	// TODO: add error handling
 	var datasets []Dataset
 	err := db.Select(&datasets,
 		`select 

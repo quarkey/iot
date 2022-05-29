@@ -45,6 +45,18 @@ import { MatGridListModule } from "@angular/material/grid-list";
 import { MatMenuModule } from "@angular/material/menu";
 import { LayoutModule } from "@angular/cdk/layout";
 import { SystemComponent } from "./views/system/system.component";
+import { ControllersListComponent } from "./views/controllers-list/controllers-list.component";
+import { ControllerCardComponent } from "./components/controller-card/controller-card.component";
+import { ControllerDetailsComponent } from "./components/controller-details/controller-details.component";
+import { ControllerComponent } from "./views/controller/controller.component";
+import { NewControllerComponent } from "./components/dialogs/new-controller/new-controller.component";
+import { TwoColumnDivComponent } from "./shared/auxiliary/components/two-column-div/two-column-div.component";
+import { StatusDotComponent } from "./shared/auxiliary/components/status-dot/status-dot.component";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatTimepickerModule } from "mat-timepicker";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { ConfirmationDialogComponent } from "./components/dialogs/confirmation-dialog/confirmation-dialog.component";
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -66,12 +78,22 @@ import { SystemComponent } from "./views/system/system.component";
     DeviceCardComponent,
     DashComponent,
     SystemComponent,
+    ControllersListComponent,
+    ControllerCardComponent,
+    ControllerDetailsComponent,
+    ControllerComponent,
+    NewControllerComponent,
+    TwoColumnDivComponent,
+    StatusDotComponent,
+    ConfirmationDialogComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    MatTimepickerModule,
     MatSidenavModule,
+    MatDatepickerModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
@@ -95,11 +117,13 @@ import { SystemComponent } from "./views/system/system.component";
     MatGridListModule,
     MatMenuModule,
     LayoutModule,
+    MatSlideToggleModule,
   ],
   providers: [
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
     ErrorHandlingDialogComponent,
+    ConfirmationDialogComponent,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpErrorInterceptor,

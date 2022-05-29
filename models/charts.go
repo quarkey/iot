@@ -23,7 +23,7 @@ type LineChartDataset struct {
 func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ref := vars["reference"]
-	data, err := loadData(s.DB, ref)
+	data, err := loadSensorData(s.DB, ref, 1000)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to load data: ", err)
 		return
@@ -33,7 +33,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// decoding jsonRawMessage data column
-	raw, err := helper.DecodeRawJSON(data[0].Data)
+	raw, err := helper.DecodeRawJSONtoSlice(data[0].Data)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
@@ -60,7 +60,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		var ps LineChartDataset
 		ps.Label = fields[i]
 		for _, set := range data {
-			decoded, err := helper.DecodeRawJSON(set.Data)
+			decoded, err := helper.DecodeRawJSONtoSlice(set.Data)
 			if err != nil {
 				helper.RespondErr(w, r, 500, err)
 				return
@@ -96,7 +96,7 @@ type Point struct {
 func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ref := vars["reference"]
-	data, err := loadData(s.DB, ref)
+	data, err := loadSensorData(s.DB, ref, 1000)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
@@ -106,7 +106,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// decoding jsonRawMessage data column
-	raw, err := helper.DecodeRawJSON(data[0].Data)
+	raw, err := helper.DecodeRawJSONtoSlice(data[0].Data)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
@@ -130,7 +130,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 		}
 		var ps []Point
 		for _, set := range data {
-			decoded, err := helper.DecodeRawJSON(set.Data)
+			decoded, err := helper.DecodeRawJSONtoSlice(set.Data)
 			if err != nil {
 				helper.RespondErr(w, r, 500, err)
 				return
@@ -149,8 +149,9 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, out)
 }
 
-// loadData fetches the last 1000 records in the correct order
-func loadData(db *sqlx.DB, ref string) ([]Data, error) {
+// loadSensorData fetches the last n records available for given
+// dataset id and reference.
+func loadSensorData(db *sqlx.DB, ref string, limit int) ([]Data, error) {
 	var data []Data
 	err := db.Select(&data, `
 	select * from (select 
@@ -160,12 +161,10 @@ func loadData(db *sqlx.DB, ref string) ([]Data, error) {
 		from sensordata a, datasets b 
 		where b.reference=$1 
 		and b.id = a.dataset_id
-		order by id desc limit 1000
-	) as storedItems
+		order by id desc limit $2
+	) as sortedItems -- required for pg sub selects.
 	order by id asc;
-
-	--and a.time BETWEEN NOW() - INTERVAL '3 HOURS' AND NOW()
-	`, ref)
+	`, ref, limit)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get dataset from db: %v", err)
 	}

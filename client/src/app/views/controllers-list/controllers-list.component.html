@@ -1,0 +1,31 @@
+<div class="backgroundImage" style="overflow-y: auto">
+  <div fxLayoutAlign="center" style="padding-top: 20px">
+    <mat-spinner *ngIf="loading; else show"></mat-spinner>
+  </div>
+  <ng-template #show>
+    <div
+      fxLayout="row wrap"
+      fxLayoutGap="16px grid"
+      fxLayoutAlign="space-evenly center"
+      style="padding: 20px"
+    >
+      <div
+        fxFlex="50%"
+        fxFlex.xs="90%"
+        fxFlex.sm="90%"
+        *ngFor="let item of citem"
+      >
+        <app-controller-card [citem]="item"></app-controller-card>
+      </div>
+    </div>
+  </ng-template>
+  <button
+    mat-mini-fab
+    color="primary"
+    class="bottom-right"
+    matTooltip="Add new controller"
+    (click)="newControllerDialog()"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

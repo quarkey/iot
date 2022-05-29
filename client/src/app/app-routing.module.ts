@@ -8,10 +8,15 @@ import { DevicesListComponent } from "./views/devices-list/devices-list.componen
 import { EventsComponent } from "./views/events/events.component";
 import { DashComponent } from "./views/dash/dash.component";
 import { SystemComponent } from "./views/system/system.component";
+import { ControllersListComponent } from "./views/controllers-list/controllers-list.component";
+import { ControllerDetailsComponent } from "./components/controller-details/controller-details.component";
+import { ControllerComponent } from "./views/controller/controller.component";
 
 const routes: Routes = [
   { path: "dashboard", component: DashboardComponent },
   { path: "dash", component: DashComponent },
+  { path: "controllers", component: ControllersListComponent },
+  { path: "controllers/:id", component: ControllerComponent },
   { path: "devices", component: DevicesListComponent },
   { path: "devices/:arduino_key", component: DeviceComponent },
   { path: "datasets", component: DatasetsListComponent },

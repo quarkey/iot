@@ -1,0 +1,13 @@
+.backgroundImage {
+  background-image: url("../../../assets/img/background/pexels-ty-3958976.jpg");
+  height: 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: auto;
+}
+.bottom-right {
+  position: fixed !important;
+  right: 20px; /* Add this and change value to set the margin you want */
+  bottom: 30px;
+  z-index: 1;
+}

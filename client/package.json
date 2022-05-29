@@ -24,6 +24,7 @@
     "@angular/router": "~13.3.1",
     "@swimlane/ngx-charts": "^20.1.0",
     "chart.js": "^3.7.1",
+    "mat-timepicker": "^5.1.5",
     "ng2-charts": "^3.0.9",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
