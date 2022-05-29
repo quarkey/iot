@@ -24,7 +24,7 @@ func (s *Server) DashboardInfoEndpoint(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, 400, err)
 		return
 	}
-	err = s.DB.Get(&controllers, `select count(*) as "controllers" from controllers where active='t'`)
+	err = s.DB.Get(&controllers, `select count(*) as "controllers" from controllers`)
 	if err != nil {
 		helper.RespondErr(w, r, 400, err)
 		return
