@@ -1,0 +1,10 @@
+<ng-container>
+  <mat-form-field appearance="fill" *ngIf="deviceList">
+    <mat-label>Select device</mat-label>
+    <mat-select [(ngModel)]="change" (ngModelChange)="handleChange()">
+      <mat-option *ngFor="let device of deviceList" [value]="device.id">
+        {{ device.title }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</ng-container>

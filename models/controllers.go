@@ -79,7 +79,8 @@ func GetControllersList(db *sqlx.DB) ([]Controller, error) {
 		alert,
 		active,
 		created_at 
-	from controllers`)
+	from controllers
+	order by id`)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get list of controllers: %v", err)
 	}

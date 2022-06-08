@@ -56,6 +56,7 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatTimepickerModule } from "mat-timepicker";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { ConfirmationDialogComponent } from "./components/dialogs/confirmation-dialog/confirmation-dialog.component";
+import { SelectDeviceComponent } from './shared/auxiliary/forms/select-device/select-device.component';
 
 @NgModule({
   declarations: [
@@ -86,6 +87,7 @@ import { ConfirmationDialogComponent } from "./components/dialogs/confirmation-d
     TwoColumnDivComponent,
     StatusDotComponent,
     ConfirmationDialogComponent,
+    SelectDeviceComponent,
   ],
   imports: [
     BrowserModule,

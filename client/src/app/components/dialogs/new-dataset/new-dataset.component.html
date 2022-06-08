@@ -1,23 +1,30 @@
 <h3>Add new dataset</h3>
-<mat-dialog-content [formGroup]="form">
-  <mat-form-field class="example-full-width" appearance="fill">
-    <mat-label>Titlte</mat-label>
-    <input matInput formControlName="title" />
-  </mat-form-field>
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field class="example-full-width" appearance="fill">
+      <mat-label>Titlte</mat-label>
+      <input matInput formControlName="title" />
+    </mat-form-field>
 
-  <mat-form-field class="example-full-width" appearance="fill">
-    <mat-label>Description</mat-label>
-    <textarea matInput formControlName="description"></textarea>
-  </mat-form-field>
+    <mat-form-field class="example-full-width" appearance="fill">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill" *ngIf="deviceList">
+    <app-select-device
+      [deviceList]="deviceList"
+      formControlName="sensor_id"
+      *ngIf="deviceList"
+    ></app-select-device>
+  </form>
+  <!-- <mat-form-field appearance="fill" *ngIf="deviceList">
     <mat-label>Select device</mat-label>
     <mat-select formControlName="sensor_id">
       <mat-option *ngFor="let device of deviceList" [value]="device.id">
         {{ device.title }}
       </mat-option>
     </mat-select>
-  </mat-form-field>
+  </mat-form-field> -->
   {{ ref }}
 </mat-dialog-content>
 <mat-dialog-actions>
