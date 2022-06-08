@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
 import { Dataset, Sensordata } from "src/app/models/dataset";
 import { DatasetsService } from "src/app/services/datasets.service";
+import { DialogsService } from "src/app/services/dialogs.service";
 import { GeneralService } from "src/app/services/general.service";
 
 @Component({
@@ -17,7 +19,9 @@ export class DatasetDetailsComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private datasetService: DatasetsService,
-    private generalService: GeneralService
+    private generalService: GeneralService,
+    private dialogService: DialogsService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -86,6 +90,27 @@ export class DatasetDetailsComponent implements OnInit {
           const date = Date.now();
           const filename = `export_dataset_id_${this.dataset.id}_${date}.csv`;
           this.generalService.DownloadFile(res, filename);
+        }
+      });
+  }
+  deleteDataset() {
+    this.dialogService
+      .openConfirmationDialog(
+        "Delete dataset, INCLUDING DATA?",
+        `Are you sure you want to permanently delete dataset, INCLUDING data points?`,
+        "CONFIRM",
+        "CANCEL",
+        true
+      )
+      .subscribe((confirm) => {
+        if (confirm) {
+          this.datasetService
+            .DeleteDatasetByID(this.dataset.id, this.dataset.title)
+            .subscribe((res) => {
+              if (res) {
+                this.router.navigate([`/datasets`]);
+              }
+            });
         }
       });
   }

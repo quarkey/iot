@@ -72,6 +72,21 @@
     >
       EXPORT
     </button>
+    <button mat-button [matMenuTriggerFor]="menu">MORE</button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item disabled>
+        <mat-icon>density_small</mat-icon>
+        <span>Clear data points</span>
+      </button>
+      <button mat-menu-item (click)="deleteDataset()">
+        <mat-icon>delete_forever</mat-icon>
+        <span>Delete dataset</span>
+      </button>
+      <!-- <button mat-menu-item>
+        <mat-icon>delete_forever</mat-icon>
+        <span>Set dataset inactive</span>
+      </button> -->
+    </mat-menu>
   </mat-card-actions>
 </mat-card>
 <pre>

@@ -150,7 +150,7 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 	}
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
+	s.NewEvent(DatasetEvent, "dataset '%s' added", dat.Title)
 	helper.RespondSuccess(w, r)
 }
 
@@ -186,6 +186,54 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	s.Telemetry.UpdateTelemetryLists()
 	s.NewEvent(DatasetEvent, "dataset '%s' updated", dataset.Title)
 	helper.Respond(w, r, 200, dataset)
+}
+
+// DeleteDatasetByIDEndpoint deletes dataset and any sensor data associated with it.
+// WARNING!!! THIS IS IRREVERSIBLE!
+func (s *Server) DeleteDatasetByIDEndpoint(w http.ResponseWriter, r *http.Request) {
+	var dat Dataset
+	err := helper.DecodeBody(r, &dat)
+	if err != nil {
+		log.Printf("unable to decode body: %v", err)
+		helper.RespondErr(w, r, 500, err)
+		return
+	}
+	tx, err := s.DB.Begin()
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to start transactio: ", err)
+	}
+	// deleting sensor data first so forein key constraint wont get triggered
+	_, err = tx.Exec(`delete from sensordata where dataset_id=$1`, dat.ID)
+	if err != nil {
+		err := tx.Rollback()
+		if err != nil {
+			helper.RespondErr(w, r, 500, "unable to delete rolling back: ", err)
+			return
+		}
+		helper.RespondErr(w, r, 500, "unable to delete dataset: ", err)
+		return
+	}
+	// deleting dataset
+	_, err = tx.Exec(`delete from datasets where id=$1`, dat.ID)
+	if err != nil {
+		err := tx.Rollback()
+		if err != nil {
+			helper.RespondErr(w, r, 500, "unable to delete rolling back: ", err)
+			return
+		}
+		helper.RespondErr(w, r, 500, "unable to delete dataset: ", err)
+		return
+	}
+	err = tx.Commit()
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to commit: ", err)
+		return
+	}
+	// also update telemetry
+	// also update telemetry dataset list
+	s.Telemetry.UpdateTelemetryLists()
+	s.NewEvent(DatasetEvent, "dataset '%s' deleted", dat.Title)
+	helper.RespondSuccess(w, r, 200)
 }
 
 func DatasetFieldAndShowCartList(ref string, db *sqlx.DB) ([]string, []bool, error) {

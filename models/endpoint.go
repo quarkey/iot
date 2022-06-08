@@ -18,10 +18,12 @@ func (s *Server) SetupEndpoints() {
 	s.Router.HandleFunc("/api/sensordata", s.SaveSensorReading).Methods("POST")
 	s.Router.HandleFunc("/api/syncdata", s.SyncSensorData).Methods("POST")
 
+	// datasets
 	s.Router.HandleFunc("/api/datasets", s.GetDatasetsListEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/datasets", s.UpdateDataset).Methods("PUT")
 	s.Router.HandleFunc("/api/datasets/{reference}", s.GetDatasetByReference).Methods("GET")
 	s.Router.HandleFunc("/api/datasets", s.NewDataset).Methods("POST")
+	s.Router.HandleFunc("/api/datasets/delete", s.DeleteDatasetByIDEndpoint).Methods("POST")
 
 	// charts
 	s.Router.HandleFunc("/api/chart/area/{reference}", s.AreaChartDataSeries).Methods("GET")
