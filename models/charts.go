@@ -67,7 +67,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 			}
 			toFloatValue, err := strconv.ParseFloat(decoded[i], 64)
 			if err != nil {
-				msg := fmt.Sprintf("LineChartDataSeries(): unable to parse data point '%v', check type for column %d", decoded[i], i)
+				msg := fmt.Sprintf("LineChartDataSeries(): unable to parse data point '%v', check type in column '%s'", decoded[i], fields[i])
 				helper.RespondErr(w, r, 500, msg)
 				return
 			}
@@ -138,7 +138,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 			// converting data point from string to float
 			toFloatValue, err := strconv.ParseFloat(decoded[i], 64)
 			if err != nil {
-				msg := fmt.Sprintf("AreaChartDataSeries(): unable to parse data point '%v', check type for column %d", decoded[i], i)
+				msg := fmt.Sprintf("AreaChartDataSeries(): unable to parse data point '%v', check type in column '%s'", decoded[i], fields[i])
 				helper.RespondErr(w, r, 500, msg)
 				return
 			}

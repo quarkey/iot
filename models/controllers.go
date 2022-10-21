@@ -13,6 +13,7 @@ import (
 	helper "github.com/quarkey/iot/json"
 )
 
+// Controller data structure
 type Controller struct {
 	ID          int              `db:"id" json:"id"`
 	SensorID    int              `db:"sensor_id" json:"sensor_id"`
@@ -26,6 +27,13 @@ type Controller struct {
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 }
 
+// SwitchDefaultValues initial state
+var SwitchDefaultValues = `[{
+	"item_description": "",
+	"on": false
+}]`
+
+// ThresholdswitchDefaultValues initial state
 var ThresholdswitchDefaultValues = `
 [{
 	"item_description": "",
@@ -34,10 +42,8 @@ var ThresholdswitchDefaultValues = `
 	"threshold_limit": null,
 	"on": false
 }]`
-var SwitchDefaultValues = `[{
-	"item_description": "",
-	"on": false
-}]`
+
+// TimesSwitchDefaultValues initial state
 var TimesSwitchDefaultValues = `
 [{
 	"item_description": "",
@@ -48,6 +54,8 @@ var TimesSwitchDefaultValues = `
 	"on": false
 }]
 `
+var SWITCH_ON = 1
+var SWITCH_OFF = 0
 
 type Thresholdswitch struct {
 	Description    string  `json:"item_description"`
@@ -64,10 +72,10 @@ type Timeswitch struct {
 	On          bool   `json:"on"`
 }
 
-// GetControllersList fetches a list of controllers. All types of errors will return empty a slice.
+// GetControllersList fetches a list of available controllers including not active ones.
 func GetControllersList(db *sqlx.DB) ([]Controller, error) {
-	var cs []Controller
-	err := db.Select(&cs, `
+	var list []Controller
+	err := db.Select(&list, `
 	select
 		id,
 		sensor_id,
@@ -82,12 +90,12 @@ func GetControllersList(db *sqlx.DB) ([]Controller, error) {
 	from controllers
 	order by id`)
 	if err != nil {
-		return nil, fmt.Errorf("unable to get list of controllers: %v", err)
+		return nil, fmt.Errorf("unable to get list of controllers from database: %v", err)
 	}
-	return cs, nil
+	return list, nil
 }
 
-// GetControllerByID loads a specific controller from database by given id
+// GetControllerByID loads a specific controller from database by given ID
 func GetControllerByID(db *sqlx.DB, cid int) (Controller, error) {
 	var c Controller
 	err := db.Get(&c, `
@@ -109,13 +117,13 @@ func GetControllerByID(db *sqlx.DB, cid int) (Controller, error) {
 	return c, nil
 }
 
-// GetControllersListEndpoint loads all available controllers
+// GetControllersListEndpoint fetches a list of all available controllers.
 func (s *Server) GetControllersListEndpoint(w http.ResponseWriter, r *http.Request) {
-	cs, err := GetControllersList(s.DB)
+	list, err := GetControllersList(s.DB)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 	}
-	helper.Respond(w, r, 200, cs)
+	helper.Respond(w, r, 200, list)
 }
 
 // GetControllerByIDEndpoint loads a specific controller from database by given id
@@ -130,7 +138,7 @@ func (s *Server) GetControllerByIDEndpoint(w http.ResponseWriter, r *http.Reques
 	helper.Respond(w, r, 200, c)
 }
 
-// AddControllerEndpoint adds a new controller to the database with initial switch state set to false
+// AddNewControllerEndpoint adds a new controller to the database with an initial switch state and alerting to false.
 func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request) {
 	var dat Controller
 	err := helper.DecodeBody(r, &dat)
@@ -159,10 +167,7 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		dat.Category,
 		dat.Title,
 		dat.Description,
-		//dat.Switch,
-		//dat.Items,
-		//dat.Alert,
-		//dat.Active,
+
 		itemJSON,
 		false,
 		false).Scan(&returning_id)
@@ -181,7 +186,7 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 	helper.Respond(w, r, 200, returning_id)
 }
 
-// UpdateControllerByIDEndpoint updates the entire row including json items
+// UpdatControllerByIDEndpoint updates database and memory values for a  controller item by an ID. NB! The method will not validate *json.RawMessage.
 func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	dat := Controller{}
 	err := helper.DecodeBody(r, &dat)
@@ -216,7 +221,8 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	helper.Respond(w, r, 200, "updated")
 }
 
-// ResetControllerSwitchValueEndpoint
+// ResetControllerSwitchValueEndpoint resets the active configuration (raw json) for a given controller to its default state.
+// The method also sets the controller switch state to OFF and inactive.
 func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *http.Request) {
 	var dat Controller
 	err := helper.DecodeBody(r, &dat)
@@ -247,7 +253,8 @@ func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *ht
 	helper.RespondSuccess(w, r, 200)
 }
 
-// DeleteControllerByIDEndpoint deletes entire controller record by and id. warning will delete without confirmation.
+// DeleteControllerByIDEndpoint deletes a controller record by a given ID without any confirmation.
+// Caution is advised when deleting controllers, as this may affect the IoT system.
 func (s *Server) DeleteControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	var dat Controller
 	err := helper.DecodeBody(r, &dat)
@@ -270,8 +277,7 @@ type switchState struct {
 	SwitchState int  `db:"switch" json:"switch"`
 }
 
-// SetControllerSwitchState allows caller to change switch state either on or off.
-// Inactive controllers will not be processed, and will produce an error message.
+// SetControllerSwitchState allows the caller to change the state to on or off for active controllers only.
 func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
 	vars := mux.Vars(r)
@@ -285,26 +291,26 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 		return
 	}
 	if !sw.Active {
-		helper.RespondErr(w, r, 500, "unable to change switch state: controller inactive")
+		helper.RespondErr(w, r, 500, "unable to change switch state: controller is currently set to inactive")
 		return
 	}
 	switch vars["state"] {
 	case "on":
-		if sw.SwitchState == 1 {
+		if sw.SwitchState == SWITCH_ON {
 			helper.RespondErr(w, r, 500, "switch state already on!")
 			return
 		}
-		// update switch
-		updateControllerSwitchState(s.DB, reqID, 1)
-		sw.SwitchState = 1
+		// turn the switch on
+		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_ON)
+		sw.SwitchState = SWITCH_ON
 	case "off":
-		if sw.SwitchState == 0 {
+		if sw.SwitchState == SWITCH_OFF {
 			helper.RespondErr(w, r, 500, "switch state already off!")
 			return
 		}
-		// update switch
-		updateControllerSwitchState(s.DB, reqID, 0)
-		sw.SwitchState = 0
+		// turn the switch off
+		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_OFF)
+		sw.SwitchState = SWITCH_OFF
 	default:
 		helper.RespondErr(w, r, 500, "unknown state")
 		return
@@ -312,7 +318,9 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 	helper.Respond(w, r, 200, sw)
 }
 
-func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
+// CheckThresholdEntries checks if a list of threshold switches is within the boundaries of a given condition and turns them ON or OFF.
+// Supported operations: greather than, less than, equal and not equal.
+func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB) {
 	if !c.Active {
 		return
 	}
@@ -327,19 +335,18 @@ func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 		case "greather than":
 			// switching state based on threshold
 			if dataPoint > item.ThresholdLimit {
-				err := c.UpdateControllerSwitchState(db, 1)
+				err := c.UpdateControllerSwitchState(db, SWITCH_ON)
 				if err != nil {
 					fmt.Println(err)
 				}
-				c.Switch = 1
 				// fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 				return
 			}
-			err := c.UpdateControllerSwitchState(db, 0)
+			err := c.UpdateControllerSwitchState(db, SWITCH_OFF)
 			if err != nil {
 				fmt.Println(err)
 			}
-			c.Switch = 0
+			c.Switch = SWITCH_OFF
 			// fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
 			// fmt.Printf("gt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 
@@ -347,21 +354,20 @@ func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 			// switching state based on threshold
 			// fmt.Println("datapoint", dataPoint, "threshold", item.ThresholdLimit)
 			if dataPoint < item.ThresholdLimit {
-				err := c.UpdateControllerSwitchState(db, 1)
+				err := c.UpdateControllerSwitchState(db, SWITCH_ON)
 				if err != nil {
 					fmt.Println(err)
 				}
-				c.Switch = 1
+				// c.Switch = 1
 				// fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
 				// fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
-
 				return
 			}
-			err := c.UpdateControllerSwitchState(db, 0)
+			err := c.UpdateControllerSwitchState(db, SWITCH_OFF)
 			if err != nil {
 				fmt.Println(err)
 			}
-			c.Switch = 0
+			c.Switch = SWITCH_OFF
 			// fmt.Printf("lt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
 			// fmt.Printf("ls switch off %v - state: %d\n", dataPoint, c.Switch)
 		case "equal":
@@ -376,7 +382,8 @@ func (c Controller) CheckThresholdEntries(dataPoint float64, db *sqlx.DB) {
 	}
 }
 
-func (c Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
+// CheckTimeSwitchEtries checks if a list of time switches is within a timeframe and turns them ON or OFF.
+func (c *Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
 	if !c.Active {
 		return
 	}
@@ -397,12 +404,6 @@ func (c Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
 		start := on.In(time.Now().Location())
 		end := off.In(time.Now().Location())
 
-		// fmt.Printf("on   %v \noff: %v \nnow: %v \n",
-		// 	start,
-		// 	end,
-		// 	time.Now(),
-		// )
-		// if start.Unix() > time.Now().Unix() || end.Unix() < time.Now().Unix() {
 		if inTimeSpan(start, end, time.Now()) {
 			fmt.Printf("timeswitch: %s status: on \n", item.Description)
 			err := c.UpdateControllerSwitchState(db, 1)
@@ -417,27 +418,23 @@ func (c Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
 		}
 	}
 }
+
+// inTimeSpan checks if "current time" is in between start and end time.
 func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
 }
 
-//
-func (c Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
-	// _, err := db.Exec(`update controllers set
-	// 	switch=$1
-	// 	where id=$2
-	// `, switchState, c.ID)
-	// if err != nil {
-	// 	return fmt.Errorf("unable to update controller: %v", err)
-	// }
-	// return nil
-	err := updateControllerSwitchState(db, c.ID, switchState)
+// UpdateControllerSwitchState changes the controller switch state.
+func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
+	err := updateControllerSwitchStatebyID(db, c.ID, switchState)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func updateControllerSwitchState(db *sqlx.DB, id, switchState int) error {
+
+// updateControllerSwitchStatebyID changes the state for a given controller id.
+func updateControllerSwitchStatebyID(db *sqlx.DB, id, switchState int) error {
 	_, err := db.Exec(`update controllers set
 		switch=$1
 		where id=$2

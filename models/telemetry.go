@@ -207,7 +207,7 @@ func (t *Telemetry) CheckControllersTelemetry() {
 					datapoint = 0
 				}
 
-				c.CheckThresholdEntries(datapoint, t.db)
+				c.CheckThresholdSwitchEntries(datapoint, t.db)
 			}
 		case "timeswitch":
 			c.ChecktimeSwitchEntries(t.db)
