@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"regexp"
 	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/quarkey/iot/entities"
 	helper "github.com/quarkey/iot/json"
 )
 
@@ -181,7 +181,7 @@ func (t *Telemetry) CheckControllersTelemetry() {
 				if item.Datasource == "" {
 					return
 				}
-				dset, column := getSpecificSensorDataPoint(item.Datasource)
+				dset, column := entities.GetSpecificSensorDataPoint(item.Datasource)
 				var data *json.RawMessage
 				err := t.db.Get(&data, `
 			select data from sensordata
@@ -217,21 +217,4 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			log.Println("[ERROR] unsupported controller category:", c.Category)
 		}
 	}
-}
-
-// getSpecificSensorDataPoint takes a datasource string and returns dataset id and column.
-//
-// e.g. d0c1 will return dataset_id=0, column=1
-func getSpecificSensorDataPoint(datasource string) (dataset_id, column int64) {
-	re := regexp.MustCompile("[0-9]+")
-	slice := re.FindAllString(datasource, -1)
-	s0, err := strconv.ParseInt(slice[0], 10, 64)
-	if err != nil {
-		return 0, 0
-	}
-	s1, err := strconv.ParseInt(slice[1], 10, 64)
-	if err != nil {
-		return 0, 0
-	}
-	return s0, s1
 }

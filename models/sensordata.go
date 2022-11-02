@@ -86,7 +86,7 @@ func (s *Server) SyncSensorData(w http.ResponseWriter, r *http.Request) {
 }
 
 // Data JSON payload
-type Data struct {
+type SensorRawJSONData struct {
 	ID   int              `json:"id"`
 	Data *json.RawMessage `json:"data"`
 	Time time.Time        `json:"time"`
@@ -96,7 +96,7 @@ type Data struct {
 func (s *Server) GetSensorDataByReferenceEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	//	var data []Data
-	data, err := loadSensorData(s.DB, vars["reference"], 1000)
+	data, err := loadSensorDataWithRowLimit(s.DB, vars["reference"], 1000)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
 		return
@@ -123,7 +123,7 @@ func ExportSensorDataToCSV(ref string, db *sqlx.DB) (interface{}, error) {
 		return nil, fmt.Errorf("unable to get datasetfields: %v", err)
 
 	}
-	dat, err := loadSensorData(db, ref, 1000)
+	dat, err := loadSensorDataWithRowLimit(db, ref, 1000)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get data: %v", err)
 	}

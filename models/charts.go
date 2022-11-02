@@ -23,7 +23,7 @@ type LineChartDataset struct {
 func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ref := vars["reference"]
-	data, err := loadSensorData(s.DB, ref, 1000)
+	data, err := loadSensorDataWithRowLimit(s.DB, ref, 1000)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to load data: ", err)
 		return
@@ -96,7 +96,7 @@ type Point struct {
 func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ref := vars["reference"]
-	data, err := loadSensorData(s.DB, ref, 1000)
+	data, err := loadSensorDataWithRowLimit(s.DB, ref, 1000)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 		return
@@ -149,10 +149,10 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, out)
 }
 
-// loadSensorData fetches the last n records available for given
+// loadSensorDataWithLimit fetches the last n records available for given
 // dataset id and reference.
-func loadSensorData(db *sqlx.DB, ref string, limit int) ([]Data, error) {
-	var data []Data
+func loadSensorDataWithRowLimit(db *sqlx.DB, ref string, limit int) ([]SensorRawJSONData, error) {
+	var data []SensorRawJSONData
 	err := db.Select(&data, `
 	select * from (select 
 		a.id,
