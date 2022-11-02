@@ -1,0 +1,8 @@
+{
+    "connectString": "host=10.47.43.68 port=15432 user=iot password=iot dbname=iot sslmode=disable",
+    "driver": "postgres",
+    "api_addr": ":6002",
+    "encryptionkey": "enter encryption key",
+    "migration": "./database/migrations",
+    "checkTelemetryTimer": 10
+}
