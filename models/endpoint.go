@@ -50,5 +50,4 @@ func (s *Server) SetupEndpoints() {
 
 	s.Router.HandleFunc("/api/dashboard", s.DashboardInfoEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/health", s.HealthCheckHandler).Methods("GET")
-
 }

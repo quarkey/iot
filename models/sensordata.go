@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
 	"github.com/quarkey/iot/pkg/dataset"
+	"github.com/quarkey/iot/pkg/sensor"
 )
 
 // A structure that holds Sensor data
@@ -97,8 +97,7 @@ type SensorRawJSONData struct {
 // GetSensorDataByReferenceEndpoint fetches a dataset by a reference
 func (s *Server) GetSensorDataByReferenceEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	//	var data []Data
-	data, err := loadSensorDataWithRowLimit(s.DB, vars["reference"], 1000)
+	data, err := sensor.GetRawDataWithLimitByRef(s.DB, 1000, vars["reference"])
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
 		return
@@ -109,37 +108,10 @@ func (s *Server) GetSensorDataByReferenceEndpoint(w http.ResponseWriter, r *http
 // ExportSensorDataToCSVEndpoint for exporting datasets used to create CSV report
 func (s *Server) ExportSensorDataToCSVEndpoint(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	result, err := ExportSensorDataToCSV(vars["reference"], s.DB)
+	result, err := sensor.ExportSensorDataToCSV(vars["reference"], s.DB)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to export dataset to csv:", err)
 		return
 	}
 	helper.Respond(w, r, 200, result)
-}
-
-// ExportSensorDataToCSV generates a csv dataset with corresponding columns
-// Exported data will include id, and time columns and then data points
-func ExportSensorDataToCSV(ref string, db *sqlx.DB) (interface{}, error) {
-	datalabel, _, err := DatasetFieldAndShowCartList(ref, db)
-	if err != nil {
-		return nil, fmt.Errorf("unable to get datasetfields: %v", err)
-
-	}
-	dat, err := loadSensorDataWithRowLimit(db, ref, 1000)
-	if err != nil {
-		return nil, fmt.Errorf("unable to get data: %v", err)
-	}
-	var csv [][]string
-	var header []string
-	// adding id and time columns
-	header = append(header, "id", "time")
-	header = append(header, datalabel...)
-	csv = append(csv, header)
-	for _, x := range dat {
-		slice, _ := helper.DecodeRawJSONtoSlice(x.Data)
-		row := []string{strconv.Itoa(x.ID), x.Time.Format(TimeFormat)}
-		row = append(row, slice...)
-		csv = append(csv, row)
-	}
-	return csv, nil
 }
