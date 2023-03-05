@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/event"
 )
 
 // Controller data structure
@@ -167,7 +168,6 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		dat.Category,
 		dat.Title,
 		dat.Description,
-
 		itemJSON,
 		false,
 		false).Scan(&returning_id)
@@ -181,7 +181,10 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 	// out := fmt.Sprintf(`{"returning_id": "%d"}`, returning_id)
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
+
+	e := event.New(s.DB)
+	e.NewEvent(DatasetEvent, "dataset '%s' created", dat.Title)
+	// s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
 
 	helper.Respond(w, r, 200, returning_id)
 }
@@ -217,7 +220,8 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	}
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent(DatasetEvent, "controller '%s' updated", dat.Title)
+	e := event.New(s.DB)
+	e.NewEvent(DatasetEvent, "controller '%s' updated", dat.Title)
 	helper.Respond(w, r, 200, "updated")
 }
 
@@ -277,7 +281,7 @@ type switchState struct {
 	SwitchState int  `db:"switch" json:"switch"`
 }
 
-// SetControllerSwitchState allows the caller to change the state to on or off for active controllers only.
+// SetControllerSwitchState allows the caller to change the state to either on or off, but for only active controllers.
 func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
 	vars := mux.Vars(r)

@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/event"
 )
 
 // Dataset ....
@@ -150,7 +151,8 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 	}
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent(DatasetEvent, "dataset '%s' added", dat.Title)
+	e := event.New(s.DB)
+	e.NewEvent(DatasetEvent, "dataset '%s' added", dat.Title)
 	helper.RespondSuccess(w, r)
 }
 
@@ -184,7 +186,8 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	}
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent(DatasetEvent, "dataset '%s' updated", dataset.Title)
+	e := event.New(s.DB)
+	e.NewEvent(DatasetEvent, "dataset '%s' updated", dataset.Title)
 	helper.Respond(w, r, 200, dataset)
 }
 
@@ -232,7 +235,9 @@ func (s *Server) DeleteDatasetByIDEndpoint(w http.ResponseWriter, r *http.Reques
 	// also update telemetry
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent(DatasetEvent, "dataset '%s' deleted", dat.Title)
+	e := event.New(s.DB)
+	e.NewEvent(DatasetEvent, "dataset '%s' deleted", dat.Title)
+
 	helper.RespondSuccess(w, r, 200)
 }
 

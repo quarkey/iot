@@ -20,6 +20,7 @@ import (
 	_ "github.com/lib/pq" // postgres driver
 	"github.com/quarkey/iot/hub"
 	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/event"
 
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
@@ -135,8 +136,8 @@ func (srv *Server) Run(ctx context.Context) {
 	if err != nil {
 		log.Printf("[ERROR] %v", err)
 	}
-
-	srv.NewEvent(SystemEvent, "Server started")
+	e := event.New(srv.DB)
+	e.NewEvent(SystemEvent, "Server started")
 	// socket hub for live monitoring
 	hub := hub.NewHub()
 	srv.Hub = hub
@@ -164,7 +165,7 @@ func (srv *Server) Run(ctx context.Context) {
 	err = srv.httpServer.ListenAndServe()
 	if err != nil {
 		log.Printf("[INFO] Service stopped")
-		srv.NewEvent(SystemEvent, "Server stopped")
+		e.NewEvent(SystemEvent, "Server stopped")
 	}
 }
 

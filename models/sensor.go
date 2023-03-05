@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/event"
 )
 
 // Sensor meta information
@@ -127,7 +128,10 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent(SernsorEvent, "sensor '%s' added", device.Title)
+
+	e := event.New(s.DB)
+	e.NewEvent(SernsorEvent, "sensor '%s' added", device.Title)
+
 	helper.Respond(w, r, 200, device)
 }
 
@@ -153,6 +157,7 @@ func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.Telemetry.UpdateTelemetryLists()
-	s.NewEvent(SernsorEvent, "sensor '%s' updated", device.Title)
+	e := event.New(s.DB)
+	e.NewEvent(SernsorEvent, "sensor '%s' updated", device.Title)
 	helper.RespondSuccess(w, r)
 }

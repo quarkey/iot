@@ -54,7 +54,7 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 					}
 					duration = 0
 				}
-				// controllers require extra precision so check is done every second
+				// controllers require extra precision so a check is done every second
 				telemetry.CheckControllersTelemetry()
 				duration++
 			}
