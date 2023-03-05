@@ -325,26 +325,26 @@ func datasetShowChartBools(ref string, db *sqlx.DB) ([]bool, error) {
 	return nextOut, nil
 }
 
-// ResetDatasetConnectivity sets all dataset telemetry status to offline.
-func (s *Server) ResetDatasetConnectivity() error {
-	_, err := s.DB.Exec(`update datasets set telemetry='offline'`)
-	if err != nil {
-		return fmt.Errorf("unable to set dataset telemetry to 'offline': %v", err)
-	}
-	return nil
-}
+// // ResetDatasetConnectivity sets all dataset telemetry status to offline.
+// func (s *Server) ResetDatasetConnectivity() error {
+// 	_, err := s.DB.Exec(`update datasets set telemetry='offline'`)
+// 	if err != nil {
+// 		return fmt.Errorf("unable to set dataset telemetry to 'offline': %v", err)
+// 	}
+// 	return nil
+// }
 
-func SetDatasetIDOnline(db *sqlx.DB, id int) {
-	_, err := db.Exec(`update datasets set telemetry='online' where id=$1`, id)
-	if err != nil {
-		log.Printf("[ERROR] unable to set dataset telemetry to 'online': %v", err)
-		return
-	}
-}
-func SetDatasetIDOffline(db *sqlx.DB, id int) {
-	_, err := db.Exec(`update datasets set telemetry='offline' where id=$1`, id)
-	if err != nil {
-		log.Printf("[ERROR] unable to set dataset telemetry to 'offline': %v", err)
-		return
-	}
-}
+// func SetDatasetIDOnline(db *sqlx.DB, id int) {
+// 	_, err := db.Exec(`update datasets set telemetry='online' where id=$1`, id)
+// 	if err != nil {
+// 		log.Printf("[ERROR] unable to set dataset telemetry to 'online': %v", err)
+// 		return
+// 	}
+// }
+// func SetDatasetIDOffline(db *sqlx.DB, id int) {
+// 	_, err := db.Exec(`update datasets set telemetry='offline' where id=$1`, id)
+// 	if err != nil {
+// 		log.Printf("[ERROR] unable to set dataset telemetry to 'offline': %v", err)
+// 		return
+// 	}
+// }

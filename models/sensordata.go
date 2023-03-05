@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/dataset"
 )
 
 // A structure that holds Sensor data
@@ -35,7 +36,8 @@ func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// setting dataset to online and broadcasting only when clients are connected
-	SetDatasetIDOnline(s.DB, dat.DatasetID)
+
+	dataset.SetOnlineByID(s.DB, dat.DatasetID)
 	if len(s.Hub.Clients) > 0 {
 		b, err := json.Marshal(&dat)
 		if err != nil {

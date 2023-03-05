@@ -11,6 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/entities"
 	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/dataset"
 )
 
 // A telemetry struct holds the telemetry components in memory.
@@ -162,7 +163,7 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 		// if (current time - next interval time) are more than 60 seconds
 		// we can consider the telemetry to be offline
 		if (time.Now().Unix() - timeFuture) > 60 {
-			SetDatasetIDOffline(t.db, dset.ID)
+			dataset.SetOfflineByID(t.db, dset.ID)
 		}
 	}
 }

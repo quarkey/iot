@@ -53,8 +53,7 @@ func (s *Server) InsertTestdata() error {
 			'[{
 				"item_description": "dataset col 0 > 45c", 
 				"datasource": "d1c0", 
-				"operation": 
-				"greather than", 
+				"operation": "greather than", 
 				"threshold_limit": 45, 
 				"on": false 
 			}]',

@@ -20,6 +20,7 @@ import (
 	_ "github.com/lib/pq" // postgres driver
 	"github.com/quarkey/iot/hub"
 	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/event"
 
 	"github.com/golang-migrate/migrate"
@@ -132,7 +133,7 @@ func (srv *Server) Run(ctx context.Context) {
 	log.Printf("[INFO] Starting to listen on %s", srv.Config["api_addr"].(string))
 
 	// resetting dataset connectivity on start to offline
-	err := srv.ResetDatasetConnectivity()
+	err := dataset.ResetConnectivity(srv.DB)
 	if err != nil {
 		log.Printf("[ERROR] %v", err)
 	}
