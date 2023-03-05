@@ -188,7 +188,7 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			where dataset_id=$1
 			order by id desc limit 1`, dset)
 				if err != nil {
-					log.Println("[ERROR] problem fetching sensor data point values: ", err)
+					log.Printf("[ERROR] problem fetching sensor data point values for controller item: '%v', %v\n", item.Description, err)
 					return
 				}
 				//fmt.Printf("checking datasource '%s'\n", item.Datasource)

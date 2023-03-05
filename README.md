@@ -1,6 +1,7 @@
 # iot sensorboard
 
-Iot sensorboard is a simple golang server that can store data points captured by Arduino devices. The system enables you to add new devices, configure datasets, and more. Setting up sensors and datasets can be done via an angular frontend.
+Iot sensorboard is a simple golang server that can store data points captured by Arduino devices. The system enables you
+to add new devices, configure datasets, and more. Setting up sensors and datasets can be done via an angular frontend.
 
 <insert drawing here>
 
@@ -18,7 +19,8 @@ Additional make features are available but not documented.
 
 ## Arduino setup
 
-Create a simple circuit that can capture data points, e.g., temperature sensor. Datapoint will be collected every n second and sent to the server with a JSON payload such as:
+Create a simple circuit that can capture data points, e.g., temperature sensor. Datapoint will be collected every n
+second and sent to the server with a JSON payload such as:
 
 ```
 {"sensor_id": 1, "dataset_id": "1,", "data": ["123.00", "12.00"]}
@@ -26,9 +28,14 @@ Create a simple circuit that can capture data points, e.g., temperature sensor. 
 
 ## docker setup
 
+You can also setup a local docker environment by navigating into resources/local and run the following command: $
+./docker_install.local.sh
+
 ### nginx
 
-The angular frontend is hosted with Nginx, but please note that additional configuration is required to host SPA. However this is taken care of in the Dockerfile. Read https://medium.com/@technicadil_001/deploy-an-angular-app-with-nginx-a79cc1a44b49 for more information.
+The angular frontend is hosted with Nginx, but please note that additional configuration is required to host SPA.
+However this is taken care of in the Dockerfile. Read
+https://medium.com/@technicadil_001/deploy-an-angular-app-with-nginx-a79cc1a44b49 for more information.
 
 ```
 1. $ docker build -t ngimg .
@@ -52,7 +59,8 @@ $ docker run --restart always --name pgtwo -p 15432:5432 -d -e POSTGRES_USER=iot
 
 ## Setup commands QA environment.
 
-steps needed to configure qa environment, from go backend, ng and docker containers. Read docker_install.qa.sh for more details
+steps needed to configure qa environment, from go backend, ng and docker containers. Read docker_install.qa.sh for more
+details
 
 ```
 part 1
@@ -78,16 +86,17 @@ $ docker run --name qa_iot_backend --net qa-network -p 6001:6001 -d qa_iot_backe
 done!
 
 ```
+
 ## migrate postgres database from server a to server b
-    
+
 ```
-0. docker stop qa_iot_backend 
+0. docker stop qa_iot_backend
 1. dump rpi database and copy over to new server
    pg_dump -Fc -f iot.dump.db -h localhost iot
    scp iot.dump.db slundin@192.168.10.159:/Users/slundin/devel/iot/resources
    docker cp iot.dump.db qa_iot_pg:/tmp
 
-2. restore database   
+2. restore database
    docker stop qa_iot_backend
    docker exec -it qa_iot_pg sh
    su - postgres
@@ -95,7 +104,7 @@ done!
    dropdb -h localhost iot
    createdb -h localhost -T template0 iot
    pg_restore -d iot -h localhost iot.dump.db
-   psql -U iot   
+   psql -U iot
    update iot.schema_migrations set dirty='f';
    exit
    exit

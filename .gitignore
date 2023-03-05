@@ -23,4 +23,5 @@ Thumbs.db
 **/resources/pg_data
 **/resources/qa/ng/dist
 **/resources/prod/ng/dist
+**/resources/local/ng/dist
 **/qa_pg-data
