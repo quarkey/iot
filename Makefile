@@ -28,11 +28,11 @@ up:
 
 run:
 	go build ./cmd/api
-	./api --conf config/exampleconfig.json
+	./api --conf config/exampleconfig.json --automigrate
 
 rundebug:
 	go build ./cmd/api
-	./api --conf config/exampleconfig.json --debug
+	./api --conf config/exampleconfig.json --debug --automigrate
 
 deploy:
 	GOOS=linux GOARCH=arm go build ./cmd/api

@@ -33,8 +33,8 @@ func (s *Server) InsertTestdata() error {
 		{"data point 4", `insert into sensordata(sensor_id, dataset_id, data) values(2,currval(pg_get_serial_sequence('datasets', 'id')),'["58.8531","5.7329","e"]');`},
 
 		{"adding arduino sensor 3", `insert into sensors(title, description, arduino_key) values('SuperduperRecordingbox','this device is awesome', 'dummykey');`},
-		{"adding dataset 3", `insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types) 
-		values(3,'Bicycle to work 2','Battery-driven lat/long tracker','dummykey',4,'["lat (n)", "long (e)", "direction"]','["float","float","string"]');`},
+		{"adding dataset 3", `insert into datasets(sensor_id, title, description, reference, intervalsec, fields, types, showcharts) 
+		values(3,'Bicycle to work 2','Battery-driven lat/long tracker','dummykey',4,'["lat (n)", "long (e)", "direction"]','["float","float","string"]','["true","true","false"]');`},
 		{"data point 1", `insert into sensordata(sensor_id, dataset_id, data) values(3,currval(pg_get_serial_sequence('datasets', 'id')),'["58.8533","5.7329","e"]');`},
 
 		// controllers

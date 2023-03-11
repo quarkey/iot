@@ -49,6 +49,7 @@ type Server struct {
 	Hub       *hub.Hub
 	Telemetry *Telemetry
 	Debug     bool
+	simulator *Sim
 	startTime time.Time
 }
 
@@ -147,6 +148,15 @@ func (srv *Server) Run(ctx context.Context) {
 	srv.Telemetry = newTelemetryTicker(srv.DB)
 	srv.Telemetry.startTelemetryTicker(srv.Config, srv.Debug)
 
+	// only when allowSim is set we start the simulator.
+	_, exist := srv.Config["allowSim"]
+	if exist {
+		log.Print("[INFO] allowSim is set to true")
+		sim := NewSim()
+		srv.simulator = sim
+		srv.StartSim(sim)
+	}
+
 	go func(ctx context.Context) {
 		signalCh := make(chan os.Signal, 1024)
 		signal.Notify(signalCh, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM, os.Interrupt)
@@ -155,11 +165,11 @@ func (srv *Server) Run(ctx context.Context) {
 			case <-ctx.Done():
 				log.Print("[INFO] Received cancel request, shutting down...")
 				srv.Stop(ctx)
-
 				return
 			case sig := <-signalCh:
 				log.Printf("[INFO] Received signal %v, shutting down...\n", sig)
 				srv.Stop(ctx)
+				return
 			}
 		}
 	}(ctx)
@@ -175,6 +185,7 @@ func (s *Server) Stop(ctx context.Context) {
 	err := s.httpServer.Shutdown(context.Background())
 	if err != nil {
 		log.Printf("ERROR: failed shutting down server after cancel request: %v", err)
+		panic("PANIC!!!")
 	}
 }
 
