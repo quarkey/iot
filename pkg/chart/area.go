@@ -41,12 +41,28 @@ func AreaChartDataSeries(db *sqlx.DB, ref string) (*[]AreaChart, error) {
 		fields = append(fields, "unknow field")
 		showcharts = append(showcharts, true)
 	}
+	// FIXME:  when adding a column to an existing dataset this function will produce
+	// an error because the sensordata array is not matching the number of fields.
+	// the code below checks if more fields than data is present, this is not a fix.
+	isEmpty := false
+	count := len(raw)
+	if len(raw) < len(fields) {
+		fmt.Print("hmmm")
+		isEmpty = true
+		count++
+	}
+
 	// populate data structure fitted for ngx-charts
 	var out []AreaChart
 	for i := 0; i < len(raw); i++ {
 		// skipping disabled charts
 		if !showcharts[i] {
 			continue
+		}
+		if isEmpty {
+			if (len(raw) - 1) == i {
+				fmt.Println("should add dummy point here")
+			}
 		}
 		var ps []point
 		for _, set := range data {

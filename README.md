@@ -49,20 +49,24 @@ learn more about how to set up Postgres, please refer to the instructions below.
 
 ### exampleconfig.json
 
+The api require the following settings to be able to run.
+
 ```
 {
     "connectString": "host=localhost port=15432 user=iot password=iot dbname=iot sslmode=disable",
     "driver": "postgres",
     "api_addr": ":6001",
+
+    // not implemented
     "encryptionkey": "enter encryption key",
 
+    // full path to up/down sql-files
     "migration": "database/migrations",
 
     // the numbers of seconds between telemetry checks
     "checkTelemetryTimer": 10,
 
-    // enables simulation mode for development, this should be deactivated
-    // when running application
+    // enables simulation mode for development, this should be deactivated when running application
     "allowSim": true
 }
 ```

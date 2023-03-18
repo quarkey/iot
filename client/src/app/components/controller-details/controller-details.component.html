@@ -1,129 +1,29 @@
-<mat-card [formGroup]="form">
-  <mat-card-title class="title-text"
-    >Controller DETAILS
-    <span>
-      <mat-icon [ngClass]="citem.switch == 1 ? 'online' : 'offline'"
-        >circle</mat-icon
-      >
-    </span>
-  </mat-card-title>
-  <mat-card-content>
-    <div fxLayout="row" fxFlexFill fxLayout.lt-md="column" fxLayoutGap="16px">
-      <mat-form-field appearance="fill">
-        <mat-label>Title</mat-label>
-        <input matInput formControlName="title" placeholder="Title" />
-      </mat-form-field>
-      <mat-form-field appearance="fill" class="customer" fxFlex="grow">
-        <mat-label>Category</mat-label>
-        <mat-select formControlName="category">
-          <mat-option *ngFor="let cat of categories" [value]="cat">{{
-            cat
-          }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Description</mat-label>
-        <input matInput formControlName="description" />
-      </mat-form-field>
-    </div>
-    <h4>
-      Switch specific configuration: {{ this.form.get("category").value }}
-    </h4>
-    <!-- SWITCH FORM -->
-    <ng-container *ngIf="citem.category === 'switch'">
-      <ng-container
-        formArrayName="items"
-        *ngFor="let item of items.controls; let i = index"
-      >
-        <div
-          [formGroupName]="i"
-          fxLayout="row"
-          fxFlexFill
-          fxLayout.lt-md="column"
-          fxLayoutGap="16px"
-        >
-          <mat-form-field appearance="fill">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="item_description" />
-          </mat-form-field>
-        </div>
-      </ng-container>
-    </ng-container>
-    <!-- THRESHOLD FORM -->
-    <ng-container *ngIf="citem.category === 'thresholdswitch'">
-      <ng-container
-        formArrayName="items"
-        *ngFor="let item of items.controls; let i = index"
-      >
-        <div
-          [formGroupName]="i"
-          fxLayout="row"
-          fxFlexFill
-          fxLayout.lt-md="column"
-          fxLayoutGap="16px"
-        >
-          <mat-form-field appearance="fill">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="item_description" />
-          </mat-form-field>
+<div class="wrapper" [formGroup]="form">
+  <div class="left">
+    <h3>
+      Controller DETAILS
+      <span>
+        <mat-icon [ngClass]="citem.switch == 1 ? 'online' : 'offline'">circle</mat-icon>
+      </span>
+    </h3>
+    <app-tip-text>Select controller type</app-tip-text>
+    <mat-form-field appearance="fill">
+      <mat-label>Category</mat-label>
+      <mat-select formControlName="category">
+        <mat-option *ngFor="let cat of categories" [value]="cat">{{ cat }}</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-          <mat-form-field appearance="fill">
-            <mat-label>Operation</mat-label>
-            <mat-select formControlName="operation">
-              <mat-option value="greather than">greather than</mat-option>
-              <mat-option value="less than">less than</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill">
-            <mat-label>Datasource</mat-label>
-            <input matInput formControlName="datasource" />
-          </mat-form-field>
-
-          <mat-form-field appearance="fill">
-            <mat-label>Threshold limit</mat-label>
-            <input matInput type="number" formControlName="threshold_limit" />
-          </mat-form-field>
-        </div>
-      </ng-container>
-    </ng-container>
-
-    <!-- TIMESWITCH FORM -->
-    <ng-container *ngIf="citem.category === 'timeswitch'">
-      <ng-container
-        formArrayName="items"
-        *ngFor="let item of items.controls; let i = index"
-      >
-        <div
-          [formGroupName]="i"
-          fxLayout="row"
-          fxFlexFill
-          fxLayout.lt-md="column"
-          fxLayoutGap="16px"
-        >
-          <mat-form-field appearance="fill">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="item_description" />
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Time on</mat-label>
-            <input matInput formControlName="time_on" />
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Time on</mat-label>
-            <input matInput formControlName="time_off" />
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Duration</mat-label>
-            <input matInput type="number" formControlName="duration" />
-          </mat-form-field>
-          <mat-form-field appearance="fill">
-            <mat-label>Repeat</mat-label>
-            <input matInput formControlName="repeat" />
-          </mat-form-field>
-        </div>
-      </ng-container>
-    </ng-container>
+    <app-tip-text>Describe controller</app-tip-text>
+    <mat-form-field appearance="fill">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" placeholder="Title" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <input matInput formControlName="description" />
+    </mat-form-field>
+    <app-tip-text>Controller activity state</app-tip-text>
     <mat-form-field appearance="fill">
       <mat-label>Controller active</mat-label>
       <mat-select formControlName="active">
@@ -131,17 +31,7 @@
         <mat-option [value]="true">true</mat-option>
       </mat-select>
     </mat-form-field>
-  </mat-card-content>
-  <mat-card-actions>
-    <div style="flex: 1 1 auto"></div>
-    <button
-      mat-raised-button
-      color="primary"
-      [disabled]="form.pristine"
-      (click)="updateController()"
-    >
-      UPDATE
-    </button>
+    <button mat-raised-button color="primary" [disabled]="form.pristine" (click)="updateController()">UPDATE</button>
     <button mat-button [matMenuTriggerFor]="menu">MORE</button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item (click)="resetControllerItemValues()">
@@ -153,9 +43,95 @@
         <span>Delete controller</span>
       </button>
     </mat-menu>
-  </mat-card-actions>
-</mat-card>
-<pre>
-  {{ form.value | json }}
-  {{ form.status }}
-</pre>
+  </div>
+  <div class="right">
+    <h3>Configuration: {{ this.form.get('category').value }}</h3>
+    <!-- SWITCH FORM -->
+    <ng-container *ngIf="citem.category === 'switch'">
+      <ng-container formArrayName="items" *ngFor="let item of items.controls; let i = index">
+        <div [formGroupName]="i">
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="item_description" />
+          </mat-form-field>
+        </div>
+      </ng-container>
+    </ng-container>
+    <!-- THRESHOLD FORM -->
+    <ng-container *ngIf="citem.category === 'thresholdswitch'">
+      <ng-container formArrayName="items" *ngFor="let item of items.controls; let i = index">
+        <div [formGroupName]="i">
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="item_description" />
+          </mat-form-field>
+          <app-tip-text>Select dataset e.g d0c1 </app-tip-text>
+          <mat-form-field appearance="fill">
+            <mat-label>Datasource</mat-label>
+            <input matInput formControlName="datasource" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Operation</mat-label>
+            <mat-select formControlName="operation">
+              <mat-option value="greather than">greather than</mat-option>
+              <mat-option value="less than">less than</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <app-tip-text>Threshold limitx</app-tip-text>
+          <mat-form-field appearance="fill">
+            <mat-label>Threshold limit</mat-label>
+            <input matInput type="number" formControlName="threshold_limit" />
+          </mat-form-field>
+        </div>
+      </ng-container>
+    </ng-container>
+    <!-- TIMESWITCH FORM -->
+    <ng-container *ngIf="citem.category === 'timeswitch'">
+      <ng-container formArrayName="items" *ngFor="let item of items.controls; let i = index">
+        <div [formGroupName]="i">
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="item_description" />
+          </mat-form-field>
+          <app-tip-text>Time format: 2023 12:03:25</app-tip-text>
+          <mat-form-field appearance="fill">
+            <mat-label>Time on</mat-label>
+            <input matInput formControlName="time_on" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Time off</mat-label>
+            <input matInput formControlName="time_off" />
+          </mat-form-field>
+          <!-- <app-tip-text>Not implemented</app-tip-text>
+          <mat-form-field appearance="fill">
+            <mat-label>Duration</mat-label>
+            <input matInput type="number" formControlName="duration" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Repeat</mat-label>
+            <input matInput formControlName="repeat" />
+          </mat-form-field> -->
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div class="information">
+    <h3>Controller information</h3>
+    <pre>
+A controller is a versatile programmable element that can be utilized to manage the operation of various switches.
+
+Its functionality is not limited to a traditional on/off switch, as it can also operate based on a threshold switch triggered by a reference number from a dataset or a time-based switch that turns on equipment for a specific period.
+
+With a controller, you can easily automate the management of switches, improving efficiency, and reducing errors caused by manual operations. 
+
+Whether it is turning off lights or controlling industrial equipment, a controller can make the process easier and more streamlined. 
+
+Additionally, it provides the flexibility to customize the switch's operation based on specific needs, 
+such as using a threshold switch to trigger a response only when specific data conditions are met.
+      </pre
+    >
+    <ng-container *ngIf="citem.category === 'switch'"> asd </ng-container>
+    <ng-container *ngIf="citem.category === 'thresholdswitch'"> asd </ng-container>
+    <ng-container *ngIf="citem.category === 'timeswitch'"> asd </ng-container>
+  </div>
+</div>

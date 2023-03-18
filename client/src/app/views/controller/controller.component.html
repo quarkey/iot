@@ -1,9 +1,6 @@
 <mat-tab-group mat-align-tabs="start">
   <mat-tab label="DETAILS">
-    <app-controller-details
-      [citem]="citem"
-      *ngIf="citem"
-    ></app-controller-details>
+    <app-controller-details [citem]="citem" *ngIf="citem"></app-controller-details>
   </mat-tab>
   <mat-tab label="JSON">
     <mat-card>

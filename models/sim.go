@@ -47,6 +47,10 @@ func (s *Server) StartSim(sim *Sim) {
 				return
 			case <-ticker.C:
 				for _, dset := range s.Telemetry.datasets {
+					// skipping if fields (data columns) are empty
+					if dset.Fields == nil {
+						break
+					}
 					item, ok := sim.items[dset.ID]
 					if ok {
 						if item == 0 {

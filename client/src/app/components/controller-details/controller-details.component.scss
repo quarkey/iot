@@ -17,3 +17,37 @@ mat-form-field {
 .bigger-icon {
   font-size: 32px;
 }
+
+.wrapper {
+  display: flex;
+  min-height: 70vh;
+  .information {
+    width: 30vw;
+    background-color: rgba(0, 255, 0, 0.2);
+    padding: 10px;
+    pre {
+      white-space: pre-wrap;
+      font-family: Roboto, "Helvetica Neue", sans-serif;
+    }
+  }
+  .left {
+    width: 35vw;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 20px;
+
+    mat-form-field {
+      width: 90%;
+    }
+  }
+  .right {
+    width: 35vw;
+    background-color: rgba(255, 255, 255, 0.1);
+
+    padding: 20px;
+
+    mat-form-field {
+      width: 90%;
+    }
+  }
+
+}

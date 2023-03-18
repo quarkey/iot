@@ -57,6 +57,7 @@ import { MatTimepickerModule } from "mat-timepicker";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { ConfirmationDialogComponent } from "./components/dialogs/confirmation-dialog/confirmation-dialog.component";
 import { SelectDeviceComponent } from './shared/auxiliary/forms/select-device/select-device.component';
+import { TipTextComponent } from './shared/auxiliary/components/tip-text/tip-text.component';
 
 @NgModule({
   declarations: [
@@ -88,6 +89,7 @@ import { SelectDeviceComponent } from './shared/auxiliary/forms/select-device/se
     StatusDotComponent,
     ConfirmationDialogComponent,
     SelectDeviceComponent,
+    TipTextComponent,
   ],
   imports: [
     BrowserModule,

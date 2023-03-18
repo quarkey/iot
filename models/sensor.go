@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -150,9 +149,7 @@ func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 		device.SensorIP,
 		device.ArduinoKey,
 	)
-	fmt.Println(device)
 	if err != nil {
-		log.Println(err)
 		helper.RespondErr(w, r, 500, "unable to update device: ", err)
 		return
 	}

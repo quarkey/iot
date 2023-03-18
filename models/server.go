@@ -149,12 +149,14 @@ func (srv *Server) Run(ctx context.Context) {
 	srv.Telemetry.startTelemetryTicker(srv.Config, srv.Debug)
 
 	// only when allowSim is set we start the simulator.
-	_, exist := srv.Config["allowSim"]
+	state, exist := srv.Config["allowSim"]
 	if exist {
-		log.Print("[INFO] allowSim is set to true")
-		sim := NewSim()
-		srv.simulator = sim
-		srv.StartSim(sim)
+		log.Printf("[INFO] allowSim is set to %v\n", state)
+		if state == true {
+			sim := NewSim()
+			srv.simulator = sim
+			srv.StartSim(sim)
+		}
 	}
 
 	go func(ctx context.Context) {
@@ -184,7 +186,7 @@ func (srv *Server) Run(ctx context.Context) {
 func (s *Server) Stop(ctx context.Context) {
 	err := s.httpServer.Shutdown(context.Background())
 	if err != nil {
-		log.Printf("ERROR: failed shutting down server after cancel request: %v", err)
+		log.Printf("[ERROR]: failed shutting down server after cancel request: %v", err)
 		panic("PANIC!!!")
 	}
 }
