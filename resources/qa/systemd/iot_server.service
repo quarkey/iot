@@ -8,7 +8,7 @@ Wants=docker.target
 Type=simple
 User=slundin
 
-ExecStart=/iot/api --conf /iot/rpi_prod.json
+ExecStart=/iot/api --conf /iot/exampleconfig.json --automigrate=true
 Restart=on-failure
 RestartSec=10
 
