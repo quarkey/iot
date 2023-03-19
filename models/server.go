@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -193,8 +193,11 @@ func (s *Server) Stop(ctx context.Context) {
 
 // loadcfg reads the contents of a jsonfile
 func (s *Server) loadcfg(path string) error {
-	// TODO use io.reader
-	data, err := ioutil.ReadFile(path)
+	file, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("unable to open file: %v", err)
+	}
+	data, err := io.ReadAll(file)
 	if err != nil {
 		return fmt.Errorf("unable to read file: %v", err)
 	}
