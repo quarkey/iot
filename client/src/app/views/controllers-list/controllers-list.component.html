@@ -1,31 +1,37 @@
-<div class="backgroundImage" style="overflow-y: auto">
+<mat-card>
+  <mat-card-title>Controllers</mat-card-title>
+  <div style="width: 600px">
+    A controller in this system is programmable and can function as a switch, time switch, or threshold switch based on
+    sensor data.
+  </div>
+  <br />
+  <mat-divider></mat-divider>
+  <br />
+  <div *ngIf="loading; else showx">loading...</div>
+  <ng-template #showx>
+    <app-controller-table></app-controller-table>
+  </ng-template>
+</mat-card>
+
+<!-- <div class="backgroundImage" style="overflow-y: auto">
   <div fxLayoutAlign="center" style="padding-top: 20px">
     <mat-spinner *ngIf="loading; else show"></mat-spinner>
   </div>
   <ng-template #show>
-    <div
-      fxLayout="row wrap"
-      fxLayoutGap="16px grid"
-      fxLayoutAlign="space-evenly center"
-      style="padding: 20px"
-    >
-      <div
-        fxFlex="50%"
-        fxFlex.xs="90%"
-        fxFlex.sm="90%"
-        *ngFor="let item of citem"
-      >
+    <div fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="space-evenly center" style="padding: 20px">
+      <div fxFlex="50%" fxFlex.xs="90%" fxFlex.sm="90%" *ngFor="let item of citem">
         <app-controller-card [citem]="item"></app-controller-card>
       </div>
     </div>
   </ng-template>
-  <button
-    mat-mini-fab
-    color="primary"
-    class="bottom-right"
-    matTooltip="Add new controller"
-    (click)="newControllerDialog()"
-  >
-    <mat-icon>add</mat-icon>
-  </button>
-</div>
+</div> -->
+
+<button
+  mat-mini-fab
+  color="primary"
+  class="bottom-right"
+  matTooltip="Add new controller"
+  (click)="newControllerDialog()"
+>
+  <mat-icon>add</mat-icon>
+</button>

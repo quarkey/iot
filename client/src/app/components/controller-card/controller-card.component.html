@@ -3,15 +3,9 @@
     <div mat-card-avatar>
       <div [ngSwitch]="citem.category">
         <!-- [class.online]="citem.switch === 1" -->
-        <mat-icon class="bigger-icon" *ngSwitchCase="'switch'"
-          >lightbulb</mat-icon
-        >
-        <mat-icon class="bigger-icon" *ngSwitchCase="'thresholdswitch'"
-          >data_thresholding</mat-icon
-        >
-        <mat-icon class="bigger-icon" *ngSwitchCase="'timeswitch'"
-          >schedule</mat-icon
-        >
+        <mat-icon class="bigger-icon" *ngSwitchCase="'switch'">lightbulb</mat-icon>
+        <mat-icon class="bigger-icon" *ngSwitchCase="'thresholdswitch'">data_thresholding</mat-icon>
+        <mat-icon class="bigger-icon" *ngSwitchCase="'timeswitch'">schedule</mat-icon>
       </div>
     </div>
     <mat-card-title>{{ citem.title }}</mat-card-title>
@@ -21,42 +15,29 @@
     <div fxLayout="row" fxLayoutAlign="start center">
       <div fxFlex="30">Switch state:</div>
       <div fxFlex="70">
-        <app-status-dot
-          [state]="citem.switch == 1 ? 'online' : 'offline'"
-        ></app-status-dot>
+        <app-status-dot [state]="citem.switch == 1 ? 'online' : 'offline'"></app-status-dot>
       </div>
     </div>
-    <app-two-column-div
-      col1="Category:"
-      [col2]="citem.category"
-    ></app-two-column-div>
-    <app-two-column-div
-      col1="Alert:"
-      [col2]="citem.active"
-    ></app-two-column-div>
+    <app-two-column-div col1="Category:" [col2]="citem.category"></app-two-column-div>
+    <app-two-column-div col1="Alert:" [col2]="citem.active"></app-two-column-div>
     <app-two-column-div
       col1="Created at:"
-      [col2]="citem.created_at | date: 'YYYY-MM-dd HH:mm:ss'"
+      [col2]="citem.created_at | date : 'YYYY-MM-dd HH:mm:ss'"
     ></app-two-column-div>
-    <app-two-column-div
-      col1="Active"
-      [col2]="citem.active"
-    ></app-two-column-div>
+    <app-two-column-div col1="Active" [col2]="citem.active"></app-two-column-div>
   </mat-card-content>
   <mat-card-actions align="end">
     <button
       *ngIf="citem.category == 'switch'"
       mat-raised-button
       color="primary"
-      (click)="updateState()"
+      (click)="updateState(element)"
       [class.spinner]="loading"
       [disabled]="loading"
       [ngClass]="{ primary: citem.switch == 1 }"
     >
-      {{ citem.switch == 1 ? "TURN OFF" : "TURN ON" }}
+      {{ citem.switch == 1 ? 'TURN OFF' : 'TURN ON' }}
     </button>
-    <button mat-raised-button color="primary" [routerLink]="citem.id">
-      DETAILS
-    </button>
+    <button mat-raised-button color="primary" [routerLink]="citem.id">DETAILS</button>
   </mat-card-actions>
 </mat-card>
