@@ -51,7 +51,7 @@ var TimesSwitchDefaultValues = `
 	"time_on": "",
 	"time_off": "",
 	"duration": null,
-	"repeat": null,
+	"repeat": false,
 	"on": false
 }]
 `
@@ -69,7 +69,7 @@ type Timeswitch struct {
 	TimeOn      string `json:"time_on"`
 	TimeOff     string `json:"time_off"`
 	Duration    int    `json:"duration"`
-	Repeat      string `json:"repeat"`
+	Repeat      bool   `json:"repeat"`
 	On          bool   `json:"on"`
 }
 
@@ -157,7 +157,9 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 	}
 	if dat.Category == "timeswitch" {
 		itemJSON = TimesSwitchDefaultValues
-
+	}
+	if dat.Category == "timeswitchrepeat" {
+		itemJSON = TimesSwitchDefaultValues
 	}
 
 	var returning_id int
@@ -183,7 +185,7 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 	s.Telemetry.UpdateTelemetryLists()
 
 	e := event.New(s.DB)
-	e.NewEvent(DatasetEvent, "dataset '%s' created", dat.Title)
+	e.NewEvent(ControllerEvent, "controller '%s' created", dat.Title)
 	// s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
 
 	helper.Respond(w, r, 200, returning_id)
@@ -386,6 +388,31 @@ func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB)
 	}
 }
 
+func (c *Controller) ChecktimeSwitchRepeatEntries(db *sqlx.DB) {
+	if !c.Active {
+		return
+	}
+	var ts []Timeswitch
+	err := json.Unmarshal(*c.Items, &ts)
+	if err != nil {
+		log.Printf("[ERROR] unable to unmarshal timeswitchrepeat json: %v", err)
+	}
+
+	for _, item := range ts {
+		if isCurrentTimeBetween(item.TimeOn, item.TimeOff) {
+			err := c.UpdateControllerSwitchState(db, 1)
+			if err != nil {
+				fmt.Println(err)
+			}
+			return
+		}
+		err = c.UpdateControllerSwitchState(db, 0)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
 // CheckTimeSwitchEtries checks if a list of time switches is within a timeframe and turns them ON or OFF.
 func (c *Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
 	if !c.Active {
@@ -426,6 +453,14 @@ func (c *Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
 // inTimeSpan checks if "current time" is in between start and end time.
 func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
+}
+
+// isCurrentTimeBetween checks if the current time is between two given times.
+// t1 and t2 should be in the format "15:04" (HH:MM).
+func isCurrentTimeBetween(t1, t2 string) bool {
+	layout := "15:04:05"
+	now := time.Now().Format(layout)
+	return now >= t1 && now <= t2
 }
 
 // UpdateControllerSwitchState changes the controller switch state.

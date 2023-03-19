@@ -93,7 +93,7 @@
             <mat-label>Description</mat-label>
             <input matInput formControlName="item_description" />
           </mat-form-field>
-          <app-tip-text>Time format: 2023 12:03:25</app-tip-text>
+          <app-tip-text>Time format: 2023-01-01 12:03:25</app-tip-text>
           <mat-form-field appearance="fill">
             <mat-label>Time on</mat-label>
             <input matInput formControlName="time_on" />
@@ -102,14 +102,42 @@
             <mat-label>Time off</mat-label>
             <input matInput formControlName="time_off" />
           </mat-form-field>
-          <!-- <app-tip-text>Not implemented</app-tip-text>
-          <mat-form-field appearance="fill">
-            <mat-label>Duration</mat-label>
-            <input matInput type="number" formControlName="duration" />
-          </mat-form-field>
+          <!-- <app-tip-text>You can repeat time interval above</app-tip-text>
           <mat-form-field appearance="fill">
             <mat-label>Repeat</mat-label>
-            <input matInput formControlName="repeat" />
+            <mat-select formControlName="repeat">
+              <mat-option [value]="false">false</mat-option>
+              <mat-option [value]="true">true</mat-option>
+            </mat-select>
+          </mat-form-field> -->
+        </div>
+      </ng-container>
+    </ng-container>
+    <!-- TIMESWITCHREPEAT FORM -->
+    <ng-container *ngIf="citem.category === 'timeswitchrepeat'">
+      JADDA
+      <ng-container formArrayName="items" *ngFor="let item of items.controls; let i = index">
+        <div [formGroupName]="i">
+          <mat-form-field appearance="fill">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="item_description" />
+          </mat-form-field>
+          <app-tip-text>Time format: 2023-01-01 12:03:25</app-tip-text>
+          <mat-form-field appearance="fill">
+            <mat-label>Time on</mat-label>
+            <input matInput formControlName="time_on" />
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Time off</mat-label>
+            <input matInput formControlName="time_off" />
+          </mat-form-field>
+          <!-- <app-tip-text>You can repeat time interval above</app-tip-text>
+          <mat-form-field appearance="fill">
+            <mat-label>Repeat</mat-label>
+            <mat-select formControlName="repeat">
+              <mat-option [value]="false">false</mat-option>
+              <mat-option [value]="true">true</mat-option>
+            </mat-select>
           </mat-form-field> -->
         </div>
       </ng-container>

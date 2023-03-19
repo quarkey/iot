@@ -212,6 +212,8 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			}
 		case "timeswitch":
 			c.ChecktimeSwitchEntries(t.db)
+		case "timeswitchrepeat":
+			c.ChecktimeSwitchRepeatEntries(t.db)
 		case "switch":
 			// do we need to track switches other than sensor telemetry?
 		default:

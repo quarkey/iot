@@ -34,6 +34,7 @@ import (
 var SystemEvent = "system"
 var SernsorEvent = "sensor"
 var DatasetEvent = "dataset"
+var ControllerEvent = "controller"
 
 var TimeFormat = "2006-01-02 15:04:05"
 

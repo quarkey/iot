@@ -1,1 +1,0 @@
-alter table iot.datasets add column types jsonb;

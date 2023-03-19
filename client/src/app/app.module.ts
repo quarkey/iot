@@ -59,6 +59,7 @@ import { ConfirmationDialogComponent } from "./components/dialogs/confirmation-d
 import { SelectDeviceComponent } from './shared/auxiliary/forms/select-device/select-device.component';
 import { TipTextComponent } from './shared/auxiliary/components/tip-text/tip-text.component';
 import { ControllerTableComponent } from './components/controller-table/controller-table.component';
+import { SensorIconComponent } from './shared/auxiliary/components/sensor-icon/sensor-icon.component';
 
 @NgModule({
   declarations: [
@@ -92,6 +93,7 @@ import { ControllerTableComponent } from './components/controller-table/controll
     SelectDeviceComponent,
     TipTextComponent,
     ControllerTableComponent,
+    SensorIconComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,13 +1,12 @@
 <mat-dialog-content [formGroup]="form">
-  <mat-card-title
-    ><h3 class="title-text">Add new controller</h3></mat-card-title
-  >
+  <mat-card-title><h3 class="title-text">Add new controller</h3></mat-card-title>
   <mat-form-field appearance="fill">
     <mat-label> Category</mat-label>
     <mat-select formControlName="category">
       <mat-option value="switch">ON/OFF switch</mat-option>
       <mat-option value="thresholdswitch">Threshold switch</mat-option>
       <mat-option value="timeswitch">Time switch</mat-option>
+      <mat-option value="timeswitchrepeat">Repeatable time switch</mat-option>
     </mat-select>
   </mat-form-field>
   <mat-form-field appearance="fill">
@@ -21,12 +20,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <div style="flex: 1 1 auto"></div>
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="addNewController()"
-    [disabled]="form.invalid"
-  >
+  <button mat-raised-button color="primary" (click)="addNewController()" [disabled]="form.invalid">
     <mat-icon>add</mat-icon>
     <span>ADD</span>
   </button>

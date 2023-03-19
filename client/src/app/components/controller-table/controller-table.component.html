@@ -2,11 +2,7 @@
   <ng-container matColumnDef="type">
     <th mat-header-cell *matHeaderCellDef>Type</th>
     <td mat-cell *matCellDef="let element">
-      <span [ngSwitch]="element.category">
-        <mat-icon class="bigger-icon" *ngSwitchCase="'switch'">lightbulb</mat-icon>
-        <mat-icon class="bigger-icon" *ngSwitchCase="'thresholdswitch'">data_thresholding</mat-icon>
-        <mat-icon class="bigger-icon" *ngSwitchCase="'timeswitch'">schedule</mat-icon>
-      </span>
+      <app-sensor-icon [category]="element.category"></app-sensor-icon>
     </td>
   </ng-container>
 
@@ -16,14 +12,17 @@
       {{ element.category }}
     </td>
   </ng-container>
+
   <ng-container matColumnDef="title">
     <th mat-header-cell *matHeaderCellDef>Title</th>
     <td mat-cell *matCellDef="let element">{{ element.title }}</td>
   </ng-container>
+
   <ng-container matColumnDef="description">
     <th mat-header-cell *matHeaderCellDef>Description</th>
     <td mat-cell *matCellDef="let element">{{ element.description }}</td>
   </ng-container>
+
   <ng-container matColumnDef="switch">
     <th mat-header-cell *matHeaderCellDef>Switch state</th>
     <td mat-cell *matCellDef="let element">
@@ -31,22 +30,15 @@
       <app-status-dot [state]="element.switch == 1 ? 'online' : 'offline'"></app-status-dot>
     </td>
   </ng-container>
+
   <ng-container matColumnDef="alert">
     <th mat-header-cell *matHeaderCellDef>Alert</th>
     <td mat-cell *matCellDef="let element">{{ element.alert }}</td>
   </ng-container>
+
   <ng-container matColumnDef="expand">
     <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
     <td mat-cell *matCellDef="let element" style="float: right">
-      <!-- <button
-        *ngIf="element.category == 'switch'"
-        mat-icon-button
-        color="primary"
-        (click)="updateState()"
-        [ngClass]="{ primary: citem.switch == 1 }"
-      >
-        {{ citem.switch == 1 ? 'TURN OFF' : 'TURN ON' }}
-      </button> -->
       <button
         *ngIf="element.category == 'switch'"
         (click)="updateState(element)"

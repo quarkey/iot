@@ -1,27 +1,22 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import {
-  Controller,
-  normalswitch,
-  thresholdswitch,
-  timeswitch,
-} from "src/app/models/controllers";
-import { Sensordata } from "src/app/models/dataset";
-import { ControllersService } from "src/app/services/controllers.service";
-import { DialogsService } from "src/app/services/dialogs.service";
-import { environment } from "src/environments/environment";
+import { Component, Input, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Controller, normalswitch, thresholdswitch, timeswitch } from 'src/app/models/controllers';
+import { Sensordata } from 'src/app/models/dataset';
+import { ControllersService } from 'src/app/services/controllers.service';
+import { DialogsService } from 'src/app/services/dialogs.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "app-controller-details",
-  templateUrl: "./controller-details.component.html",
-  styleUrls: ["./controller-details.component.scss"],
+  selector: 'app-controller-details',
+  templateUrl: './controller-details.component.html',
+  styleUrls: ['./controller-details.component.scss'],
 })
 export class ControllerDetailsComponent implements OnInit {
   @Input() citem: Controller;
   form: FormGroup;
   showReloadbutton = false;
-  categories: string[] = ["switch", "thresholdswitch", "timeswitch"];
+  categories: string[] = ['switch', 'thresholdswitch', 'timeswitch', 'timeswitchrepeat'];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -42,22 +37,17 @@ export class ControllerDetailsComponent implements OnInit {
     this.form = this.controllerService.addInitialForm(this.citem);
     this.citem.items.forEach((item: any) => {
       switch (this.citem.category) {
-        case "thresholdswitch":
-          this.items.push(
-            this.controllerService.addThresholdSwitchForm(
-              item as thresholdswitch
-            )
-          );
+        case 'thresholdswitch':
+          this.items.push(this.controllerService.addThresholdSwitchForm(item as thresholdswitch));
           break;
-        case "timeswitch":
-          this.items.push(
-            this.controllerService.addTimeSwitchForm(item as timeswitch)
-          );
+        case 'timeswitch':
+          this.items.push(this.controllerService.addTimeSwitchForm(item as timeswitch));
           break;
-        case "switch":
-          this.items.push(
-            this.controllerService.addSwitchForm(item as normalswitch)
-          );
+        case 'timeswitchrepeat':
+          this.items.push(this.controllerService.addTimeSwitchForm(item as timeswitch));
+          break;
+        case 'switch':
+          this.items.push(this.controllerService.addSwitchForm(item as normalswitch));
           break;
       }
     });
@@ -67,7 +57,7 @@ export class ControllerDetailsComponent implements OnInit {
     });
   }
   get items() {
-    return this.form.get("items") as FormArray;
+    return this.form.get('items') as FormArray;
   }
   updateController() {
     var obj = {
@@ -84,11 +74,11 @@ export class ControllerDetailsComponent implements OnInit {
   confirmReload() {
     this.dialogService
       .openConfirmationDialog(
-        "Save and reload page?",
+        'Save and reload page?',
         `Warning! To initiate new form values the page must be reloaded. 
         Do you want to save values and reload page?`,
-        "CONFIRM",
-        "CANCEL",
+        'CONFIRM',
+        'CANCEL',
         true
       )
       .subscribe((res) => {
@@ -102,33 +92,31 @@ export class ControllerDetailsComponent implements OnInit {
   deleteController() {
     this.dialogService
       .openConfirmationDialog(
-        "Delete controller?",
+        'Delete controller?',
         `Are you sure you want to permanently delete controller?`,
-        "CONFIRM",
-        "CANCEL",
+        'CONFIRM',
+        'CANCEL',
         true
       )
       .subscribe((res) => {
         if (res) {
           this.showReloadbutton = false;
           // do delete
-          this.controllerService
-            .DeleteControllerByID(this.citem.id)
-            .subscribe((res) => {
-              if (res) {
-                this.router.navigate([`/controllers`]);
-              }
-            });
+          this.controllerService.DeleteControllerByID(this.citem.id).subscribe((res) => {
+            if (res) {
+              this.router.navigate([`/controllers`]);
+            }
+          });
         }
       });
   }
   resetControllerItemValues() {
     this.dialogService
       .openConfirmationDialog(
-        "Reset item fields?",
+        'Reset item fields?',
         `Are you sure you want to reset item values?`,
-        "CONFIRM",
-        "CANCEL",
+        'CONFIRM',
+        'CANCEL',
         false
       )
       .subscribe((res) => {
@@ -136,10 +124,7 @@ export class ControllerDetailsComponent implements OnInit {
           this.showReloadbutton = false;
           // do reset
           this.controllerService
-            .ResetControllerSwitchValueEndpoint(
-              this.citem.id,
-              this.citem.category
-            )
+            .ResetControllerSwitchValueEndpoint(this.citem.id, this.citem.category)
             .subscribe((res) => {
               if (res) {
                 window.location.reload();
