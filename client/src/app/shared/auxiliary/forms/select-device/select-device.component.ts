@@ -1,16 +1,11 @@
-import { Component, Input, OnInit } from "@angular/core";
-import {
-  ControlValueAccessor,
-  FormBuilder,
-  FormGroup,
-  NG_VALUE_ACCESSOR,
-} from "@angular/forms";
-import { Device } from "src/app/models/device";
+import { Component, Input } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Device } from 'src/app/models/device';
 
 @Component({
-  selector: "app-select-device",
-  templateUrl: "./select-device.component.html",
-  styleUrls: ["./select-device.component.scss"],
+  selector: 'app-select-device',
+  templateUrl: './select-device.component.html',
+  styleUrls: ['./select-device.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

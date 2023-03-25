@@ -397,9 +397,14 @@ func (c *Controller) ChecktimeSwitchRepeatEntries(db *sqlx.DB) {
 	if err != nil {
 		log.Printf("[ERROR] unable to unmarshal timeswitchrepeat json: %v", err)
 	}
-
 	for _, item := range ts {
-		if isCurrentTimeBetween(item.TimeOn, item.TimeOff) {
+		t1, t2, err := parseStrToLocalTime(item.TimeOn, item.TimeOff)
+		if err != nil {
+			fmt.Println(err)
+		}
+		duration := t2.Sub(*t1)
+		fmt.Println("duration:", duration)
+		if InTimeSpan(item.TimeOn, item.TimeOff) {
 			err := c.UpdateControllerSwitchState(db, 1)
 			if err != nil {
 				fmt.Println(err)
@@ -424,18 +429,7 @@ func (c *Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
 		log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
 	}
 	for _, item := range ts {
-		on, err := time.ParseInLocation(TimeFormat, item.TimeOn, time.Now().Location())
-		if err != nil {
-			fmt.Printf("unable to parse time: %v\n", err)
-		}
-		off, err := time.ParseInLocation(TimeFormat, item.TimeOff, time.Now().Location())
-		if err != nil {
-			fmt.Printf("unable to parse time: %v\n", err)
-		}
-		start := on.In(time.Now().Location())
-		end := off.In(time.Now().Location())
-
-		if inTimeSpan(start, end, time.Now()) {
+		if InTimeSpan(item.TimeOn, item.TimeOff) {
 			fmt.Printf("timeswitch: %s status: on \n", item.Description)
 			err := c.UpdateControllerSwitchState(db, 1)
 			if err != nil {
@@ -453,6 +447,29 @@ func (c *Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
 // inTimeSpan checks if "current time" is in between start and end time.
 func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
+}
+func InTimeSpan(start string, end string) bool {
+	now := time.Now()
+	t1, err := time.ParseInLocation(TimeFormat, start, time.Now().Location())
+	if err != nil {
+		return false
+	}
+	t2, err := time.ParseInLocation(TimeFormat, end, time.Now().Location())
+	if err != nil {
+		return false
+	}
+	return now.After(t1) && now.Before(t2)
+}
+func parseStrToLocalTime(t1 string, t2 string) (*time.Time, *time.Time, error) {
+	pt1, err := time.ParseInLocation(TimeFormat, t1, time.Now().Location())
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to parse time string: %v", err)
+	}
+	pt2, err := time.ParseInLocation(TimeFormat, t2, time.Now().Location())
+	if err != nil {
+		return nil, nil, fmt.Errorf("unable to parse time string: %v", err)
+	}
+	return &pt1, &pt2, nil
 }
 
 // isCurrentTimeBetween checks if the current time is between two given times.
