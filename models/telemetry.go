@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/quarkey/iot/entities"
 	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/helper"
 )
@@ -178,28 +177,24 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			if err != nil {
 				log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
 			}
+			// to be able to check thresold dataset is required
 			for _, item := range ts {
 				if item.Datasource == "" {
 					return
 				}
-				dset, column := entities.GetSpecificSensorDataPoint(item.Datasource)
-				var data *json.RawMessage
-				err := t.db.Get(&data, `
-			select data from sensordata
-			where dataset_id=$1
-			order by id desc limit 1`, dset)
+				jsonRaw, _, column, err := dataset.GetLastDataSourcePointRaw(t.db, item.Datasource)
 				if err != nil {
-					log.Printf("[ERROR] problem fetching sensor data point values for controller item: '%v', %v\n", item.Description, err)
+					log.Printf("[ERROR] %v", err)
 					return
 				}
 				//fmt.Printf("checking datasource '%s'\n", item.Datasource)
 				//fmt.Printf("dataset: %v and column: %v \n", dset, column)
-				slice, err := helper.DecodeRawJSONtoSlice(data)
+				slice, err := helper.DecodeRawJSONtoSlice(jsonRaw)
 				if err != nil {
 					fmt.Printf("something went wrong... %v\n", err)
 				}
 				if len(slice) == 0 {
-					fmt.Println("controller skipped, empty dataset")
+					log.Printf("[WARNING] controller '%s' skipped, empty dataset", c.Category)
 				}
 				// fmt.Printf("Data: %v\n", slice)
 				datapoint, err := strconv.ParseFloat(slice[column], 64)

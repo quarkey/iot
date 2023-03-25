@@ -5,5 +5,5 @@
     "encryptionkey": "enter encryption key",
     "migration": "database/migrations",
     "checkTelemetryTimer": 10,
-    "allowSim": false
+    "allowSim": true
 }

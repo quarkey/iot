@@ -18,10 +18,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
-	"github.com/quarkey/iot/hub"
 	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
+	"github.com/quarkey/iot/pkg/hub"
 
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"

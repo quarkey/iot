@@ -1,9 +1,9 @@
-package entities_test
+package dataset_test
 
 import (
 	"testing"
 
-	"github.com/quarkey/iot/entities"
+	"github.com/quarkey/iot/pkg/dataset"
 )
 
 func TestGetSpecificSensorDataPoint(t *testing.T) {
@@ -46,7 +46,7 @@ func TestGetSpecificSensorDataPoint(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotDataset_id, gotColumn := entities.GetSpecificSensorDataPoint(tt.args)
+			gotDataset_id, gotColumn := dataset.GetSpecificSensorDataPoint(tt.args)
 			if gotDataset_id != tt.wantDataset_id {
 				t.Errorf("GetSpecificSensorDataPoint() gotDataset_id = %v, want %v", gotDataset_id, tt.wantDataset_id)
 			}

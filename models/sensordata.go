@@ -73,6 +73,7 @@ func saveReadingsTx(datapoints []SensorData, db *sqlx.DB) error {
 }
 
 // SyncDataset ...
+// this is not in use.
 func (s *Server) SyncSensorData(w http.ResponseWriter, r *http.Request) {
 	dat := []SensorData{}
 	err := helper.DecodeBody(r, &dat)

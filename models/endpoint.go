@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/quarkey/iot/hub"
+	"github.com/quarkey/iot/pkg/hub"
 )
 
 func (s *Server) SetupEndpoints() {
