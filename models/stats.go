@@ -3,7 +3,7 @@ package models
 import (
 	"net/http"
 
-	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/helper"
 )
 
 type dashinfo struct {

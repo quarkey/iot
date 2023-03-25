@@ -10,8 +10,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/entities"
-	helper "github.com/quarkey/iot/json"
 	"github.com/quarkey/iot/pkg/dataset"
+	"github.com/quarkey/iot/pkg/helper"
 )
 
 // A telemetry struct holds the telemetry components in memory.

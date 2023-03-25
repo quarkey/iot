@@ -3,8 +3,8 @@ package models
 import (
 	"net/http"
 
-	helper "github.com/quarkey/iot/json"
 	"github.com/quarkey/iot/pkg/event"
+	"github.com/quarkey/iot/pkg/helper"
 )
 
 // EventLogEndpoint fetches a list of events with a limite from GET param count

@@ -1,4 +1,4 @@
-package json_test
+package helper_test
 
 import "testing"
 

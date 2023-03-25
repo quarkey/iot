@@ -1,9 +1,11 @@
-package json
+package helper_test
 
 import (
 	"encoding/json"
 	"reflect"
 	"testing"
+
+	"github.com/quarkey/iot/pkg/helper"
 )
 
 func TestJSONrawToString(t *testing.T) {
@@ -20,7 +22,7 @@ func TestJSONrawToString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := DecodeRawJSONtoString((*json.RawMessage)(&tt.args))
+			got := helper.DecodeRawJSONtoString((*json.RawMessage)(&tt.args))
 			if reflect.TypeOf(got).String() != tt.wantType {
 				t.Errorf("DecodeRawJSONtoString() = %v, want %v", got, tt.wantType)
 			}
@@ -56,7 +58,7 @@ func TestDecodeRawJSONtoSlice(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := DecodeRawJSONtoSlice((*json.RawMessage)(&tt.args))
+			got, _ := helper.DecodeRawJSONtoSlice((*json.RawMessage)(&tt.args))
 			if reflect.TypeOf(got).String() != tt.wantType {
 				t.Errorf("DecodeRawJSONtoSlice() = %v, want %v", got, tt.want)
 			}

@@ -8,8 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
-	helper "github.com/quarkey/iot/json"
 	"github.com/quarkey/iot/pkg/dataset"
+	"github.com/quarkey/iot/pkg/helper"
 	"github.com/quarkey/iot/pkg/sensor"
 )
 

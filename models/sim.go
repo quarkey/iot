@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	helper "github.com/quarkey/iot/json"
+	"github.com/quarkey/iot/pkg/helper"
 )
 
 type Sim struct {

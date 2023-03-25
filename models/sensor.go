@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
-	helper "github.com/quarkey/iot/json"
 	"github.com/quarkey/iot/pkg/event"
+	"github.com/quarkey/iot/pkg/helper"
 )
 
 // Sensor meta information

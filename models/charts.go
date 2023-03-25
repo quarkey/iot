@@ -4,8 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	helper "github.com/quarkey/iot/json"
+
 	"github.com/quarkey/iot/pkg/chart"
+	"github.com/quarkey/iot/pkg/helper"
 )
 
 // LineChartDataSeries will generate a data structure that is fitted to ng2-charts.
