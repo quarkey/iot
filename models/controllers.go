@@ -388,73 +388,86 @@ func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB)
 	}
 }
 
-func (c *Controller) ChecktimeSwitchRepeatEntries(db *sqlx.DB) {
+// func (c *Controller) ChecktimeSwitchRepeatEntries(db *sqlx.DB) {
+// 	if !c.Active {
+// 		return
+// 	}
+// 	var ts []Timeswitch
+// 	err := json.Unmarshal(*c.Items, &ts)
+// 	if err != nil {
+// 		log.Printf("[ERROR] unable to unmarshal timeswitchrepeat json: %v", err)
+// 	}
+// 	for _, item := range ts {
+// 		t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 		}
+// 		if helper.InTimeSpanIgnoreDate(*t1, *t2) {
+// 			fmt.Println("IN TIME FRAME")
+// 			err := c.UpdateControllerSwitchState(db, 1)
+// 			if err != nil {
+// 				fmt.Println(err)
+// 			}
+// 			return
+// 		} else {
+// 			fmt.Println("NOT IN TIME FRAME")
+// 		}
+
+// 		// 	if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
+// 		// 		err := c.UpdateControllerSwitchState(db, 1)
+// 		// 		if err != nil {
+// 		// 			fmt.Println(err)
+// 		// 		}
+// 		// 		return
+// 		// 	}
+// 		err = c.UpdateControllerSwitchState(db, 0)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 		}
+// 	}
+// }
+
+// CheckTimeSwitchEtries checks if a list of time switches is within a timeframe and turns them ON or OFF.
+func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 	if !c.Active {
 		return
 	}
 	var ts []Timeswitch
 	err := json.Unmarshal(*c.Items, &ts)
 	if err != nil {
-		log.Printf("[ERROR] unable to unmarshal timeswitchrepeat json: %v", err)
+		log.Printf("[ERROR] unable to unmarshal %s json: %v", c.Category, err)
 	}
 	for _, item := range ts {
 		t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("[ERROR] invalid format: %v", err)
 		}
-		duration := t2.Sub(*t1)
-		fmt.Println("duration:", duration)
-		if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
-			err := c.UpdateControllerSwitchState(db, 1)
-			if err != nil {
-				fmt.Println(err)
+		switch c.Category {
+		case "timeswitchrepeat":
+			if helper.InTimeSpanIgnoreDate(*t1, *t2) {
+				fmt.Printf("timeswitchrepeat: %s status 'on'\n", item.Description)
+				err := c.UpdateControllerSwitchState(db, 1)
+				if err != nil {
+					fmt.Println(err)
+				}
+				return
 			}
-			return
-		}
+		case "timeswitch":
+			if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
+				fmt.Printf("timeswitch: %s status 'on'\n", item.Description)
+				err := c.UpdateControllerSwitchState(db, 1)
+				if err != nil {
+					fmt.Println(err)
+				}
+				return
+			}
+		} // end switch
+
 		err = c.UpdateControllerSwitchState(db, 0)
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
-}
-
-// CheckTimeSwitchEtries checks if a list of time switches is within a timeframe and turns them ON or OFF.
-func (c *Controller) ChecktimeSwitchEntries(db *sqlx.DB) {
-	if !c.Active {
-		return
-	}
-	var ts []Timeswitch
-	err := json.Unmarshal(*c.Items, &ts)
-	if err != nil {
-		log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
-	}
-	for _, item := range ts {
-		if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
-			fmt.Printf("timeswitch: %s status: on \n", item.Description)
-			err := c.UpdateControllerSwitchState(db, 1)
-			if err != nil {
-				fmt.Println(err)
-			}
-			return
-		}
-		err = c.UpdateControllerSwitchState(db, 0)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}
-}
-
-// inTimeSpan checks if "current time" is in between start and end time.
-func inTimeSpan(start, end, check time.Time) bool {
-	return check.After(start) && check.Before(end)
-}
-
-// isCurrentTimeBetween checks if the current time is between two given times.
-// t1 and t2 should be in the format "15:04" (HH:MM).
-func isCurrentTimeBetween(t1, t2 string) bool {
-	layout := "15:04:05"
-	now := time.Now().Format(layout)
-	return now >= t1 && now <= t2
 }
 
 // UpdateControllerSwitchState changes the controller switch state.

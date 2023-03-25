@@ -19,9 +19,6 @@ func isCurrentTimeBetween(t1, t2 string) bool {
 	if now >= t1 && now <= t2 {
 		fmt.Println("inside time frame")
 	}
-
-	// fmt.Println("t1", time.Now().Format())
-
 	return now >= t1 && now <= t2
 }
 

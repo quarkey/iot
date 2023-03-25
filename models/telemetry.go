@@ -210,10 +210,10 @@ func (t *Telemetry) CheckControllersTelemetry() {
 
 				c.CheckThresholdSwitchEntries(datapoint, t.db)
 			}
-		case "timeswitch":
-			c.ChecktimeSwitchEntries(t.db)
-		case "timeswitchrepeat":
-			c.ChecktimeSwitchRepeatEntries(t.db)
+		case "timeswitch", "timeswitchrepeat":
+			c.CheckTimeSwitchEntries(t.db)
+		// case "timeswitchrepeat":
+		// 	c.ChecktimeSwitchRepeatEntries(t.db)
 		case "switch":
 			// do we need to track switches other than sensor telemetry?
 		default:
