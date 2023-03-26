@@ -20,7 +20,7 @@ type lineChartDataset struct {
 }
 
 func LineDataSeries(db *sqlx.DB, ref string) (*LineChart, error) {
-	data, err := sensor.GetRawDataWithLimitByRef(db, 1000, ref)
+	data, err := sensor.GetRawDataWithLimitByRef(db, 2000, ref)
 	if err != nil {
 		return nil, fmt.Errorf("LineDataSeries() unable to load data: %v", err)
 	}

@@ -21,7 +21,7 @@ type point struct {
 }
 
 func AreaChartDataSeries(db *sqlx.DB, ref string) (*[]AreaChart, error) {
-	data, err := sensor.GetRawDataWithLimitByRef(db, 1000, ref)
+	data, err := sensor.GetRawDataWithLimitByRef(db, 2000, ref)
 	if err != nil {
 		return nil, err
 	}
