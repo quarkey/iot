@@ -20,7 +20,7 @@ export class ControllerTableComponent implements OnInit {
   loading: boolean = true;
   constructor(private cs: ControllersService) {}
   dataSource: Controller[] = [];
-  columnsToDisplay = ['type', 'category', 'title', 'description', 'switch', 'alert'];
+  columnsToDisplay = ['type', 'category', 'title', 'description', 'switch', 'active'];
   columnsToDisplayWithExpand = [...this.columnsToDisplay, 'expand'];
   expandedElement: Controller | null;
   ngOnInit(): void {

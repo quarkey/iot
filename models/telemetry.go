@@ -19,7 +19,7 @@ type Telemetry struct {
 	db          *sqlx.DB
 	datasets    []Dataset      // in memory datasets
 	sensors     []SensorDevice // in memory sensors
-	controllers []Controller   // in memory controllers
+	controllers []*Controller  // in memory controllers
 }
 
 // newTelemetryTicker ...
@@ -170,6 +170,9 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 // CheckControllersTelemetry ...
 func (t *Telemetry) CheckControllersTelemetry() {
 	for _, c := range t.controllers {
+		if !c.Active {
+			continue
+		}
 		switch c.Category {
 		case "thresholdswitch":
 			var ts []Thresholdswitch

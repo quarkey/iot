@@ -74,8 +74,8 @@ type Timeswitch struct {
 }
 
 // GetControllersList fetches a list of available controllers including not active ones.
-func GetControllersList(db *sqlx.DB) ([]Controller, error) {
-	var list []Controller
+func GetControllersList(db *sqlx.DB) ([]*Controller, error) {
+	var list []*Controller
 	err := db.Select(&list, `
 	select
 		id,
@@ -300,6 +300,8 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 		helper.RespondErr(w, r, 500, "unable to change switch state: controller is currently set to inactive")
 		return
 	}
+	event := event.New(s.DB)
+
 	switch vars["state"] {
 	case "on":
 		if sw.SwitchState == SWITCH_ON {
@@ -308,6 +310,7 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 		}
 		// turn the switch on
 		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_ON)
+		event.NewEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to on", reqID))
 		sw.SwitchState = SWITCH_ON
 	case "off":
 		if sw.SwitchState == SWITCH_OFF {
@@ -316,6 +319,8 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 		}
 		// turn the switch off
 		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_OFF)
+		event.NewEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to off", reqID))
+
 		sw.SwitchState = SWITCH_OFF
 	default:
 		helper.RespondErr(w, r, 500, "unknown state")
@@ -346,6 +351,7 @@ func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB)
 					fmt.Println(err)
 				}
 				// fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				c.Switch = SWITCH_ON
 				return
 			}
 			err := c.UpdateControllerSwitchState(db, SWITCH_OFF)
@@ -367,6 +373,7 @@ func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB)
 				// c.Switch = 1
 				// fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
 				// fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				c.Switch = SWITCH_ON
 				return
 			}
 			err := c.UpdateControllerSwitchState(db, SWITCH_OFF)
@@ -437,6 +444,7 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 	if err != nil {
 		log.Printf("[ERROR] unable to unmarshal %s json: %v", c.Category, err)
 	}
+
 	for _, item := range ts {
 		t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
 		if err != nil {
@@ -445,33 +453,44 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 		switch c.Category {
 		case "timeswitchrepeat":
 			if helper.InTimeSpanIgnoreDate(*t1, *t2) {
-				fmt.Printf("timeswitchrepeat: %s status 'on'\n", item.Description)
-				err := c.UpdateControllerSwitchState(db, 1)
+				// fmt.Printf("timeswitchrepeat: %s status 'on'\n", item.Description)
+				err := c.UpdateControllerSwitchState(db, SWITCH_ON)
 				if err != nil {
 					fmt.Println(err)
 				}
+				c.Switch = SWITCH_ON
 				return
 			}
 		case "timeswitch":
 			if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
-				fmt.Printf("timeswitch: %s status 'on'\n", item.Description)
-				err := c.UpdateControllerSwitchState(db, 1)
+				// fmt.Printf("timeswitch: %s status 'on'\n", item.Description)
+				err := c.UpdateControllerSwitchState(db, SWITCH_ON)
 				if err != nil {
 					fmt.Println(err)
 				}
+				c.Switch = SWITCH_ON
 				return
 			}
 		} // end switch
-
-		err = c.UpdateControllerSwitchState(db, 0)
+		err = c.UpdateControllerSwitchState(db, SWITCH_OFF)
 		if err != nil {
 			fmt.Println(err)
 		}
+		c.Switch = SWITCH_OFF
 	}
 }
 
 // UpdateControllerSwitchState changes the controller switch state.
 func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
+	event := event.New(db)
+	if c.Switch == 0 && switchState == 1 {
+		fmt.Println(c.Category, "turning on", c.Title)
+		event.NewEvent(ControllerEvent, fmt.Sprintf("'%s' set to on", c.Title))
+	}
+	if c.Switch == 1 && switchState == 0 {
+		fmt.Println(c.Category, "turning off", c.Title)
+		event.NewEvent(ControllerEvent, fmt.Sprintf("'%s' set to off", c.Title))
+	}
 	err := updateControllerSwitchStatebyID(db, c.ID, switchState)
 	if err != nil {
 		return err
