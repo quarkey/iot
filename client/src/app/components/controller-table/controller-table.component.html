@@ -31,6 +31,14 @@
     </td>
   </ng-container>
 
+  <ng-container matColumnDef="alert">
+    <th mat-header-cell *matHeaderCellDef>Alert</th>
+    <td mat-cell *matCellDef="let element">
+      <!-- {{ element.switch }} -->
+      <app-status-dot [state]="element.alert == 1 ? 'online' : 'offline'"></app-status-dot>
+    </td>
+  </ng-container>
+
   <ng-container matColumnDef="active">
     <th mat-header-cell *matHeaderCellDef>Active</th>
     <td mat-cell *matCellDef="let element">

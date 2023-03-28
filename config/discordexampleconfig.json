@@ -1,0 +1,6 @@
+{
+  "discord": {
+    "url": "link-to-webhook",
+    "prefix": "a prefix string before message, can be @<id>"
+  }
+}

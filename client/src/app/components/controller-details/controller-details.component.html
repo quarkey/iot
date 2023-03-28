@@ -23,6 +23,14 @@
       <mat-label>Description</mat-label>
       <input matInput formControlName="description" />
     </mat-form-field>
+    <app-tip-text>Alert mode</app-tip-text>
+    <mat-form-field appearance="fill">
+      <mat-label>Alert mode</mat-label>
+      <mat-select formControlName="alert">
+        <mat-option [value]="false">false</mat-option>
+        <mat-option [value]="true">true</mat-option>
+      </mat-select>
+    </mat-form-field>
     <app-tip-text>Controller activity state</app-tip-text>
     <mat-form-field appearance="fill">
       <mat-label>Controller active</mat-label>

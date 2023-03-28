@@ -54,6 +54,8 @@ type Server struct {
 	startTime time.Time
 }
 
+var GLOBALCONFIG map[string]interface{}
+
 // New initialize server and opens a database connection.
 func New(path string, automigrate bool, debug bool) *Server {
 	//TODO move timezone to config
@@ -205,6 +207,7 @@ func (s *Server) loadcfg(path string) error {
 	if err := json.Unmarshal(data, &s.Config); err != nil {
 		return fmt.Errorf("unable to unmarshal: %v", err)
 	}
+	GLOBALCONFIG = s.Config
 	return nil
 }
 

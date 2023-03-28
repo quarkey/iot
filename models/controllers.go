@@ -12,6 +12,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
+	"github.com/quarkey/iot/pkg/webhooks"
 )
 
 // Controller data structure
@@ -206,12 +207,14 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 		title=$2,
 		description=$3,
 		items=$4,
-		active=$5
-	where id=$6`,
+		alert=$5,
+		active=$6
+	where id=$7`,
 		dat.Category,
 		dat.Title,
 		dat.Description,
 		dat.Items,
+		dat.Alert,
 		dat.Active,
 		dat.ID,
 	)
@@ -482,16 +485,28 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 
 // UpdateControllerSwitchState changes the controller switch state.
 func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
+	wh, err := webhooks.ParseDiscord(GLOBALCONFIG["discordConfig"].(string))
+	if err != nil {
+		log.Printf("[ERROR] unable to parse discord webhook configuration: %v", err)
+	}
+
 	event := event.New(db)
+
 	if c.Switch == 0 && switchState == 1 {
 		fmt.Println(c.Category, "turning on", c.Title)
+		if c.Alert {
+			wh.Discord.Sendf("'%s' set to on", c.Title)
+		}
 		event.NewEvent(ControllerEvent, fmt.Sprintf("'%s' set to on", c.Title))
 	}
 	if c.Switch == 1 && switchState == 0 {
 		fmt.Println(c.Category, "turning off", c.Title)
+		if c.Alert {
+			wh.Discord.Sendf("'%s' set to off", c.Title)
+		}
 		event.NewEvent(ControllerEvent, fmt.Sprintf("'%s' set to off", c.Title))
 	}
-	err := updateControllerSwitchStatebyID(db, c.ID, switchState)
+	err = updateControllerSwitchStatebyID(db, c.ID, switchState)
 	if err != nil {
 		return err
 	}
