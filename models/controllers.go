@@ -485,7 +485,7 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 
 // UpdateControllerSwitchState changes the controller switch state.
 func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
-	wh, err := webhooks.ParseDiscord(GLOBALCONFIG["discordConfig"].(string))
+	wh, err := webhooks.ParseConfig(GLOBALCONFIG["discordConfig"].(string))
 	if err != nil {
 		log.Printf("[ERROR] unable to parse discord webhook configuration: %v", err)
 	}
