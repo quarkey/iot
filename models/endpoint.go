@@ -37,7 +37,11 @@ func (s *Server) SetupEndpoints() {
 	s.Router.HandleFunc("/api/controllers/{cid}", s.GetControllerByIDEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/controllers", s.AddNewControllerEndpoint).Methods("POST")
 	s.Router.HandleFunc("/api/controllers", s.UpdateControllerByIDEndpoint).Methods("PUT")
+
+	s.Router.HandleFunc("/api/controller/{id}/state/{state}", s.SetControllerStateEndpoint).Methods("GET")
 	s.Router.HandleFunc("/api/controller/{id}/switch/{state}", s.SetControllerSwitchStateEndpoint).Methods("GET")
+	s.Router.HandleFunc("/api/controller/{id}/alert/{state}", s.SetControllerAlertStateEndpoint).Methods("GET")
+
 	s.Router.HandleFunc("/api/controller/reset", s.ResetControllerSwitchValueEndpoint).Methods("POST")
 	s.Router.HandleFunc("/api/controller/delete", s.DeleteControllerByIDEndpoint).Methods("POST")
 

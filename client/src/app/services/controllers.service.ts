@@ -37,6 +37,9 @@ export class ControllersService {
   public setContllerState(id: number, switchState: string) {
     return this.http.get<any>(`${environment.apiUrl}/api/controller/${id}/switch/${switchState}`);
   }
+  public setContllerAlertState(id: number, alertState: string) {
+    return this.http.get<any>(`${environment.apiUrl}/api/controller/${id}/alert/${alertState}`);
+  }
   addInitialForm(item: Controller) {
     return this.formBuilder.group({
       category: [item.category, Validators.required],

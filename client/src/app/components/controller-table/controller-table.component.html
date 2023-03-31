@@ -66,11 +66,17 @@
           <span>Manage details</span>
         </button>
         <mat-divider></mat-divider>
-        <button mat-menu-item>
+        <!-- <button mat-menu-item>
           <span>Deactivate</span>
+        </button> -->
+        <button (click)="updateActivity(element); $event.stopPropagation()" mat-menu-item>
+          {{ element.alert ? 'Activate' : 'Deactivate' }} alert {{ element.alert }}
+        </button>
+        <button (click)="updateAlert(element); $event.stopPropagation()" mat-menu-item>
+          {{ element.alert ? 'Disable' : 'Enable' }} alert {{ element.alert }}
         </button>
         <button mat-menu-item>
-          <span>Delete controller</span>
+          <span>Delete</span>
         </button>
       </mat-menu>
       <button

@@ -284,6 +284,7 @@ type switchState struct {
 	ID          int  `db:"id" json:"id"`
 	Active      bool `db:"active" json:"active"`
 	SwitchState int  `db:"switch" json:"switch"`
+	Alert       bool `db:"alert" json:"alert"`
 }
 
 // SetControllerSwitchState allows the caller to change the state to either on or off, but for only active controllers.
@@ -330,6 +331,51 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 		return
 	}
 	helper.Respond(w, r, 200, sw)
+}
+
+// SetControllerAlertStateEndpoint ...
+func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.Request) {
+	// check current status
+	vars := mux.Vars(r)
+	tmp := vars["id"]
+	reqID, _ := strconv.Atoi(tmp)
+	var sw switchState
+
+	err := s.DB.Get(&sw, `select id, active, switch, alert from controllers where id=$1`, reqID)
+	if err != nil {
+		helper.RespondErr(w, r, 200, "unable to get data from db: ", err)
+		return
+	}
+	if !sw.Active {
+		helper.RespondErr(w, r, 500, "unable to change alert state: controller is currently set to inactive")
+		return
+	}
+	event := event.New(s.DB)
+	switch vars["state"] {
+	case "on":
+		if sw.Alert {
+			helper.RespondErr(w, r, 500, "alert is already on!")
+			return
+		}
+		updateControllerAlertStatebyID(s.DB, reqID, true)
+		event.NewEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to on", reqID))
+		sw.Alert = true
+	case "off":
+		if !sw.Alert {
+			helper.RespondErr(w, r, 500, "alert is already off!")
+			return
+		}
+		updateControllerAlertStatebyID(s.DB, reqID, false)
+		event.NewEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to off", reqID))
+		sw.Alert = false
+	default:
+		helper.RespondErr(w, r, 500, "unknown state")
+		return
+	}
+	helper.Respond(w, r, 200, sw)
+}
+
+func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 // CheckThresholdEntries checks if a list of threshold switches is within the boundaries of a given condition and turns them ON or OFF.
@@ -397,45 +443,6 @@ func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB)
 		}
 	}
 }
-
-// func (c *Controller) ChecktimeSwitchRepeatEntries(db *sqlx.DB) {
-// 	if !c.Active {
-// 		return
-// 	}
-// 	var ts []Timeswitch
-// 	err := json.Unmarshal(*c.Items, &ts)
-// 	if err != nil {
-// 		log.Printf("[ERROR] unable to unmarshal timeswitchrepeat json: %v", err)
-// 	}
-// 	for _, item := range ts {
-// 		t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 		}
-// 		if helper.InTimeSpanIgnoreDate(*t1, *t2) {
-// 			fmt.Println("IN TIME FRAME")
-// 			err := c.UpdateControllerSwitchState(db, 1)
-// 			if err != nil {
-// 				fmt.Println(err)
-// 			}
-// 			return
-// 		} else {
-// 			fmt.Println("NOT IN TIME FRAME")
-// 		}
-
-// 		// 	if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
-// 		// 		err := c.UpdateControllerSwitchState(db, 1)
-// 		// 		if err != nil {
-// 		// 			fmt.Println(err)
-// 		// 		}
-// 		// 		return
-// 		// 	}
-// 		err = c.UpdateControllerSwitchState(db, 0)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 		}
-// 	}
-// }
 
 // CheckTimeSwitchEtries checks if a list of time switches is within a timeframe and turns them ON or OFF.
 func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
@@ -513,14 +520,29 @@ func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) e
 	return nil
 }
 
-// updateControllerSwitchStatebyID changes the state for a given controller id.
+// updateControllerSwitchStatebyID udpated the switch state for a given controller id.
 func updateControllerSwitchStatebyID(db *sqlx.DB, id, switchState int) error {
-	_, err := db.Exec(`update controllers set
-		switch=$1
-		where id=$2
-	`, switchState, id)
+	_, err := db.Exec(`update controllers set switch=$1 where id=$2`, switchState, id)
 	if err != nil {
-		return fmt.Errorf("unable to update controller: %v", err)
+		return fmt.Errorf("unable to change switch state for controller: %v", err)
+	}
+	return nil
+}
+
+// updateControllerAlertStatebyID updates the state for a given controller id.
+func updateControllerAlertStatebyID(db *sqlx.DB, id int, alertState bool) error {
+	_, err := db.Exec(`update controllers set alert=$1 where id=$2`, alertState, id)
+	if err != nil {
+		return fmt.Errorf("unable to change alert state for controller: %v", err)
+	}
+	return nil
+}
+
+// updateControllerState updates the controller activity state for a given controller id.
+func updateControllerState(db *sqlx.DB, id int, state bool) error {
+	_, err := db.Exec(`update controllers set active=$1 where id=$2`, state, id)
+	if err != nil {
+		return fmt.Errorf("unable to change alert state for controller: %v", err)
 	}
 	return nil
 }

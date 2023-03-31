@@ -18,6 +18,8 @@ import { ControllersService } from 'src/app/services/controllers.service';
 export class ControllerTableComponent implements OnInit {
   citems: Controller[];
   loading: boolean = true;
+  alertLoading: boolean = true;
+
   constructor(private cs: ControllersService) {}
   dataSource: Controller[] = [];
   columnsToDisplay = ['type', 'category', 'title', 'description', 'switch', 'alert', 'active'];
@@ -29,6 +31,7 @@ export class ControllerTableComponent implements OnInit {
         this.citems = res;
         this.dataSource = res;
         this.loading = false;
+        this.alertLoading = false;
       }
     });
   }
@@ -53,4 +56,25 @@ export class ControllerTableComponent implements OnInit {
       });
     }
   }
+  updateAlert(citem: Controller) {
+    this.loading = true;
+    // http://localhost:6001/api/controller/4/switch/on
+    if (citem.alert == true) {
+      this.cs.setContllerAlertState(citem.id, 'off').subscribe((res) => {
+        if (res) {
+          this.alertLoading = false;
+          citem.alert = res.alert;
+        }
+      });
+    }
+    if (citem.alert == false) {
+      this.cs.setContllerAlertState(citem.id, 'on').subscribe((res) => {
+        if (res) {
+          this.alertLoading = false;
+          citem.alert = res.alert;
+        }
+      });
+    }
+  }
+  updateActivity(citem: Controller) {}
 }
