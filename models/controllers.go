@@ -280,13 +280,49 @@ func (s *Server) DeleteControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 }
 
 type switchState struct {
-	ID          int  `db:"id" json:"id"`
-	Active      bool `db:"active" json:"active"`
-	SwitchState int  `db:"switch" json:"switch"`
-	Alert       bool `db:"alert" json:"alert"`
+	ID     int  `db:"id" json:"id"`
+	Active bool `db:"active" json:"active"`
+	Switch int  `db:"switch" json:"switch"`
+	Alert  bool `db:"alert" json:"alert"`
 }
 
-// SetControllerSwitchState allows the caller to change the state to either on or off, but for only active controllers.
+// SetControllerStateEndpoint
+func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Request) {
+	// check current status
+	reqID, _ := strconv.Atoi(chi.URLParam(r, "id"))
+	var sw switchState
+
+	err := s.DB.Get(&sw, `select id, active, switch from controllers where id=$1`, reqID)
+	if err != nil {
+		helper.RespondErr(w, r, 200, "unable to get data from db: ", err)
+		return
+	}
+	event := event.New(s.DB)
+	switch chi.URLParam(r, "state") {
+	case "on":
+		if sw.Active {
+			helper.RespondErr(w, r, 500, "controller is already active")
+			return
+		}
+		updateControllerStatebyID(s.DB, reqID, true)
+		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' set to active", reqID))
+		sw.Active = true
+	case "off":
+		if !sw.Active {
+			helper.RespondErr(w, r, 500, "controller is already disabled")
+			return
+		}
+		updateControllerStatebyID(s.DB, reqID, false)
+		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' set to disabled", reqID))
+		sw.Active = false
+	default:
+		helper.RespondErr(w, r, 500, "unknown state")
+		return
+	}
+	helper.Respond(w, r, 200, sw)
+}
+
+// SetControllerSwitchState allows the caller to change the switch state to either on or off, but for only active controllers.
 func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
 	reqID, _ := strconv.Atoi(chi.URLParam(r, "id"))
@@ -305,16 +341,16 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 
 	switch chi.URLParam(r, "state") {
 	case "on":
-		if sw.SwitchState == SWITCH_ON {
+		if sw.Switch == SWITCH_ON {
 			helper.RespondErr(w, r, 500, "switch state already on!")
 			return
 		}
 		// turn the switch on
 		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_ON)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to on", reqID))
-		sw.SwitchState = SWITCH_ON
+		sw.Switch = SWITCH_ON
 	case "off":
-		if sw.SwitchState == SWITCH_OFF {
+		if sw.Switch == SWITCH_OFF {
 			helper.RespondErr(w, r, 500, "switch state already off!")
 			return
 		}
@@ -322,7 +358,7 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_OFF)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to off", reqID))
 
-		sw.SwitchState = SWITCH_OFF
+		sw.Switch = SWITCH_OFF
 	default:
 		helper.RespondErr(w, r, 500, "unknown state")
 		return
@@ -368,9 +404,6 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 		return
 	}
 	helper.Respond(w, r, 200, sw)
-}
-
-func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 // CheckThresholdEntries checks if a list of threshold switches is within the boundaries of a given condition and turns them ON or OFF.
@@ -533,8 +566,8 @@ func updateControllerAlertStatebyID(db *sqlx.DB, id int, alertState bool) error 
 	return nil
 }
 
-// updateControllerState updates the controller activity state for a given controller id.
-func updateControllerState(db *sqlx.DB, id int, state bool) error {
+// updateControllerStatebyID updates the controller activity state for a given controller id.
+func updateControllerStatebyID(db *sqlx.DB, id int, state bool) error {
 	_, err := db.Exec(`update controllers set active=$1 where id=$2`, state, id)
 	if err != nil {
 		return fmt.Errorf("unable to change alert state for controller: %v", err)
@@ -542,36 +575,6 @@ func updateControllerState(db *sqlx.DB, id int, state bool) error {
 	return nil
 }
 
-// ------------
-type ChangeStateRequest struct {
-	CID    int    `json:"cid"`
-	Type   string `json:"type"`
-	Alert  bool   `json:"alert"`
-	Switch int    `json:"switch"`
-	Active bool   `json:"active"`
-}
-
-// ChangeControllerStateEndpoint
-func (s *Server) ChangeControllerStateEndpoint(w http.ResponseWriter, r *http.Request) {
-	var csr ChangeStateRequest
-	err := helper.DecodeBody(r, &csr)
-	if err != nil {
-		helper.RespondErr(w, r, 500, "unable to decode request body: ", err)
-		return
-	}
-	// get current controller use for checking.
-	cc, err := GetControllerByID(s.DB, csr.CID)
-	if err != nil {
-		helper.RespondErr(w, r, 200, err)
-		return
-	}
-	if !cc.Active {
-		helper.RespondErr(w, r, 500, "unable to change state because the controller is inactive")
-		return
-	}
-
-}
-
-func (s *Controller) ChangeControllerState() {
-
+func getSwitchStateByID(db *sqlx.DB, id int) *switchState {
+	return nil
 }

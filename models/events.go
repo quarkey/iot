@@ -7,8 +7,8 @@ import (
 	"github.com/quarkey/iot/pkg/helper"
 )
 
-// EventLogEndpoint fetches a list of events with a limite from GET param count
-func (s *Server) EventLogEndpoint(w http.ResponseWriter, r *http.Request) {
+// GetEventLogListEndpoint fetches a list of events with a limite from GET param count
+func (s *Server) GetEventLogListEndpoint(w http.ResponseWriter, r *http.Request) {
 	e := event.New(s.DB)
 	events, err := e.GetEventLogWithLimitRequest(r)
 	if err != nil {

@@ -17,7 +17,7 @@ export class ControllerCardComponent implements OnInit {
     this.loading = true;
     // http://localhost:6001/api/controller/4/switch/on
     if (this.citem.switch == 1) {
-      this.controllerService.setContllerState(this.citem.id, 'off').subscribe((res) => {
+      this.controllerService.setControllerSwitchState(this.citem.id, 'off').subscribe((res) => {
         if (res) {
           this.loading = false;
           this.citem.switch = res.switch;
@@ -25,7 +25,7 @@ export class ControllerCardComponent implements OnInit {
       });
     }
     if (this.citem.switch == 0) {
-      this.controllerService.setContllerState(this.citem.id, 'on').subscribe((res) => {
+      this.controllerService.setControllerSwitchState(this.citem.id, 'on').subscribe((res) => {
         if (res) {
           this.loading = false;
           this.citem.switch = res.switch;

@@ -34,12 +34,17 @@ export class ControllersService {
     return this.http.post<any>(`${environment.apiUrl}/api/controllers`, citem);
   }
 
-  public setContllerState(id: number, switchState: string) {
+  public setControllerSwitchState(id: number, switchState: string) {
     return this.http.get<any>(`${environment.apiUrl}/api/controller/${id}/switch/${switchState}`);
   }
-  public setContllerAlertState(id: number, alertState: string) {
+  public setControllerAlertState(id: number, alertState: string) {
     return this.http.get<any>(`${environment.apiUrl}/api/controller/${id}/alert/${alertState}`);
   }
+
+  public setControllerState(id: number, alertState: string) {
+    return this.http.get<any>(`${environment.apiUrl}/api/controller/${id}/state/${alertState}`);
+  }
+
   addInitialForm(item: Controller) {
     return this.formBuilder.group({
       category: [item.category, Validators.required],

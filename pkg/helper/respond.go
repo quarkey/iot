@@ -32,6 +32,13 @@ func RespondErr(w http.ResponseWriter, r *http.Request, status int, args ...inte
 		},
 	})
 }
+func RespondErrf(w http.ResponseWriter, r *http.Request, status int, format string, a ...any) {
+	Respond(w, r, status, map[string]interface{}{
+		"error": map[string]interface{}{
+			"message": fmt.Sprintf(format, a...),
+		},
+	})
+}
 
 // RespondSuccess ....
 func RespondSuccess(w http.ResponseWriter, r *http.Request, args ...interface{}) {

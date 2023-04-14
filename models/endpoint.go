@@ -31,7 +31,7 @@ func (s *Server) SetupEndpoints() {
 	s.Router.Get("/api/chart/line/{reference}", s.LineChartDataSeries)
 
 	// events
-	s.Router.Get("/api/events/{count}", s.EventLogEndpoint)
+	s.Router.Get("/api/events/{count}", s.GetEventLogListEndpoint)
 
 	// controllers
 	s.Router.Get("/api/controllers", s.GetControllersListEndpoint)

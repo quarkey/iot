@@ -36,11 +36,11 @@ export class ControllerTableComponent implements OnInit {
     });
   }
 
-  updateState(citem: Controller) {
+  updateSwitchState(citem: Controller) {
     this.loading = true;
     // http://localhost:6001/api/controller/4/switch/on
     if (citem.switch == 1) {
-      this.cs.setContllerState(citem.id, 'off').subscribe((res) => {
+      this.cs.setControllerSwitchState(citem.id, 'off').subscribe((res) => {
         if (res) {
           this.loading = false;
           citem.switch = res.switch;
@@ -48,7 +48,7 @@ export class ControllerTableComponent implements OnInit {
       });
     }
     if (citem.switch == 0) {
-      this.cs.setContllerState(citem.id, 'on').subscribe((res) => {
+      this.cs.setControllerSwitchState(citem.id, 'on').subscribe((res) => {
         if (res) {
           this.loading = false;
           citem.switch = res.switch;
@@ -56,25 +56,46 @@ export class ControllerTableComponent implements OnInit {
       });
     }
   }
-  updateAlert(citem: Controller) {
+  updateAlertState(citem: Controller) {
     this.loading = true;
     // http://localhost:6001/api/controller/4/switch/on
     if (citem.alert == true) {
-      this.cs.setContllerAlertState(citem.id, 'off').subscribe((res) => {
+      this.cs.setControllerAlertState(citem.id, 'off').subscribe((res) => {
         if (res) {
           this.alertLoading = false;
+          this.loading = false;
           citem.alert = res.alert;
         }
       });
     }
     if (citem.alert == false) {
-      this.cs.setContllerAlertState(citem.id, 'on').subscribe((res) => {
+      this.cs.setControllerAlertState(citem.id, 'on').subscribe((res) => {
         if (res) {
           this.alertLoading = false;
+          this.loading = false;
           citem.alert = res.alert;
         }
       });
     }
   }
-  updateActivity(citem: Controller) {}
+  updateState(citem: Controller) {
+    this.loading = true;
+    // http://localhost:6001/api/controller/4/switch/on
+    if (citem.active == true) {
+      this.cs.setControllerState(citem.id, 'off').subscribe((res) => {
+        if (res) {
+          citem.active = res.active;
+          this.loading = false;
+        }
+      });
+    }
+    if (citem.active == false) {
+      this.cs.setControllerState(citem.id, 'on').subscribe((res) => {
+        if (res) {
+          citem.active = res.active;
+          this.loading = false;
+        }
+      });
+    }
+  }
 }
