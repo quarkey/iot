@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
@@ -83,8 +83,7 @@ func GetDatasetsList(db *sqlx.DB) []Dataset {
 
 // GetDatasetByReference fetches a dataset based on a reference
 func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	dataset, err := s.getDsetByRef(vars["reference"])
+	dataset, err := s.getDsetByRef(chi.URLParam(r, "reference"))
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondHTTPErr(w, r, 500)

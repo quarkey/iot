@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/helper"
@@ -97,8 +97,8 @@ type SensorRawJSONData struct {
 
 // GetSensorDataByReferenceEndpoint fetches a dataset by a reference
 func (s *Server) GetSensorDataByReferenceEndpoint(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	data, err := sensor.GetRawDataWithLimitByRef(s.DB, 1000, vars["reference"])
+	ref := chi.URLParam(r, "reference")
+	data, err := sensor.GetRawDataWithLimitByRef(s.DB, 1000, ref)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
 		return
@@ -108,8 +108,7 @@ func (s *Server) GetSensorDataByReferenceEndpoint(w http.ResponseWriter, r *http
 
 // ExportSensorDataToCSVEndpoint for exporting datasets used to create CSV report
 func (s *Server) ExportSensorDataToCSVEndpoint(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	result, err := sensor.ExportSensorDataToCSV(vars["reference"], s.DB)
+	result, err := sensor.ExportSensorDataToCSV(chi.URLParam(r, "reference"), s.DB)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to export dataset to csv:", err)
 		return

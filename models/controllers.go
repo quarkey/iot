@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
@@ -130,8 +130,7 @@ func (s *Server) GetControllersListEndpoint(w http.ResponseWriter, r *http.Reque
 
 // GetControllerByIDEndpoint loads a specific controller from database by given id
 func (s *Server) GetControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	n, _ := strconv.Atoi(vars["cid"])
+	n, _ := strconv.Atoi(chi.URLParam(r, "cid"))
 	c, err := GetControllerByID(s.DB, n)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
@@ -290,9 +289,7 @@ type switchState struct {
 // SetControllerSwitchState allows the caller to change the state to either on or off, but for only active controllers.
 func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
-	vars := mux.Vars(r)
-	tmp := vars["id"]
-	reqID, _ := strconv.Atoi(tmp)
+	reqID, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	var sw switchState
 
 	err := s.DB.Get(&sw, `select id, active, switch from controllers where id=$1`, reqID)
@@ -306,7 +303,7 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 	}
 	event := event.New(s.DB)
 
-	switch vars["state"] {
+	switch chi.URLParam(r, "state") {
 	case "on":
 		if sw.SwitchState == SWITCH_ON {
 			helper.RespondErr(w, r, 500, "switch state already on!")
@@ -336,9 +333,7 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 // SetControllerAlertStateEndpoint ...
 func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
-	vars := mux.Vars(r)
-	tmp := vars["id"]
-	reqID, _ := strconv.Atoi(tmp)
+	reqID, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	var sw switchState
 
 	err := s.DB.Get(&sw, `select id, active, switch, alert from controllers where id=$1`, reqID)
@@ -351,7 +346,7 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 		return
 	}
 	event := event.New(s.DB)
-	switch vars["state"] {
+	switch chi.URLParam(r, "state") {
 	case "on":
 		if sw.Alert {
 			helper.RespondErr(w, r, 500, "alert is already on!")

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
@@ -68,7 +68,6 @@ func GetSensorsList(db *sqlx.DB) []SensorDevice {
 // GetSensorByReference is looking up a particular sensor based on a arduino_key
 func (s *Server) GetSensorByReference(w http.ResponseWriter, r *http.Request) {
 	var sensor SensorDevice
-	vars := mux.Vars(r)
 	err := s.DB.Get(&sensor, `
 	select
 		id,
@@ -80,7 +79,7 @@ func (s *Server) GetSensorByReference(w http.ResponseWriter, r *http.Request) {
 		dataset_telemetry
 	from sensors 
 	where arduino_key=$1`,
-		vars["reference"])
+		chi.URLParam(r, "reference"))
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondErr(w, r, 500, "unable to get sensor by reference:", err)

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -49,9 +49,7 @@ func (e *Event) GetEventLogWithLimit(limit int) ([]EventLogMessage, error) {
 // GetEventLogWithLimitRequest parses a GET request that contains the variable "count" and
 // fetching a list of event messages with that given count.
 func (e *Event) GetEventLogWithLimitRequest(r *http.Request) ([]EventLogMessage, error) {
-	vars := mux.Vars(r)
-	count := vars["count"]
-	n, err := strconv.Atoi(count)
+	n, err := strconv.Atoi(chi.URLParam(r, "count"))
 	if err != nil {
 		return nil, err
 	}

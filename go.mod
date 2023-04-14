@@ -14,6 +14,7 @@ require (
 )
 
 require (
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	go.uber.org/atomic v1.6.0 // indirect

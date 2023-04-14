@@ -3,7 +3,7 @@ package models
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 
 	"github.com/quarkey/iot/pkg/chart"
 	"github.com/quarkey/iot/pkg/helper"
@@ -11,8 +11,7 @@ import (
 
 // LineChartDataSeries will generate a data structure that is fitted to ng2-charts.
 func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	series, err := chart.LineDataSeries(s.DB, vars["reference"])
+	series, err := chart.LineDataSeries(s.DB, chi.URLParam(r, "reference"))
 	if err != nil {
 		if err.Error() == "no data" {
 			helper.RespondErr(w, r, http.StatusBadRequest, err)
@@ -26,8 +25,7 @@ func (s *Server) LineChartDataSeries(w http.ResponseWriter, r *http.Request) {
 
 // AreaChartDataSeries will generate a data structure that is fitted to ngx-charts.
 func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	series, err := chart.AreaChartDataSeries(s.DB, vars["reference"])
+	series, err := chart.AreaChartDataSeries(s.DB, chi.URLParam(r, "reference"))
 	if err != nil {
 		if err.Error() == "no data" {
 			helper.RespondErr(w, r, http.StatusBadRequest, err)

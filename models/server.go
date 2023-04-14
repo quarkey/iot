@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
 	"github.com/quarkey/iot/pkg/dataset"
@@ -43,7 +43,7 @@ type Server struct {
 	DB *sqlx.DB
 	// Server JSON config file
 	Config     map[string]interface{}
-	Router     *mux.Router
+	Router     *chi.Mux
 	httpServer *http.Server
 	//Hub to keep track of socket connection
 	// for live monitoring of datasets.
