@@ -150,17 +150,17 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		return
 	}
 	var itemJSON string
-	if dat.Category == "thresholdswitch" {
+	switch dat.Category {
+	case "thresholdswitch":
 		itemJSON = ThresholdswitchDefaultValues
-	}
-	if dat.Category == "switch" {
+	case "switch":
 		itemJSON = SwitchDefaultValues
-	}
-	if dat.Category == "timeswitch" {
+	case "timeswitch", "timeswitchrepeat":
 		itemJSON = TimesSwitchDefaultValues
-	}
-	if dat.Category == "timeswitchrepeat" {
-		itemJSON = TimesSwitchDefaultValues
+	default:
+		// handle unknown category
+		helper.RespondErr(w, r, http.StatusBadRequest, "unknown controller type")
+		return
 	}
 
 	var returning_id int
