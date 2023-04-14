@@ -129,7 +129,7 @@ func (s *Server) AddNewDevice(w http.ResponseWriter, r *http.Request) {
 	s.Telemetry.UpdateTelemetryLists()
 
 	e := event.New(s.DB)
-	e.NewEvent(SernsorEvent, "sensor '%s' added", device.Title)
+	e.LogEvent(SernsorEvent, "sensor '%s' added", device.Title)
 
 	helper.Respond(w, r, 200, device)
 }
@@ -155,6 +155,6 @@ func (s *Server) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 	s.Telemetry.UpdateTelemetryLists()
 	e := event.New(s.DB)
-	e.NewEvent(SernsorEvent, "sensor '%s' updated", device.Title)
+	e.LogEvent(SernsorEvent, "sensor '%s' updated", device.Title)
 	helper.RespondSuccess(w, r)
 }

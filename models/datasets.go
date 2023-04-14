@@ -151,7 +151,7 @@ func (s *Server) NewDataset(w http.ResponseWriter, r *http.Request) {
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
 	e := event.New(s.DB)
-	e.NewEvent(DatasetEvent, "dataset '%s' added", dat.Title)
+	e.LogEvent(DatasetEvent, "dataset '%s' added", dat.Title)
 	helper.RespondSuccess(w, r)
 }
 
@@ -186,7 +186,7 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
 	e := event.New(s.DB)
-	e.NewEvent(DatasetEvent, "dataset '%s' updated", dataset.Title)
+	e.LogEvent(DatasetEvent, "dataset '%s' updated", dataset.Title)
 	helper.Respond(w, r, 200, dataset)
 }
 
@@ -235,7 +235,7 @@ func (s *Server) DeleteDatasetByIDEndpoint(w http.ResponseWriter, r *http.Reques
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
 	e := event.New(s.DB)
-	e.NewEvent(DatasetEvent, "dataset '%s' deleted", dat.Title)
+	e.LogEvent(DatasetEvent, "dataset '%s' deleted", dat.Title)
 
 	helper.RespondSuccess(w, r, 200)
 }

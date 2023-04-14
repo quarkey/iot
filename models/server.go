@@ -142,7 +142,7 @@ func (srv *Server) Run(ctx context.Context) {
 		log.Printf("[ERROR] %v", err)
 	}
 	e := event.New(srv.DB)
-	e.NewEvent(SystemEvent, "Server started")
+	e.LogEvent(SystemEvent, "Server started")
 	// socket hub for live monitoring
 	hub := hub.NewHub()
 	srv.Hub = hub
@@ -181,7 +181,7 @@ func (srv *Server) Run(ctx context.Context) {
 	err = srv.httpServer.ListenAndServe()
 	if err != nil {
 		log.Printf("[INFO] Service stopped")
-		e.NewEvent(SystemEvent, "Server stopped")
+		e.LogEvent(SystemEvent, "Server stopped")
 	}
 }
 

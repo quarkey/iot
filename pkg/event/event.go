@@ -22,7 +22,7 @@ func New(db *sqlx.DB) Event {
 }
 
 // NewEvent stores an event message to the database
-func (e *Event) NewEvent(category string, message string, v ...interface{}) {
+func (e *Event) LogEvent(category string, message string, v ...interface{}) {
 	_, err := e.db.Exec(`insert into events (category, message) values($1, $2)`, category, fmt.Sprintf(message, v...))
 	if err != nil {
 		log.Printf("[ERROR] unable to log event %v", err)

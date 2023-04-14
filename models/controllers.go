@@ -186,7 +186,7 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 	s.Telemetry.UpdateTelemetryLists()
 
 	e := event.New(s.DB)
-	e.NewEvent(ControllerEvent, "controller '%s' created", dat.Title)
+	e.LogEvent(ControllerEvent, "controller '%s' created", dat.Title)
 	// s.NewEvent(DatasetEvent, "dataset '%s' updated", dat.Title)
 
 	helper.Respond(w, r, 200, returning_id)
@@ -226,7 +226,7 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	// also update telemetry dataset list
 	s.Telemetry.UpdateTelemetryLists()
 	e := event.New(s.DB)
-	e.NewEvent(DatasetEvent, "controller '%s' updated", dat.Title)
+	e.LogEvent(DatasetEvent, "controller '%s' updated", dat.Title)
 	helper.Respond(w, r, 200, "updated")
 }
 
@@ -314,7 +314,7 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 		}
 		// turn the switch on
 		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_ON)
-		event.NewEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to on", reqID))
+		event.LogEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to on", reqID))
 		sw.SwitchState = SWITCH_ON
 	case "off":
 		if sw.SwitchState == SWITCH_OFF {
@@ -323,7 +323,7 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 		}
 		// turn the switch off
 		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_OFF)
-		event.NewEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to off", reqID))
+		event.LogEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to off", reqID))
 
 		sw.SwitchState = SWITCH_OFF
 	default:
@@ -358,7 +358,7 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 			return
 		}
 		updateControllerAlertStatebyID(s.DB, reqID, true)
-		event.NewEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to on", reqID))
+		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to on", reqID))
 		sw.Alert = true
 	case "off":
 		if !sw.Alert {
@@ -366,7 +366,7 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 			return
 		}
 		updateControllerAlertStatebyID(s.DB, reqID, false)
-		event.NewEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to off", reqID))
+		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to off", reqID))
 		sw.Alert = false
 	default:
 		helper.RespondErr(w, r, 500, "unknown state")
@@ -504,14 +504,14 @@ func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) e
 		if c.Alert {
 			wh.Discord.Sendf("'%s' set to on", c.Title)
 		}
-		event.NewEvent(ControllerEvent, fmt.Sprintf("'%s' set to on", c.Title))
+		event.LogEvent(ControllerEvent, fmt.Sprintf("'%s' set to on", c.Title))
 	}
 	if c.Switch == 1 && switchState == 0 {
 		fmt.Println(c.Category, "turning off", c.Title)
 		if c.Alert {
 			wh.Discord.Sendf("'%s' set to off", c.Title)
 		}
-		event.NewEvent(ControllerEvent, fmt.Sprintf("'%s' set to off", c.Title))
+		event.LogEvent(ControllerEvent, fmt.Sprintf("'%s' set to off", c.Title))
 	}
 	err = updateControllerSwitchStatebyID(db, c.ID, switchState)
 	if err != nil {
@@ -545,4 +545,38 @@ func updateControllerState(db *sqlx.DB, id int, state bool) error {
 		return fmt.Errorf("unable to change alert state for controller: %v", err)
 	}
 	return nil
+}
+
+// ------------
+type ChangeStateRequest struct {
+	CID    int    `json:"cid"`
+	Type   string `json:"type"`
+	Alert  bool   `json:"alert"`
+	Switch int    `json:"switch"`
+	Active bool   `json:"active"`
+}
+
+// ChangeControllerStateEndpoint
+func (s *Server) ChangeControllerStateEndpoint(w http.ResponseWriter, r *http.Request) {
+	var csr ChangeStateRequest
+	err := helper.DecodeBody(r, &csr)
+	if err != nil {
+		helper.RespondErr(w, r, 500, "unable to decode request body: ", err)
+		return
+	}
+	// get current controller use for checking.
+	cc, err := GetControllerByID(s.DB, csr.CID)
+	if err != nil {
+		helper.RespondErr(w, r, 200, err)
+		return
+	}
+	if !cc.Active {
+		helper.RespondErr(w, r, 500, "unable to change state because the controller is inactive")
+		return
+	}
+
+}
+
+func (s *Controller) ChangeControllerState() {
+
 }
