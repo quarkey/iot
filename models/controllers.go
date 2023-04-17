@@ -119,6 +119,16 @@ func GetControllerByID(db *sqlx.DB, cid int) (Controller, error) {
 	return c, nil
 }
 
+// GetControllerFromMem
+func getControllerFromMem(cl []*Controller, id int) *Controller {
+	for _, v := range cl {
+		if v.ID == id {
+			return v
+		}
+	}
+	return nil
+}
+
 // GetControllersListEndpoint fetches a list of all available controllers.
 func (s *Server) GetControllersListEndpoint(w http.ResponseWriter, r *http.Request) {
 	list, err := GetControllersList(s.DB)
@@ -258,6 +268,9 @@ func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *ht
 		helper.RespondErr(w, r, 500, "unable to update controller item: ", err)
 		return
 	}
+	s.Telemetry.UpdateTelemetryLists()
+	e := event.New(s.DB)
+	e.LogEvent(DatasetEvent, "controller '%s' reset", dat.Title)
 	helper.RespondSuccess(w, r, 200)
 }
 
@@ -276,6 +289,9 @@ func (s *Server) DeleteControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 		helper.RespondErr(w, r, 500, "unable to delete controller: ", err)
 		return
 	}
+	s.Telemetry.UpdateTelemetryLists()
+	e := event.New(s.DB)
+	e.LogEvent(DatasetEvent, "controller '%s' deleted", dat.Title)
 	helper.RespondSuccess(w, r, 200)
 }
 
@@ -304,7 +320,9 @@ func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Reque
 			helper.RespondErr(w, r, 500, "controller is already active")
 			return
 		}
-		updateControllerStatebyID(s.DB, reqID, true)
+
+		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c.updateControllerStatebyID(s.DB, true)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' set to active", reqID))
 		sw.Active = true
 	case "off":
@@ -312,7 +330,8 @@ func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Reque
 			helper.RespondErr(w, r, 500, "controller is already disabled")
 			return
 		}
-		updateControllerStatebyID(s.DB, reqID, false)
+		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c.updateControllerStatebyID(s.DB, false)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' set to disabled", reqID))
 		sw.Active = false
 	default:
@@ -346,7 +365,8 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 			return
 		}
 		// turn the switch on
-		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_ON)
+		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c.updateControllerSwitchStatebyID(s.DB, SWITCH_ON)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to on", reqID))
 		sw.Switch = SWITCH_ON
 	case "off":
@@ -355,7 +375,8 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 			return
 		}
 		// turn the switch off
-		updateControllerSwitchStatebyID(s.DB, reqID, SWITCH_OFF)
+		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c.updateControllerSwitchStatebyID(s.DB, SWITCH_OFF)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to off", reqID))
 
 		sw.Switch = SWITCH_OFF
@@ -388,7 +409,8 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 			helper.RespondErr(w, r, 500, "alert is already on!")
 			return
 		}
-		updateControllerAlertStatebyID(s.DB, reqID, true)
+		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c.updateControllerAlertStatebyID(s.DB, true)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to on", reqID))
 		sw.Alert = true
 	case "off":
@@ -396,7 +418,8 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 			helper.RespondErr(w, r, 500, "alert is already off!")
 			return
 		}
-		updateControllerAlertStatebyID(s.DB, reqID, false)
+		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c.updateControllerAlertStatebyID(s.DB, false)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to off", reqID))
 		sw.Alert = false
 	default:
@@ -541,7 +564,7 @@ func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) e
 		}
 		event.LogEvent(ControllerEvent, fmt.Sprintf("'%s' set to off", c.Title))
 	}
-	err = updateControllerSwitchStatebyID(db, c.ID, switchState)
+	err = c.updateControllerSwitchStatebyID(db, switchState)
 	if err != nil {
 		return err
 	}
@@ -549,32 +572,34 @@ func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) e
 }
 
 // updateControllerSwitchStatebyID udpated the switch state for a given controller id.
-func updateControllerSwitchStatebyID(db *sqlx.DB, id, switchState int) error {
-	_, err := db.Exec(`update controllers set switch=$1 where id=$2`, switchState, id)
+// In memory values also updated.
+func (c *Controller) updateControllerSwitchStatebyID(db *sqlx.DB, switchState int) error {
+	_, err := db.Exec(`update controllers set switch=$1 where id=$2`, switchState, c.ID)
 	if err != nil {
 		return fmt.Errorf("unable to change switch state for controller: %v", err)
 	}
+	c.Switch = switchState
 	return nil
 }
 
 // updateControllerAlertStatebyID updates the state for a given controller id.
-func updateControllerAlertStatebyID(db *sqlx.DB, id int, alertState bool) error {
-	_, err := db.Exec(`update controllers set alert=$1 where id=$2`, alertState, id)
+// In memory values also updated.
+func (c *Controller) updateControllerAlertStatebyID(db *sqlx.DB, alertState bool) error {
+	_, err := db.Exec(`update controllers set alert=$1 where id=$2`, alertState, c.ID)
 	if err != nil {
 		return fmt.Errorf("unable to change alert state for controller: %v", err)
 	}
+	c.Alert = alertState
 	return nil
 }
 
 // updateControllerStatebyID updates the controller activity state for a given controller id.
-func updateControllerStatebyID(db *sqlx.DB, id int, state bool) error {
-	_, err := db.Exec(`update controllers set active=$1 where id=$2`, state, id)
+// In memory values also updated.
+func (c *Controller) updateControllerStatebyID(db *sqlx.DB, state bool) error {
+	_, err := db.Exec(`update controllers set active=$1 where id=$2`, state, c.ID)
 	if err != nil {
 		return fmt.Errorf("unable to change alert state for controller: %v", err)
 	}
-	return nil
-}
-
-func getSwitchStateByID(db *sqlx.DB, id int) *switchState {
+	c.Active = state
 	return nil
 }
