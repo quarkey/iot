@@ -22,6 +22,7 @@ import (
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
 	"github.com/quarkey/iot/pkg/hub"
+	"github.com/quarkey/iot/pkg/webhooks"
 
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
@@ -233,6 +234,13 @@ func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 		"pg_table_stats":     s.pgTableStats(),
 	}
 	helper.Respond(w, r, 200, out)
+}
+func (s *Server) TestCheckWebhooks(w http.ResponseWriter, r *http.Request) {
+	wh, err := webhooks.ParseConfig(GLOBALCONFIG["discordConfig"].(string))
+	if err != nil {
+		log.Printf("[ERROR] unable to parse discord webhook configuration: %v", err)
+	}
+	wh.Discord.Sendf("testing connection ...")
 }
 func (s *Server) API_URL() string {
 	return fmt.Sprintf("http://%s/api", s.Config["api_addr"].(string))
