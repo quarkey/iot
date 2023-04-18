@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card class="hideOnMobile">
   <mat-card-title>Controllers</mat-card-title>
   <div style="width: 600px">
     A controller in this system is programmable and can function as a switch, time switch, or threshold switch based on
@@ -13,7 +13,8 @@
   </ng-template>
 </mat-card>
 
-<!-- <div class="backgroundImage" style="overflow-y: auto">
+<div class="backgroundImage hideOnDesktop" style="overflow-y: auto">
+  <mat-toolbar>Controllers</mat-toolbar>
   <div fxLayoutAlign="center" style="padding-top: 20px">
     <mat-spinner *ngIf="loading; else show"></mat-spinner>
   </div>
@@ -24,7 +25,7 @@
       </div>
     </div>
   </ng-template>
-</div> -->
+</div>
 
 <button
   mat-mini-fab
