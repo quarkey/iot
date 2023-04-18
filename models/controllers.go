@@ -297,6 +297,118 @@ func (s *Server) DeleteControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	helper.RespondSuccess(w, r, 200)
 }
 
+// CheckThresholdEntries checks if a list of threshold switches is within the boundaries of a given condition and turns them ON or OFF.
+// Supported operations: greather than, less than, equal and not equal.
+func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB) {
+	if !c.Active {
+		return
+	}
+	var ts []Thresholdswitch
+	err := json.Unmarshal(*c.Items, &ts)
+	if err != nil {
+		log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
+	}
+	for _, item := range ts {
+		// threshold switch operation
+		switch item.Operation {
+		case "greather than":
+			// switching state based on threshold
+			if dataPoint > item.ThresholdLimit {
+				err := c.UpdateDynamicControllerSwitchState(db, SWITCH_ON)
+				if err != nil {
+					fmt.Println(err)
+				}
+				// fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				c.Switch = SWITCH_ON
+				return
+			}
+			err := c.UpdateDynamicControllerSwitchState(db, SWITCH_OFF)
+			if err != nil {
+				fmt.Println(err)
+			}
+			c.Switch = SWITCH_OFF
+			// fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
+			// fmt.Printf("gt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+
+		case "less than":
+			// switching state based on threshold
+			// fmt.Println("datapoint", dataPoint, "threshold", item.ThresholdLimit)
+			if dataPoint < item.ThresholdLimit {
+				err := c.UpdateDynamicControllerSwitchState(db, SWITCH_ON)
+				if err != nil {
+					fmt.Println(err)
+				}
+				// c.Switch = 1
+				// fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
+				// fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+				c.Switch = SWITCH_ON
+				return
+			}
+			err := c.UpdateDynamicControllerSwitchState(db, SWITCH_OFF)
+			if err != nil {
+				fmt.Println(err)
+			}
+			c.Switch = SWITCH_OFF
+			// fmt.Printf("lt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
+			// fmt.Printf("ls switch off %v - state: %d\n", dataPoint, c.Switch)
+		case "equal":
+			if dataPoint == item.ThresholdLimit {
+				fmt.Println("equal not implemented")
+			}
+		case "not equal":
+			if dataPoint == item.ThresholdLimit {
+				fmt.Println("not equal not implemented")
+			}
+		}
+	}
+}
+
+// CheckTimeSwitchEtries checks if a list of time switches is within a timeframe and turns them ON or OFF.
+func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
+	if !c.Active {
+		return
+	}
+	var ts []Timeswitch
+	err := json.Unmarshal(*c.Items, &ts)
+	if err != nil {
+		log.Printf("[ERROR] unable to unmarshal %s json: %v", c.Category, err)
+	}
+
+	for _, item := range ts {
+		t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
+		if err != nil {
+			log.Printf("[ERROR] invalid format: %v", err)
+		}
+		switch c.Category {
+		case "timeswitchrepeat":
+			if helper.InTimeSpanIgnoreDate(*t1, *t2) {
+				// fmt.Printf("timeswitchrepeat: %s status 'on'\n", item.Description)
+				err := c.UpdateDynamicControllerSwitchState(db, SWITCH_ON)
+				if err != nil {
+					fmt.Println(err)
+				}
+				c.Switch = SWITCH_ON
+				return
+			}
+		case "timeswitch":
+			if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
+				// fmt.Printf("timeswitch: %s status 'on'\n", item.Description)
+				err := c.UpdateDynamicControllerSwitchState(db, SWITCH_ON)
+				if err != nil {
+					fmt.Println(err)
+				}
+				c.Switch = SWITCH_ON
+				return
+			}
+		} // end switch
+		err = c.UpdateDynamicControllerSwitchState(db, SWITCH_OFF)
+		if err != nil {
+			fmt.Println(err)
+		}
+		c.Switch = SWITCH_OFF
+	}
+}
+
 type switchState struct {
 	ID     int  `db:"id" json:"id"`
 	Active bool `db:"active" json:"active"`
@@ -431,120 +543,10 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 	helper.Respond(w, r, 200, sw)
 }
 
-// CheckThresholdEntries checks if a list of threshold switches is within the boundaries of a given condition and turns them ON or OFF.
-// Supported operations: greather than, less than, equal and not equal.
-func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB) {
-	if !c.Active {
-		return
-	}
-	var ts []Thresholdswitch
-	err := json.Unmarshal(*c.Items, &ts)
-	if err != nil {
-		log.Printf("[ERROR] unable to unmarshal thresholdswitch json: %v", err)
-	}
-	for _, item := range ts {
-		// threshold switch operation
-		switch item.Operation {
-		case "greather than":
-			// switching state based on threshold
-			if dataPoint > item.ThresholdLimit {
-				err := c.UpdateControllerSwitchState(db, SWITCH_ON)
-				if err != nil {
-					fmt.Println(err)
-				}
-				// fmt.Printf("gt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
-				c.Switch = SWITCH_ON
-				return
-			}
-			err := c.UpdateControllerSwitchState(db, SWITCH_OFF)
-			if err != nil {
-				fmt.Println(err)
-			}
-			c.Switch = SWITCH_OFF
-			// fmt.Printf("gt switch off %v - state: %d\n", dataPoint, c.Switch)
-			// fmt.Printf("gt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
-
-		case "less than":
-			// switching state based on threshold
-			// fmt.Println("datapoint", dataPoint, "threshold", item.ThresholdLimit)
-			if dataPoint < item.ThresholdLimit {
-				err := c.UpdateControllerSwitchState(db, SWITCH_ON)
-				if err != nil {
-					fmt.Println(err)
-				}
-				// c.Switch = 1
-				// fmt.Printf("lt switch on: %s -> %v - state: %d\n", c.Title, dataPoint, c.Switch)
-				// fmt.Printf("lt switch on: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
-				c.Switch = SWITCH_ON
-				return
-			}
-			err := c.UpdateControllerSwitchState(db, SWITCH_OFF)
-			if err != nil {
-				fmt.Println(err)
-			}
-			c.Switch = SWITCH_OFF
-			// fmt.Printf("lt switch off: %s -> t:%v -> d:%v - state: %d\n", c.Title, item.ThresholdLimit, dataPoint, c.Switch)
-			// fmt.Printf("ls switch off %v - state: %d\n", dataPoint, c.Switch)
-		case "equal":
-			if dataPoint == item.ThresholdLimit {
-				fmt.Println("equal not implemented")
-			}
-		case "not equal":
-			if dataPoint == item.ThresholdLimit {
-				fmt.Println("not equal not implemented")
-			}
-		}
-	}
-}
-
-// CheckTimeSwitchEtries checks if a list of time switches is within a timeframe and turns them ON or OFF.
-func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
-	if !c.Active {
-		return
-	}
-	var ts []Timeswitch
-	err := json.Unmarshal(*c.Items, &ts)
-	if err != nil {
-		log.Printf("[ERROR] unable to unmarshal %s json: %v", c.Category, err)
-	}
-
-	for _, item := range ts {
-		t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
-		if err != nil {
-			log.Printf("[ERROR] invalid format: %v", err)
-		}
-		switch c.Category {
-		case "timeswitchrepeat":
-			if helper.InTimeSpanIgnoreDate(*t1, *t2) {
-				// fmt.Printf("timeswitchrepeat: %s status 'on'\n", item.Description)
-				err := c.UpdateControllerSwitchState(db, SWITCH_ON)
-				if err != nil {
-					fmt.Println(err)
-				}
-				c.Switch = SWITCH_ON
-				return
-			}
-		case "timeswitch":
-			if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
-				// fmt.Printf("timeswitch: %s status 'on'\n", item.Description)
-				err := c.UpdateControllerSwitchState(db, SWITCH_ON)
-				if err != nil {
-					fmt.Println(err)
-				}
-				c.Switch = SWITCH_ON
-				return
-			}
-		} // end switch
-		err = c.UpdateControllerSwitchState(db, SWITCH_OFF)
-		if err != nil {
-			fmt.Println(err)
-		}
-		c.Switch = SWITCH_OFF
-	}
-}
-
-// UpdateControllerSwitchState changes the controller switch state.
-func (c *Controller) UpdateControllerSwitchState(db *sqlx.DB, switchState int) error {
+// UpdateDynamicControllerSwitchState updates a switch state of a controller based on telemetry data.
+// If the telemetry data indicates that the controller should be switched on/off, this function will update
+// the controller's switch state to on/off.
+func (c *Controller) UpdateDynamicControllerSwitchState(db *sqlx.DB, switchState int) error {
 	wh, err := webhooks.ParseConfig(GLOBALCONFIG["discordConfig"].(string))
 	if err != nil {
 		log.Printf("[ERROR] unable to parse discord webhook configuration: %v", err)
