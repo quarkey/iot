@@ -151,7 +151,8 @@ func (s *Server) GetControllerByIDEndpoint(w http.ResponseWriter, r *http.Reques
 	helper.Respond(w, r, 200, c)
 }
 
-// AddNewControllerEndpoint adds a new controller to the database with initial switch state and alert set to false.
+// AddNewControllerEndpoint adds a new controller to the database with an initial switch state of OFF and alert set to false.
+// The method also updates the memory with new controller values.
 func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request) {
 	var dat Controller
 	err := helper.DecodeBody(r, &dat)
@@ -203,7 +204,7 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 	helper.Respond(w, r, 200, returning_id)
 }
 
-// UpdatControllerByIDEndpoint updates database and memory values for a  controller item by an ID. NB! The method will not validate *json.RawMessage.
+// UpdateControllerByIDEndpoint updates the database and memory values for a controller item by its ID. Note that the method does not validate the *json.RawMessage.
 func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	dat := Controller{}
 	err := helper.DecodeBody(r, &dat)
@@ -241,8 +242,8 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	helper.Respond(w, r, 200, "updated")
 }
 
-// ResetControllerSwitchValueEndpoint resets the active configuration (raw json) for a given controller to its default state.
-// The method also sets the controller switch state to OFF and inactive.
+// ResetControllerSwitchValueEndpoint resets the active configuration (raw JSON) for a given controller to its default state.
+// Additionally, the method sets the controller switch state to OFF and inactive to prevent unwanted situations when IoT equiment is running in an active envionment.
 func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *http.Request) {
 	var dat Controller
 	err := helper.DecodeBody(r, &dat)
@@ -276,8 +277,8 @@ func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *ht
 	helper.RespondSuccess(w, r, 200)
 }
 
-// DeleteControllerByIDEndpoint deletes a controller record by a given ID without any confirmation.
-// Caution is advised when deleting controllers, as this may affect the IoT system.
+// DeleteControllerByIDEndpoint deletes the controller record with the specified ID from the database without any confirmation.
+// Note that caution is advised when deleting controllers as it may have an impact on the IoT system.
 func (s *Server) DeleteControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	var dat Controller
 	err := helper.DecodeBody(r, &dat)
@@ -363,7 +364,8 @@ func (c *Controller) CheckThresholdSwitchEntries(dataPoint float64, db *sqlx.DB)
 	}
 }
 
-// CheckTimeSwitchEtries checks if a list of time switches is within a timeframe and turns them ON or OFF.
+// CheckTimeSwitchEntries checks if a list of time switches is within a specified timeframe
+// and toggles their state between ON and OFF.
 func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 	if !c.Active {
 		return
@@ -416,7 +418,9 @@ type switchState struct {
 	Alert  bool `db:"alert" json:"alert"`
 }
 
-// SetControllerStateEndpoint
+// SetControllerStateEndpoint changes the state of a controller to either on or off.
+// The method updates both the memory values and the database.
+// It also writes a event log message to indicate a state changed.
 func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
 	reqID, _ := strconv.Atoi(chi.URLParam(r, "id"))
@@ -456,6 +460,8 @@ func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Reque
 }
 
 // SetControllerSwitchState allows the caller to change the switch state to either on or off, but for only active controllers.
+// The method updates both the memory values and the database.
+// It also writes a event log message to indicate a state changed.
 func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
 	reqID, _ := strconv.Atoi(chi.URLParam(r, "id"))
@@ -501,7 +507,9 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 	helper.Respond(w, r, 200, sw)
 }
 
-// SetControllerAlertStateEndpoint ...
+// SetControllerAlertStateEndpoint allows the caller to change alert state to either on or off, but for only active controllers.
+// The method updates both the memory values and the database.
+// It also writes a event log message to indicate a state changed.
 func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.Request) {
 	// check current status
 	reqID, _ := strconv.Atoi(chi.URLParam(r, "id"))
@@ -575,8 +583,8 @@ func (c *Controller) UpdateDynamicControllerSwitchState(db *sqlx.DB, switchState
 	return nil
 }
 
-// updateControllerSwitchStatebyID udpated the switch state for a given controller id.
-// In memory values also updated.
+// updateControllerSwitchStateByID updates the switch state for the controller with the given ID,
+// and updates the in-memory values accordingly.
 func (c *Controller) updateControllerSwitchStatebyID(db *sqlx.DB, switchState int) error {
 	_, err := db.Exec(`update controllers set switch=$1 where id=$2`, switchState, c.ID)
 	if err != nil {
@@ -586,7 +594,7 @@ func (c *Controller) updateControllerSwitchStatebyID(db *sqlx.DB, switchState in
 	return nil
 }
 
-// updateControllerAlertStatebyID updates the state for a given controller id.
+// updateControllerAlertStateByID updates the alert state of the controller with the given ID in the database.
 // In memory values also updated.
 func (c *Controller) updateControllerAlertStatebyID(db *sqlx.DB, alertState bool) error {
 	_, err := db.Exec(`update controllers set alert=$1 where id=$2`, alertState, c.ID)
