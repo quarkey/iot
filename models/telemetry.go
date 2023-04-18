@@ -19,7 +19,7 @@ type Telemetry struct {
 	db          *sqlx.DB
 	datasets    []Dataset      // in memory datasets
 	sensors     []SensorDevice // in memory sensors
-	controllers []*Controller  // in memory controllers
+	controllers ControllerList // in memory controllers
 }
 
 // newTelemetryTicker ...
@@ -63,6 +63,7 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 }
 
 // UpdateTelemetryLists updates sensors and dataset lists
+// TODO: remove t.init method
 func (t *Telemetry) UpdateTelemetryLists() {
 	t.init(false)
 }
@@ -85,7 +86,7 @@ func (t *Telemetry) init(runTelemetryCheck bool) {
 	}
 
 	// loading controllers into memory
-	t.controllers, _ = GetControllersList(t.db)
+	t.controllers, _ = GetControllersListFromDB(t.db)
 	// TODO handle error
 	log.Printf("[INFO] loading telemetry controllers list...")
 	if len(t.controllers) == 0 {
@@ -116,8 +117,9 @@ func (t *Telemetry) CheckSensorsTelemetry() {
 	// TODO: "ping" device by ip, waiting for arduino sketch
 }
 
-// UpdateDatasetTelemetry updates dataset telemetry,
-// but also setting dataset to offline if telemetry due are over 60 seconds.
+// UpdateDatasetTelemetry updates the telemetry data for a given dataset.
+// It also checks if the telemetry data is overdue by more than 60 seconds, and if so,
+// marks the dataset as offline.
 func (t *Telemetry) CheckDatasetTelemetry() {
 	for _, dset := range t.datasets {
 		// running query to get last signal received

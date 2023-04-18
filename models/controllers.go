@@ -28,6 +28,7 @@ type Controller struct {
 	Active      bool             `db:"active" json:"active"`
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 }
+type ControllerList []*Controller
 
 // SwitchDefaultValues initial state
 var SwitchDefaultValues = `[{
@@ -74,9 +75,9 @@ type Timeswitch struct {
 	On          bool   `json:"on"`
 }
 
-// GetControllersList fetches a list of available controllers including not active ones.
-func GetControllersList(db *sqlx.DB) ([]*Controller, error) {
-	var list []*Controller
+// GetControllersList returns a list of all available controllers, including those that are not currently active.
+func GetControllersListFromDB(db *sqlx.DB) (ControllerList, error) {
+	var list ControllerList
 	err := db.Select(&list, `
 	select
 		id,
@@ -119,8 +120,9 @@ func GetControllerByID(db *sqlx.DB, cid int) (Controller, error) {
 	return c, nil
 }
 
-// GetControllerFromMem
-func getControllerFromMem(cl []*Controller, id int) *Controller {
+// getControllerFromMem returns a pointer to the controller in memory with the given ID,
+// or nil if the controller is not found.
+func (cl ControllerList) getControllerByIDFromMem(id int) *Controller {
 	for _, v := range cl {
 		if v.ID == id {
 			return v
@@ -129,16 +131,16 @@ func getControllerFromMem(cl []*Controller, id int) *Controller {
 	return nil
 }
 
-// GetControllersListEndpoint fetches a list of all available controllers.
+// GetControllersListEndpoint returns a list of all available controllers.
 func (s *Server) GetControllersListEndpoint(w http.ResponseWriter, r *http.Request) {
-	list, err := GetControllersList(s.DB)
+	list, err := GetControllersListFromDB(s.DB)
 	if err != nil {
 		helper.RespondErr(w, r, 500, err)
 	}
 	helper.Respond(w, r, 200, list)
 }
 
-// GetControllerByIDEndpoint loads a specific controller from database by given id
+// GetControllerByIDEndpoint retrieves a specific controller from the database using the ID provided in the request body.
 func (s *Server) GetControllerByIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	n, _ := strconv.Atoi(chi.URLParam(r, "cid"))
 	c, err := GetControllerByID(s.DB, n)
@@ -149,7 +151,7 @@ func (s *Server) GetControllerByIDEndpoint(w http.ResponseWriter, r *http.Reques
 	helper.Respond(w, r, 200, c)
 }
 
-// AddNewControllerEndpoint adds a new controller to the database with an initial switch state and alerting to false.
+// AddNewControllerEndpoint adds a new controller to the database with initial switch state and alert set to false.
 func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request) {
 	var dat Controller
 	err := helper.DecodeBody(r, &dat)
@@ -321,7 +323,7 @@ func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c := s.Telemetry.controllers.getControllerByIDFromMem(reqID)
 		c.updateControllerStatebyID(s.DB, true)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' set to active", reqID))
 		sw.Active = true
@@ -330,7 +332,7 @@ func (s *Server) SetControllerStateEndpoint(w http.ResponseWriter, r *http.Reque
 			helper.RespondErr(w, r, 500, "controller is already disabled")
 			return
 		}
-		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c := s.Telemetry.controllers.getControllerByIDFromMem(reqID)
 		c.updateControllerStatebyID(s.DB, false)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' set to disabled", reqID))
 		sw.Active = false
@@ -365,7 +367,7 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 			return
 		}
 		// turn the switch on
-		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c := s.Telemetry.controllers.getControllerByIDFromMem(reqID)
 		c.updateControllerSwitchStatebyID(s.DB, SWITCH_ON)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to on", reqID))
 		sw.Switch = SWITCH_ON
@@ -375,7 +377,7 @@ func (s *Server) SetControllerSwitchStateEndpoint(w http.ResponseWriter, r *http
 			return
 		}
 		// turn the switch off
-		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c := s.Telemetry.controllers.getControllerByIDFromMem(reqID)
 		c.updateControllerSwitchStatebyID(s.DB, SWITCH_OFF)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("switch id '%d' switch set to off", reqID))
 
@@ -409,7 +411,7 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 			helper.RespondErr(w, r, 500, "alert is already on!")
 			return
 		}
-		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c := s.Telemetry.controllers.getControllerByIDFromMem(reqID)
 		c.updateControllerAlertStatebyID(s.DB, true)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to on", reqID))
 		sw.Alert = true
@@ -418,7 +420,7 @@ func (s *Server) SetControllerAlertStateEndpoint(w http.ResponseWriter, r *http.
 			helper.RespondErr(w, r, 500, "alert is already off!")
 			return
 		}
-		c := getControllerFromMem(s.Telemetry.controllers, reqID)
+		c := s.Telemetry.controllers.getControllerByIDFromMem(reqID)
 		c.updateControllerAlertStatebyID(s.DB, false)
 		event.LogEvent(ControllerEvent, fmt.Sprintf("controller id '%d' alert set to off", reqID))
 		sw.Alert = false
