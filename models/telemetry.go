@@ -161,7 +161,7 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 		// fmt.Println("future", timeFuture)
 		// fmt.Println("ti-tf", time.Now().Unix()-timeFuture)
 
-		// if (current time - next interval time) are more than 60 seconds
+		// if (current time - next interval time) is more than 60 seconds
 		// we can consider the telemetry to be offline
 		if (time.Now().Unix() - timeFuture) > 60 {
 			dataset.SetOfflineByID(t.db, dset.ID)

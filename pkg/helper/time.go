@@ -43,19 +43,35 @@ func ParseStrToLocalTime(t1 string, t2 string) (*time.Time, *time.Time, error) {
 	return &pt1, &pt2, nil
 }
 
+// // InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
+// // This function creates new time.Time objects using the current date and the hour, minute, and second values from t1 and t2.
+// // If t2 is before t1, it's assumed to be on the following day. Returns true if the current time is between t1 and t2, false otherwise.
+// func InTimeSpanIgnoreDate(t1 time.Time, t2 time.Time) bool {
+// 	now := time.Now()
+// 	startTime := time.Date(now.Year(), now.Month(), now.Day(), t1.Hour(),
+// 		t1.Minute(), t1.Second(), t1.Nanosecond(), t1.Location())
+
+// 	endTime := time.Date(now.Year(), now.Month(), now.Day(), t2.Hour(),
+// 		t2.Minute(), t2.Second(), t2.Nanosecond(), t2.Location())
+
+// 	if endTime.Before(startTime) {
+// 		endTime = endTime.Add(24 * time.Hour)
+// 	}
+// 	return now.After(startTime) && now.Before(endTime)
+// }
+
 // InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
-// This function creates new time.Time objects using the current date and the hour, minute, and second values from t1 and t2.
-// If t2 is before t1, it's assumed to be on the following day. Returns true if the current time is between t1 and t2, false otherwise.
-func InTimeSpanIgnoreDate(t1 time.Time, t2 time.Time) bool {
+// This is useful, for example, when working with recurring events that occur at the same time every day.
+func InTimeSpanIgnoreDate(t1, t2 time.Time) bool {
 	now := time.Now()
-	startTime := time.Date(now.Year(), now.Month(), now.Day(), t1.Hour(),
-		t1.Minute(), t1.Second(), t1.Nanosecond(), t1.Location())
 
-	endTime := time.Date(now.Year(), now.Month(), now.Day(), t2.Hour(),
-		t2.Minute(), t2.Second(), t2.Nanosecond(), t2.Location())
+	// getting total duration between t1 and t2
+	diff := t2.Sub(t1)
 
-	if endTime.Before(startTime) {
-		endTime = endTime.Add(24 * time.Hour)
-	}
-	return now.After(startTime) && now.Before(endTime)
+	xtime := t1.Format("15:04:05")
+	xdate := now.Format("2006-01-02")
+
+	combined, _ := time.Parse(TimeFormat, fmt.Sprintf("%s %s", xdate, xtime))
+	due := combined.Add(diff)
+	return InTimeSpan(combined, due)
 }
