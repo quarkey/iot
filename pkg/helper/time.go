@@ -63,15 +63,23 @@ func ParseStrToLocalTime(t1 string, t2 string) (*time.Time, *time.Time, error) {
 // InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
 // This is useful, for example, when working with recurring events that occur at the same time every day.
 func InTimeSpanIgnoreDate(t1, t2 time.Time) bool {
+	// now := time.Now()
+
+	// // getting total duration between t1 and t2
+	// diff := t2.Sub(t1)
+
+	// xtime := t1.Format("15:04:05")
+	// xdate := now.Format("2006-01-02")
+
+	// combined, _ := time.Parse(TimeFormat, fmt.Sprintf("%s %s", xdate, xtime))
+	// due := combined.Add(diff)
+	// return InTimeSpan(combined, due)
+
 	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 
-	// getting total duration between t1 and t2
-	diff := t2.Sub(t1)
+	start := today.Add(t1.Sub(today))
+	end := today.Add(t2.Sub(today))
 
-	xtime := t1.Format("15:04:05")
-	xdate := now.Format("2006-01-02")
-
-	combined, _ := time.Parse(TimeFormat, fmt.Sprintf("%s %s", xdate, xtime))
-	due := combined.Add(diff)
-	return InTimeSpan(combined, due)
+	return InTimeSpan(start, end)
 }
