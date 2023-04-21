@@ -383,7 +383,7 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 		}
 		switch c.Category {
 		case "timeswitchrepeat":
-			if helper.InTimeSpanIgnoreDate(*t1, *t2) {
+			if helper.InTimeSpanIgnoreDate(*t1, *t2, time.Now()) {
 				// fmt.Printf("timeswitchrepeat: %s status 'on'\n", item.Description)
 				err := c.UpdateDynamicControllerSwitchState(db, SWITCH_ON)
 				if err != nil {
