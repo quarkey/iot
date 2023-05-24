@@ -30,6 +30,8 @@ run:
 	go build ./cmd/api
 	./api --conf config/exampleconfig.json --automigrate
 
+race:
+	go run -race ./cmd/api --conf config/exampleconfig.json --automigrate
 rundebug:
 	go build ./cmd/api
 	./api --conf config/exampleconfig.json --debug --automigrate

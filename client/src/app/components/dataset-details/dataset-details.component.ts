@@ -1,15 +1,15 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
-import { Dataset, Sensordata } from "src/app/models/dataset";
-import { DatasetsService } from "src/app/services/datasets.service";
-import { DialogsService } from "src/app/services/dialogs.service";
-import { GeneralService } from "src/app/services/general.service";
+import { Component, Input, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Dataset, Sensordata } from 'src/app/models/dataset';
+import { DatasetsService } from 'src/app/services/datasets.service';
+import { DialogsService } from 'src/app/services/dialogs.service';
+import { GeneralService } from 'src/app/services/general.service';
 
 @Component({
-  selector: "app-dataset-details",
-  templateUrl: "./dataset-details.component.html",
-  styleUrls: ["./dataset-details.component.scss"],
+  selector: 'app-dataset-details',
+  templateUrl: './dataset-details.component.html',
+  styleUrls: ['./dataset-details.component.scss'],
 })
 export class DatasetDetailsComponent implements OnInit {
   @Input() dataset: Dataset;
@@ -53,18 +53,18 @@ export class DatasetDetailsComponent implements OnInit {
     }
   }
   get types() {
-    return this.form.get("types") as FormArray;
+    return this.form.get('types') as FormArray;
   }
   get fields() {
-    return this.form.get("fields") as FormArray;
+    return this.form.get('fields') as FormArray;
   }
   get showcharts() {
-    return this.form.get("showcharts") as FormArray;
+    return this.form.get('showcharts') as FormArray;
   }
   addTypeField() {
     // fields comes in pairs
-    this.types.push(this.formBuilder.control(""));
-    this.fields.push(this.formBuilder.control(""));
+    this.types.push(this.formBuilder.control(''));
+    this.fields.push(this.formBuilder.control(''));
     this.showcharts.push(this.formBuilder.control(false));
   }
   updateDataset() {
@@ -82,35 +82,31 @@ export class DatasetDetailsComponent implements OnInit {
   }
   downloadCSV() {
     this.loadingdownloadFile = true;
-    this.datasetService
-      .LoadCSVDatasetByReference(this.dataset.reference)
-      .subscribe((res) => {
-        if (res) {
-          this.loadingdownloadFile = false;
-          const date = Date.now();
-          const filename = `export_dataset_id_${this.dataset.id}_${date}.csv`;
-          this.generalService.DownloadFile(res, filename);
-        }
-      });
+    this.datasetService.LoadCSVDatasetByReference(this.dataset.reference).subscribe((res) => {
+      if (res) {
+        this.loadingdownloadFile = false;
+        const date = Date.now();
+        const filename = `export_dataset_id_${this.dataset.id}_${date}.csv`;
+        this.generalService.DownloadFile(res, filename);
+      }
+    });
   }
   deleteDataset() {
     this.dialogService
       .openConfirmationDialog(
-        "Delete dataset, INCLUDING DATA?",
+        'Delete dataset, INCLUDING DATA?',
         `Are you sure you want to permanently delete dataset, INCLUDING data points?`,
-        "CONFIRM",
-        "CANCEL",
+        'CONFIRM',
+        'CANCEL',
         true
       )
       .subscribe((confirm) => {
         if (confirm) {
-          this.datasetService
-            .DeleteDatasetByID(this.dataset.id, this.dataset.title)
-            .subscribe((res) => {
-              if (res) {
-                this.router.navigate([`/datasets`]);
-              }
-            });
+          this.datasetService.DeleteDatasetByID(this.dataset.id, this.dataset.title).subscribe((res) => {
+            if (res) {
+              this.router.navigate([`/datasets`]);
+            }
+          });
         }
       });
   }

@@ -1,14 +1,14 @@
-import { Component, Input, OnInit, ViewChild } from "@angular/core";
-import { ChartDataset, ChartOptions, Color } from "chart.js";
-import { BaseChartDirective } from "ng2-charts";
-import { Dataset, Ng2Dataset, Sensordata } from "src/app/models/dataset";
-import { DatasetsService } from "src/app/services/datasets.service";
-import { environment } from "src/environments/environment";
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChartDataset, ChartOptions, Color } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
+import { Dataset, Ng2Dataset, Sensordata } from 'src/app/models/dataset';
+import { DatasetsService } from 'src/app/services/datasets.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "app-line-chart",
-  templateUrl: "./line-chart.component.html",
-  styleUrls: ["./line-chart.component.scss"],
+  selector: 'app-line-chart',
+  templateUrl: './line-chart.component.html',
+  styleUrls: ['./line-chart.component.scss'],
 })
 export class LineChartComponent implements OnInit {
   @Input() dataset: Dataset;
@@ -26,34 +26,32 @@ export class LineChartComponent implements OnInit {
     animate: false,
     plugins: {
       legend: {
-        position: "right",
+        position: 'right',
       },
       title: {
         display: true,
-        text: "Chart.js Line Chart",
+        text: 'Chart.js Line Chart',
       },
     },
   };
   lineChartLegend = true;
   lineChartPlugins = [];
-  lineChartType = "line";
+  lineChartType = 'line';
 
   ngOnInit(): void {
-    this.datasetService
-      .LoadLineChartDatasetByReference(this.dataset.reference)
-      .subscribe((res) => {
-        if (res) {
-          this.lineChartLabels = res.labels;
-          this.lineChartData = res.lineChartdataset;
-          this.lineChartOptions.plugins.title.text = this.dataset.title;
-        }
-      });
+    this.datasetService.LoadLineChartDatasetByReference(this.dataset.reference, 1000).subscribe((res) => {
+      if (res) {
+        this.lineChartLabels = res.labels;
+        this.lineChartData = res.lineChartdataset;
+        this.lineChartOptions.plugins.title.text = this.dataset.title;
+      }
+    });
   }
   runLive() {
     const socket = new WebSocket(`${environment.wsUrl}/api/live`);
     var id = this.dataset.id;
     socket.onopen = function (e) {
-      console.log("WebSocket Opened");
+      console.log('WebSocket Opened');
       // socket.send(`dataset`);
     };
     this.clearChart();
@@ -70,7 +68,7 @@ export class LineChartComponent implements OnInit {
   }
   updateChart(data: Sensordata) {
     this.lineChartData.forEach((dset, index) => {
-      console.log("pushing data", data.data[index]);
+      console.log('pushing data', data.data[index]);
       // adding new data points to chart
       dset.data.push(+data.data[index]);
       const now = new Date();

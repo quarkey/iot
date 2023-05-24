@@ -20,27 +20,16 @@
 
   <h3>Datapoint types and fields</h3>
   <div formArrayName="types">
-    <button
-      mat-icon-button
-      matTooltip="Add field column"
-      (click)="addTypeField()"
-    >
+    <button mat-icon-button matTooltip="Add field column" (click)="addTypeField()">
       <mat-icon>add</mat-icon>
     </button>
-    <mat-form-field
-      *ngFor="let type of types.controls; let i = index"
-      appearance="fill"
-      class="smaller"
-    >
+    <mat-form-field *ngFor="let type of types.controls; let i = index" appearance="fill" class="smaller">
       <input matInput [formControlName]="i" />
     </mat-form-field>
   </div>
   <h3>Field name</h3>
   <div formArrayName="fields">
-    <mat-form-field
-      *ngFor="let field of fields.controls; let i = index"
-      appearance="fill"
-    >
+    <mat-form-field *ngFor="let field of fields.controls; let i = index" appearance="fill">
       <input matInput [formControlName]="i" />
     </mat-form-field>
   </div>
@@ -56,14 +45,7 @@
   </div>
   <mat-card-actions>
     <div style="flex: 1 1 auto"></div>
-    <button
-      mat-raised-button
-      color="primary"
-      [disabled]="form.pristine"
-      (click)="updateDataset()"
-    >
-      UPDATE
-    </button>
+    <button mat-raised-button color="primary" [disabled]="form.pristine" (click)="updateDataset()">UPDATE</button>
     <button
       mat-raised-button
       (click)="downloadCSV()"
