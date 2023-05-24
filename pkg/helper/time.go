@@ -53,14 +53,14 @@ func localTimeFixedZone(t string) (*time.Time, error) {
 // InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
 // This is useful, for example, when working with recurring events that occur at the same time every day.
 func InTimeSpanIgnoreDate(t1, t2, now time.Time) bool {
+	// now := time.Now()
 	// getting total duration between t1 and t2
 	diff := t2.Sub(t1)
-
 	xtime := t1.Format("15:04:05")
-	xdate := now.Format("2006-01-02")
+	// xdate := now.Format("2006-01-02")
 
 	combined, err := localTimeFixedZone(
-		fmt.Sprintf("%s %s", xdate, xtime),
+		fmt.Sprintf("%s %s", now.Format("2006-01-02"), xtime),
 	)
 	if err != nil {
 		fmt.Printf("Error parsing time string: %v\n", err)
@@ -69,13 +69,15 @@ func InTimeSpanIgnoreDate(t1, t2, now time.Time) bool {
 	// combined, _ := time.Parse(TimeFormat, fmt.Sprintf("%s %s", xdate, xtime))
 	due := combined.Add(diff)
 
-	// fmt.Println("combined:", combined)
-	// fmt.Println("now:", now)
-	// fmt.Println("due:", due)
-	// fmt.Println("diff:", diff)
+	fmt.Println("now:\t\t", now)
+	fmt.Println("combined:\t", combined)
+	fmt.Println("due:\t\t", due)
+	fmt.Println("diff:", diff)
+	fmt.Println("until:", time.Until(due))
 
-	// fmt.Println("inspan:", InTimeSpan(*combined, due, now))
-	return InTimeSpan(*combined, due, now)
+	fmt.Println("inspan:", InTimeSpan(*combined, due, now))
+
+	return now.After(*combined) && now.Before(due)
 
 	// now := time.Now()
 	// today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)

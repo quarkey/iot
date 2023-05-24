@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -113,7 +114,7 @@ func (t *Telemetry) init(runTelemetryCheck bool) {
 }
 
 func (t *Telemetry) CheckSensorsTelemetry() {
-	log.Println("[INFO] UpdateSensorsTelemetry() NOT IMPLEMENTED")
+	log.Println("[INFO] UpdateSensorsTelemetry() NOT IMPLEMENTED")
 	// TODO: "ping" device by ip, waiting for arduino sketch
 }
 
@@ -169,8 +170,11 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 	}
 }
 
+var mutex sync.Mutex
+
 // CheckControllersTelemetry ...
 func (t *Telemetry) CheckControllersTelemetry() {
+
 	for _, c := range t.controllers {
 		if !c.Active {
 			continue
@@ -212,8 +216,6 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			}
 		case "timeswitch", "timeswitchrepeat":
 			c.CheckTimeSwitchEntries(t.db)
-		// case "timeswitchrepeat":
-		// 	c.ChecktimeSwitchRepeatEntries(t.db)
 		case "switch":
 			// do we need to track switches other than sensor telemetry?
 		default:

@@ -27,16 +27,21 @@ var TimeFormat = "2006-01-02 15:04:05"
 func TestInTimeSpanIgnoreDatex(t *testing.T) {
 	t1, _ := time.Parse(TimeFormat, "2023-03-25 18:00:11")
 	t2, _ := time.Parse(TimeFormat, "2023-03-26 07:00:11")
+	now1, _ := time.Parse(TimeFormat, "2023-03-25 23:00:11")
 
-	now, _ := time.Parse(TimeFormat, "2023-03-25 23:00:11")
-	fail, _ := time.Parse(TimeFormat, "2023-03-25 14:00:11")
+	t3, _ := time.Parse(TimeFormat, "2023-03-25 18:00:11")
+	t4, _ := time.Parse(TimeFormat, "2023-03-26 07:00:11")
+	now2, _ := time.Parse(TimeFormat, "2023-03-26 01:00:11")
+
+	// nextDay, _ := time.Parse(TimeFormat, "2023-03-26 00:00:11")
 	// Test case 1: current time is before t1
-	if !helper.InTimeSpanIgnoreDate(t1, t2, now) {
-		t.Errorf("Test case 1 failed: current time falls not in timeframe t1=%v, t2=%v", t1, t2)
+	if !helper.InTimeSpanIgnoreDate(t1, t2, now1) {
+		t.Errorf("current time falls not in timeframe t1=%v, t2=%v", t1, t2)
 	}
-	if helper.InTimeSpanIgnoreDate(t1, t2, fail) {
-		t.Errorf("Test case 2 failed: current time falls not in timeframe t1=%v, t2=%v", t1, t2)
+	if !helper.InTimeSpanIgnoreDate(t3, t4, now2) {
+		t.Errorf("current time falls not in timeframe t3=%v, t4=%v", t1, t2)
 	}
+
 	// // Test case 2: current time is after t2
 	// if helper.InTimeSpanIgnoreDate(t1, t2) {
 	// 	t.Errorf("Test case 2 failed: current time falls not in timeframe t1=%v, t2=%v", t1, t2)
