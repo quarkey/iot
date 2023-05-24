@@ -19,8 +19,8 @@ type lineChartDataset struct {
 	Label string    `json:"label"`
 }
 
-func LineDataSeries(db *sqlx.DB, ref string) (*LineChart, error) {
-	data, err := sensor.GetRawDataWithLimitByRef(db, 2000, ref)
+func LineDataSeries(db *sqlx.DB, ref string, limit int) (*LineChart, error) {
+	data, err := sensor.GetRawDataWithLimitByRef(db, limit, ref)
 	if err != nil {
 		return nil, fmt.Errorf("LineDataSeries() unable to load data: %v", err)
 	}

@@ -27,8 +27,8 @@ func (s *Server) SetupEndpoints() {
 	s.Router.Post("/api/datasets/delete", s.DeleteDatasetByIDEndpoint)
 
 	// charts
-	s.Router.Get("/api/chart/area/{reference}", s.AreaChartDataSeries)
-	s.Router.Get("/api/chart/line/{reference}", s.LineChartDataSeries)
+	s.Router.Get("/api/chart/area/{reference}/{limit}", s.AreaChartDataSeries)
+	s.Router.Get("/api/chart/line/{reference}/{limit}", s.LineChartDataSeries)
 
 	// events
 	s.Router.Get("/api/events/{count}", s.GetEventLogListEndpoint)

@@ -20,8 +20,8 @@ type point struct {
 	Value float64 `json:"value"`
 }
 
-func AreaChartDataSeries(db *sqlx.DB, ref string) (*[]AreaChart, error) {
-	data, err := sensor.GetRawDataWithLimitByRef(db, 2000, ref)
+func AreaChartDataSeries(db *sqlx.DB, ref string, limit int) (*[]AreaChart, error) {
+	data, err := sensor.GetRawDataWithLimitByRef(db, limit, ref)
 	if err != nil {
 		return nil, err
 	}
