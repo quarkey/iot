@@ -45,7 +45,7 @@ func localTimeFixedZone(t string) (*time.Time, error) {
 	zone := time.FixedZone("CEST", 2*60*60)
 	pt1, err := time.ParseInLocation(TimeFormat, t, zone)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse time string: %v", err)
+		return nil, err
 	}
 	return &pt1, nil
 }
@@ -53,39 +53,23 @@ func localTimeFixedZone(t string) (*time.Time, error) {
 // InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
 // This is useful, for example, when working with recurring events that occur at the same time every day.
 func InTimeSpanIgnoreDate(t1, t2, now time.Time) bool {
-	// now := time.Now()
-	// getting total duration between t1 and t2
 	diff := t2.Sub(t1)
-	xtime := t1.Format("15:04:05")
-	// xdate := now.Format("2006-01-02")
+	timeStart := t1.Format("15:04:05")
+	// fmt.Println("timeStart:", timeStart)
 
-	combined, err := localTimeFixedZone(
-		fmt.Sprintf("%s %s", now.Format("2006-01-02"), xtime),
-	)
+	combined, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", t1.Format("2006-01-02"), timeStart))
 	if err != nil {
 		fmt.Printf("Error parsing time string: %v\n", err)
 	}
-
-	// combined, _ := time.Parse(TimeFormat, fmt.Sprintf("%s %s", xdate, xtime))
 	due := combined.Add(diff)
 
-	fmt.Println("now:\t\t", now)
-	fmt.Println("combined:\t", combined)
-	fmt.Println("due:\t\t", due)
-	fmt.Println("diff:", diff)
-	fmt.Println("until:", time.Until(due))
+	// combined, _ := time.Parse(TimeFormat, fmt.Sprintf("%s %s", xdate, xtime))
+	// fmt.Println("now:\t\t", now)
+	// fmt.Println("combined:\t", combined)
+	// fmt.Println("due:\t\t", due)
+	// fmt.Println("diff:", diff)
 
-	fmt.Println("inspan:", InTimeSpan(*combined, due, now))
-
-	return now.After(*combined) && now.Before(due)
-
-	// now := time.Now()
-	// today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-
-	// start := today.Add(t1.Sub(today))
-	// end := today.Add(t2.Sub(today))
-	// fmt.Println("start:", start)
-	// fmt.Println("end:", end)
-	// fmt.Println(InTimeSpan(start, end))
-	// return InTimeSpan(start, end)
+	// fmt.Println("until:", time.Until(due))
+	// fmt.Println("inspan:", InTimeSpan(combined, due, now))
+	return InTimeSpan(combined, due, now)
 }
