@@ -52,24 +52,17 @@ func localTimeFixedZone(t string) (*time.Time, error) {
 
 // InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
 // This is useful, for example, when working with recurring events that occur at the same time every day.
-func InTimeSpanIgnoreDate(t1, t2, now time.Time) bool {
-	diff := t2.Sub(t1)
-	timeStart := t1.Format("15:04:05")
-	// fmt.Println("timeStart:", timeStart)
-
-	combined, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", t1.Format("2006-01-02"), timeStart))
+func ParseInTimeSpanString(st1, st2 string) bool {
+	t1, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), st1))
 	if err != nil {
 		fmt.Printf("Error parsing time string: %v\n", err)
 	}
-	due := combined.Add(diff)
-
-	// combined, _ := time.Parse(TimeFormat, fmt.Sprintf("%s %s", xdate, xtime))
-	// fmt.Println("now:\t\t", now)
-	// fmt.Println("combined:\t", combined)
-	// fmt.Println("due:\t\t", due)
-	// fmt.Println("diff:", diff)
-
-	// fmt.Println("until:", time.Until(due))
-	// fmt.Println("inspan:", InTimeSpan(combined, due, now))
-	return InTimeSpan(combined, due, now)
+	t2, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), st2))
+	if err != nil {
+		fmt.Printf("Error parsing time string: %v\n", err)
+	}
+	fmt.Println("t1:", t1.Local())
+	fmt.Println("t2:", t2.Local())
+	fmt.Println("now:", time.Now())
+	return InTimeSpan(t1.Local(), t2.Local(), time.Now())
 }

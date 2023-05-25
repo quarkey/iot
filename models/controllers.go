@@ -377,13 +377,13 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 	}
 
 	for _, item := range ts {
-		t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
-		if err != nil {
-			log.Printf("[ERROR] invalid format: %v", err)
-		}
+		// t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
+		// if err != nil {
+		// 	log.Printf("[ERROR] invalid format: %v", err)
+		// }
 		switch c.Category {
 		case "timeswitchrepeat":
-			if helper.InTimeSpanIgnoreDate(*t1, *t2, time.Now()) {
+			if helper.ParseInTimeSpanString(item.TimeOn, item.TimeOff) {
 				// fmt.Printf("timeswitchrepeat: %s status 'on'\n", item.Description)
 				err := c.UpdateDynamicControllerSwitchState(db, SWITCH_ON)
 				if err != nil {

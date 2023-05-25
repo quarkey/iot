@@ -2,7 +2,6 @@ package helper_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/quarkey/iot/pkg/helper"
 )
@@ -24,19 +23,19 @@ var TimeFormat = "2006-01-02 15:04:05"
 // 	}
 // }
 
-func TestInTimeSpanIgnoreDatex(t *testing.T) {
-	now1, _ := time.Parse(TimeFormat, "2023-03-25 23:00:11")
-	t1, _ := time.Parse(TimeFormat, "2023-03-25 18:00:11")
-	t2, _ := time.Parse(TimeFormat, "2023-03-26 07:00:11")
+func TestParseInTimeSpanString(t *testing.T) {
+	now1 := "23:00:11"
+	t1 := "00:01:01"
+	t2 := "21:46:01"
 
-	now2, _ := time.Parse(TimeFormat, "2023-03-26 06:00:09")
-	t3, _ := time.Parse(TimeFormat, "2023-03-25 18:00:11")
-	t4, _ := time.Parse(TimeFormat, "2023-03-26 06:00:11")
+	now2 := "22:00:11"
+	t3 := "06:00:00"
+	t4 := "23:00:11"
 
-	if !helper.InTimeSpanIgnoreDate(t1, t2, now1) {
+	if !helper.ParseInTimeSpanString(t1, t2) {
 		t.Errorf("current time falls not in timeframe \nt1=%v \nt2=%v \nc1=%s", t1, t2, now1)
 	}
-	if !helper.InTimeSpanIgnoreDate(t3, t4, now2) {
+	if !helper.ParseInTimeSpanString(t3, t4) {
 		t.Errorf("current time falls not in timeframe \n t3=%v \n t4=%v \nnow=%s", t3, t4, now2)
 	}
 }
