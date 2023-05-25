@@ -61,8 +61,8 @@ func ParseInTimeSpanString(st1, st2 string) bool {
 	if err != nil {
 		fmt.Printf("Error parsing time string: %v\n", err)
 	}
-	fmt.Println("t1:", t1.Local())
-	fmt.Println("t2:", t2.Local())
-	fmt.Println("now:", time.Now())
+	// fmt.Println("t1:", t1.Local())
+	// fmt.Println("t2:", t2.Local())
+	// fmt.Println("now:", time.Now())
 	return InTimeSpan(t1.Local(), t2.Local(), time.Now())
 }
