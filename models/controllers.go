@@ -398,10 +398,14 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 	if err != nil {
 		log.Printf("[ERROR] unable to unmarshal %s json: %v", c.Category, err)
 	}
-	var tsModified []Timeswitch
+	// var tsModified []Timeswitch
 	for _, item := range ts {
 		switch c.Category {
 		case "timeswitchrepeat":
+			if item.Duration == "" {
+				log.Printf("[ERROR] missing duration for '%s', unable to perform check", c.Description)
+				return
+			}
 			// we estimate cutoff time based on today's date, if cutoff is empty we initialize it
 			parsed, _ := time.ParseInLocation("2006-01-02 15:04:05", time.Now().Format("2006-01-02")+" "+item.TimeOn, time.Local)
 			if item.Cutoff == "" {
@@ -411,7 +415,7 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 				item.Repeat = true
 				item.On = true
 				// since this is an array of items we need update the whole collection
-				tsModified = append(tsModified, item)
+				// tsModified = append(tsModified, item)
 				// fmt.Printf("update item with this value: %+v\n", item)
 			}
 

@@ -34,3 +34,20 @@ func GetRawDataWithLimitByRef(db *sqlx.DB, limit int, reference string) ([]RawSe
 	}
 	return data, nil
 }
+func GetRawDataByDateAndRef(db *sqlx.DB, DateFrom string, DateTo string, reference string) ([]RawSensorData, error) {
+	var data []RawSensorData
+	err := db.Select(&data, `
+		select 
+			a.id,
+			a.data,
+			a.time 
+		from sensordata a, datasets b
+		where b.reference=$1
+		and b.id = a.dataset_id
+		and a.time between $2 and $3
+		limit 10;`, reference, DateFrom, DateTo)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get dataset from db: %v", err)
+	}
+	return data, nil
+}

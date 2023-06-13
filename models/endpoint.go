@@ -30,6 +30,9 @@ func (s *Server) SetupEndpoints() {
 	s.Router.Get("/api/chart/area/{reference}/{limit}", s.AreaChartDataSeries)
 	s.Router.Get("/api/chart/line/{reference}/{limit}", s.LineChartDataSeries)
 
+	// reports
+	s.Router.Post("/api/report/temperature", s.GetTemperatureReport)
+
 	// events
 	s.Router.Get("/api/events/{count}", s.GetEventLogListEndpoint)
 
