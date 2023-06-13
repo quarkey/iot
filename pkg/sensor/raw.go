@@ -44,8 +44,7 @@ func GetRawDataByDateAndRef(db *sqlx.DB, DateFrom string, DateTo string, referen
 		from sensordata a, datasets b
 		where b.reference=$1
 		and b.id = a.dataset_id
-		and a.time between $2 and $3
-		limit 10;`, reference, DateFrom, DateTo)
+		and a.time between $2 and $3;`, reference, DateFrom, DateTo)
 	if err != nil {
 		return nil, fmt.Errorf("unable to get dataset from db: %v", err)
 	}
