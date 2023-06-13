@@ -25,6 +25,7 @@ type TemperatureReport struct {
 	High        float64 `json:"high"`
 	Low         float64 `json:"low"`
 	Average     float64 `json:"average"`
+	Datapoints  int     `json:"datapoints"`
 }
 
 func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
@@ -41,6 +42,7 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 	_, col := dataset.GetSpecificSensorDataPoint(req.DataColumn)
 	var min float64
 	var max float64
+	var datapoints int
 	for _, v := range data {
 		slice, err := helper.DecodeRawJSONtoSlice(v.Data)
 		if err != nil {
@@ -57,7 +59,7 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		if datapoint < min {
 			min = datapoint
 		}
-
+		datapoints++
 	}
 	avg := (max + min) / 2
 	out := TemperatureReport{
@@ -67,6 +69,7 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		High:        max,
 		Low:         min,
 		Average:     avg,
+		Datapoints:  datapoints,
 	}
 
 	helper.Respond(w, r, 200, out)
