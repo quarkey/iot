@@ -57,6 +57,17 @@ var TimesSwitchDefaultValues = `
 	"on": false
 }]
 `
+var TimesSwitchRepeatDefaultValues = `
+[{
+	"item_description": "",
+	"time_on": "",
+	"time_off": "",
+	"cutoff": "",
+	"duration": null,
+	"repeat": false,
+	"on": false
+}]
+`
 var SWITCH_ON = 1
 var SWITCH_OFF = 0
 
@@ -70,9 +81,11 @@ type Timeswitch struct {
 	Description string `json:"item_description"`
 	TimeOn      string `json:"time_on"`
 	TimeOff     string `json:"time_off"`
-	Duration    int    `json:"duration"`
-	Repeat      bool   `json:"repeat"`
-	On          bool   `json:"on"`
+	// Cutoff used for timeswitchrepeat
+	Cutoff   string `json:"cutoff,omitempty"`
+	Duration string `json:"duration"`
+	Repeat   bool   `json:"repeat"`
+	On       bool   `json:"on"`
 }
 
 // GetControllersList returns a list of all available controllers, including those that are not currently active.
@@ -167,8 +180,10 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		itemJSON = ThresholdswitchDefaultValues
 	case "switch":
 		itemJSON = SwitchDefaultValues
-	case "timeswitch", "timeswitchrepeat":
+	case "timeswitch":
 		itemJSON = TimesSwitchDefaultValues
+	case "timeswitchrepeat":
+		itemJSON = TimesSwitchRepeatDefaultValues
 	default:
 		// handle unknown category
 		helper.RespondErr(w, r, http.StatusBadRequest, "unknown controller type")
@@ -240,6 +255,14 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	e := event.New(s.DB)
 	e.LogEvent(DatasetEvent, "controller '%s' updated", dat.Title)
 	helper.Respond(w, r, 200, "updated")
+}
+
+func updateControllerItems(db *sqlx.DB, cid int, json json.RawMessage) error {
+	_, err := db.Exec(`update iot.controllers set items=$1 where id=$2`, cid, json)
+	if err != nil {
+		return fmt.Errorf("unable to run query: %v", err)
+	}
+	return nil
 }
 
 // ResetControllerSwitchValueEndpoint resets the active configuration (raw JSON) for a given controller to its default state.
@@ -375,16 +398,41 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 	if err != nil {
 		log.Printf("[ERROR] unable to unmarshal %s json: %v", c.Category, err)
 	}
-
+	var tsModified []Timeswitch
 	for _, item := range ts {
-		// t1, t2, err := helper.ParseStrToLocalTime(item.TimeOn, item.TimeOff)
-		// if err != nil {
-		// 	log.Printf("[ERROR] invalid format: %v", err)
-		// }
 		switch c.Category {
 		case "timeswitchrepeat":
-			if helper.ParseInTimeSpanString(item.TimeOn, item.TimeOff) {
-				// fmt.Printf("timeswitchrepeat: %s status 'on'\n", item.Description)
+			// we estimate cutoff time based on today's date, if cutoff is empty we initialize it
+			parsed, _ := time.ParseInLocation("2006-01-02 15:04:05", time.Now().Format("2006-01-02")+" "+item.TimeOn, time.Local)
+			if item.Cutoff == "" {
+				log.Printf("[WARNING] missing cutoffdate for '%s', initializing...", c.Description)
+				// fmt.Println("PARSED:", parsed.Local())
+				item.Cutoff = parsed.String()
+				item.Repeat = true
+				item.On = true
+				// since this is an array of items we need update the whole collection
+				tsModified = append(tsModified, item)
+				fmt.Printf("update item with this value: %+v\n", item)
+			}
+
+			// getting total duration in seconds
+			duration, err := strconv.Atoi(item.Duration)
+			if err != nil {
+				fmt.Println("Error during conversion:", err)
+				return
+			}
+			// endTime is calculated based on the duration
+			endTime := parsed.Add(time.Second * time.Duration(duration))
+			diff := endTime.Sub(parsed)
+			final := parsed.Add(diff)
+
+			fmt.Printf("start (parsed): %s\n", parsed)
+			fmt.Printf("final: %s\n", final)
+
+			// checking if timespan falls within time range
+			if helper.InTimeSpan(parsed, final, time.Now()) && item.On {
+				// fmt.Println("should be on ..")
+				// fmt.Println("remaining:", time.Until(final))
 				err := c.UpdateDynamicControllerSwitchState(db, SWITCH_ON)
 				if err != nil {
 					fmt.Println(err)
@@ -392,12 +440,18 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 				c.Switch = SWITCH_ON
 				return
 			}
+			// turning off the timeswitchrepeat
+			err = c.UpdateDynamicControllerSwitchState(db, SWITCH_OFF)
+			if err != nil {
+				log.Printf("[ERROR] unable to update controller switch state: %v", err)
+			}
+			c.Switch = SWITCH_OFF
 		case "timeswitch":
-			if helper.InTimeSpanString(item.TimeOn, item.TimeOff) {
+			if helper.InDateTimeSpanString(item.TimeOn, item.TimeOff) {
 				// fmt.Printf("timeswitch: %s status 'on'\n", item.Description)
 				err := c.UpdateDynamicControllerSwitchState(db, SWITCH_ON)
 				if err != nil {
-					fmt.Println(err)
+					log.Printf("[ERROR] unable to update controller switch state: %v", err)
 				}
 				c.Switch = SWITCH_ON
 				return
@@ -405,10 +459,23 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 		} // end switch
 		err = c.UpdateDynamicControllerSwitchState(db, SWITCH_OFF)
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("[ERROR] unable to update controller switch state: %v", err)
 		}
 		c.Switch = SWITCH_OFF
 	}
+	// updating jsonRawMessage when timeswitchrepeat is modified
+	//TODO: we need to update controller items in memory, and the database.
+	// As of now this code will never fire.
+	// if len(tsModified) > 0 {
+	// 	log.Printf("[INFO] updating timeswitchrepeat jsonRawMessage for '%s'\n%+v", c.Description, tsModified)
+	// 	b, err := json.Marshal(tsModified)
+	// 	if err != nil {
+	// 		log.Printf("[ERROR] unable to marshal: %v", err)
+	// 	}
+	// 	bArr := json.RawMessage(b)
+	// 	fmt.Println("JSON RAW:", string(bArr))
+	// 	c.Items = &bArr
+	// }
 }
 
 type switchState struct {

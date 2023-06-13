@@ -57,6 +57,9 @@ type Server struct {
 
 var GLOBALCONFIG map[string]interface{}
 
+// //go:embed ../database/migrations/sql/*.sql
+// var SQLfs embed.FS
+
 // New initialize server and opens a database connection.
 func New(path string, automigrate bool, debug bool) *Server {
 	//TODO move timezone to config

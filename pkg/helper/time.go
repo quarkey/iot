@@ -11,7 +11,7 @@ var TimeFormat = "2006-01-02 15:04:05"
 // by the start and end times given as strings in "2006-01-02 15:04:05" format.
 // Returns true if the current time is between start and end times, false otherwise.
 // Returns false if there is a problem parsing the time strings.
-func InTimeSpanString(start string, end string) bool {
+func InDateTimeSpanString(start string, end string) bool {
 	now := time.Now()
 	t1, t2, err := ParseStrToLocalTime(start, end)
 	if err != nil {
@@ -52,17 +52,26 @@ func localTimeFixedZone(t string) (*time.Time, error) {
 
 // InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
 // This is useful, for example, when working with recurring events that occur at the same time every day.
-func ParseInTimeSpanString(st1, st2 string) bool {
-	t1, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), st1))
+// func ParseInTimeSpanString(st1, st2 string) bool {
+// 	t1, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), st1))
+// 	if err != nil {
+// 		fmt.Printf("Error parsing time string: %v\n", err)
+// 	}
+// 	t2, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), st2))
+// 	if err != nil {
+// 		fmt.Printf("Error parsing time string: %v\n", err)
+// 	}
+// 	// fmt.Println("t1:", t1.Local())
+// 	// fmt.Println("t2:", t2.Local())
+// 	// fmt.Println("now:", time.Now())
+// 	return InTimeSpan(t1.Local(), t2.Local(), time.Now())
+// }
+
+func ParseTimeString(ts string) (time.Time, error) {
+	t, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), ts))
 	if err != nil {
-		fmt.Printf("Error parsing time string: %v\n", err)
+		return time.Time{}, fmt.Errorf("unable to parse time string: %v", err)
+
 	}
-	t2, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), st2))
-	if err != nil {
-		fmt.Printf("Error parsing time string: %v\n", err)
-	}
-	// fmt.Println("t1:", t1.Local())
-	// fmt.Println("t2:", t2.Local())
-	// fmt.Println("now:", time.Now())
-	return InTimeSpan(t1.Local(), t2.Local(), time.Now())
+	return t, nil
 }
