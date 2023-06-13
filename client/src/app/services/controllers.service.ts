@@ -71,6 +71,14 @@ export class ControllersService {
       item_description: [item.item_description || null, Validators.required],
     });
   }
+  addTimeSwitchRepeatForm(item: timeswitch) {
+    return this.formBuilder.group({
+      time_on: [item.time_on || null, Validators.required],
+      time_off: [item.time_off || null, Validators.required],
+      duration: [item.duration || null, Validators.required],
+      item_description: [item.item_description || null, Validators.required],
+    });
+  }
   addThresholdSwitchForm(item: thresholdswitch) {
     return this.formBuilder.group({
       item_description: [item.item_description || null, Validators.required],

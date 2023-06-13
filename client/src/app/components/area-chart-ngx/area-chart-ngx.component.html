@@ -1,7 +1,6 @@
 <mat-spinner *ngIf="loading; else show"></mat-spinner>
-<h3 class="warming" *ngIf="showSampleDataLabel">
-  Error occurred, showing sample data
-</h3>
+<h3 class="warming" *ngIf="showSampleDataLabel">Error occurred, showing sample data</h3>
+<button mat-button (click)="load()">Reload data</button>
 <ng-template #show>
   <ngx-charts-area-chart
     [view]="view"
@@ -19,6 +18,3 @@
   >
   </ngx-charts-area-chart>
 </ng-template>
-<!-- <pre
-    >{{ data | json }}
-  </pre> -->

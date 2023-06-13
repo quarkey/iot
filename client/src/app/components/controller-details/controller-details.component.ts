@@ -44,7 +44,7 @@ export class ControllerDetailsComponent implements OnInit {
           this.items.push(this.controllerService.addTimeSwitchForm(item as timeswitch));
           break;
         case 'timeswitchrepeat':
-          this.items.push(this.controllerService.addTimeSwitchForm(item as timeswitch));
+          this.items.push(this.controllerService.addTimeSwitchRepeatForm(item as timeswitch));
           break;
         case 'switch':
           this.items.push(this.controllerService.addSwitchForm(item as normalswitch));
