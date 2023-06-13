@@ -11,11 +11,12 @@ import (
 )
 
 type TemperatureReportRequest struct {
-	DateFrom   string `json:"date_from"`
-	DateTo     string `json:"date_to"`
-	DatasetID  int    `json:"dataset_id"`
-	DatasetRef string `json:"dataset_ref"`
-	DataColumn string `json:"data_column"`
+	DateFrom    string `json:"date_from"`
+	DateTo      string `json:"date_to"`
+	DatasetID   int    `json:"dataset_id"`
+	DatasetRef  string `json:"dataset_ref"`
+	DataColumn  string `json:"data_column"`
+	IncludeData bool   `json:"include_data"`
 }
 
 type TemperatureReport struct {
@@ -40,10 +41,10 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, col := dataset.GetSpecificSensorDataPoint(req.DataColumn)
-	var min float64
 	var max float64
+	var min float64
 	var datapoints int
-	for _, v := range data {
+	for i, v := range data {
 		slice, err := helper.DecodeRawJSONtoSlice(v.Data)
 		if err != nil {
 			fmt.Printf("something went wrong... %v\n", err)
@@ -53,6 +54,9 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("something went wrong... %v\n", err)
 			datapoint = 0
 		}
+		if i == 0 {
+			min = datapoint
+		}
 		if datapoint > max {
 			max = datapoint
 		}
@@ -61,7 +65,7 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		}
 		datapoints++
 	}
-	avg := (max + min) / 2
+	avg := (min + max) / 2
 	out := TemperatureReport{
 		Description: "Temperature Report",
 		DateFrom:    req.DateFrom,
@@ -71,7 +75,7 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		Average:     avg,
 		Datapoints:  datapoints,
 	}
-
+	fmt.Println("OUT:", out)
 	helper.Respond(w, r, 200, out)
 }
 func readTempRequest(r *http.Request) (TemperatureReportRequest, error) {
