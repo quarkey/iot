@@ -405,20 +405,20 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 			// we estimate cutoff time based on today's date, if cutoff is empty we initialize it
 			parsed, _ := time.ParseInLocation("2006-01-02 15:04:05", time.Now().Format("2006-01-02")+" "+item.TimeOn, time.Local)
 			if item.Cutoff == "" {
-				log.Printf("[WARNING] missing cutoffdate for '%s', initializing...", c.Description)
+				// log.Printf("[WARNING] missing cutoffdate for '%s', initializing...", c.Description)
 				// fmt.Println("PARSED:", parsed.Local())
 				item.Cutoff = parsed.String()
 				item.Repeat = true
 				item.On = true
 				// since this is an array of items we need update the whole collection
 				tsModified = append(tsModified, item)
-				fmt.Printf("update item with this value: %+v\n", item)
+				// fmt.Printf("update item with this value: %+v\n", item)
 			}
 
 			// getting total duration in seconds
 			duration, err := strconv.Atoi(item.Duration)
 			if err != nil {
-				fmt.Println("Error during conversion:", err)
+				fmt.Println("unable to parse duration:", err)
 				return
 			}
 			// endTime is calculated based on the duration
@@ -426,8 +426,8 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 			diff := endTime.Sub(parsed)
 			final := parsed.Add(diff)
 
-			fmt.Printf("start (parsed): %s\n", parsed)
-			fmt.Printf("final: %s\n", final)
+			// fmt.Printf("start (parsed): %s\n", parsed)
+			// fmt.Printf("final: %s\n", final)
 
 			// checking if timespan falls within time range
 			if helper.InTimeSpan(parsed, final, time.Now()) && item.On {
