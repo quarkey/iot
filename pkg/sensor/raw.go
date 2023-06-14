@@ -34,13 +34,14 @@ func GetRawDataWithLimitByRef(db *sqlx.DB, limit int, reference string) ([]RawSe
 	}
 	return data, nil
 }
+
 func GetRawDataByDateAndRef(db *sqlx.DB, DateFrom string, DateTo string, reference string) ([]RawSensorData, error) {
 	var data []RawSensorData
 	err := db.Select(&data, `
 		select 
 			a.id,
 			a.data,
-			a.time 
+			a.time
 		from sensordata a, datasets b
 		where b.reference=$1
 		and b.id = a.dataset_id

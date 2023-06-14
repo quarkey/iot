@@ -1,31 +1,26 @@
-<div class="backgroundImage">
+<mat-card class="hideOnMobile">
+  <mat-card-title>Datasets</mat-card-title>
+  <div style="width: 600px">
+    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum asperiores et deserunt maiores exercitationem nobis.
+  </div>
+  <br />
+  <mat-divider></mat-divider>
+  <br />
+  <app-dataset-table [dataSource]="datasets"></app-dataset-table>
+</mat-card>
+
+<div class="backgroundImage hideOnDesktop" style="overflow-y: auto">
   <div fxLayoutAlign="center" style="padding-top: 20px">
     <mat-spinner *ngIf="loading; else show"></mat-spinner>
   </div>
   <ng-template #show>
-    <div
-      fxLayout="row wrap"
-      fxLayoutGap="16px grid"
-      fxLayoutAlign="space-evenly center"
-      style="padding: 20px"
-    >
-      <div
-        fxFlex="25%"
-        fxFlex.xs="90%"
-        fxFlex.sm="50%"
-        *ngFor="let item of datasets"
-      >
+    <div fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="space-evenly center" style="padding: 20px">
+      <div fxFlex="25%" fxFlex.xs="90%" fxFlex.sm="50%" *ngFor="let item of datasets">
         <app-dataset-card [dataset]="item"></app-dataset-card>
       </div>
     </div>
   </ng-template>
 </div>
-<button
-  mat-mini-fab
-  color="primary"
-  class="bottom-right"
-  matTooltip="Add new dataset"
-  (click)="newDatasetDialog()"
->
+<button mat-mini-fab color="primary" class="bottom-right" matTooltip="Add new dataset" (click)="newDatasetDialog()">
   <mat-icon>add</mat-icon>
 </button>

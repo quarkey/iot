@@ -13,7 +13,7 @@ var TimeFormat = "2006-01-02 15:04:05"
 // Returns false if there is a problem parsing the time strings.
 func InDateTimeSpanString(start string, end string) bool {
 	now := time.Now()
-	t1, t2, err := ParseStrToLocalTime(start, end)
+	t1, t2, err := parseStrToLocalTime(start, end)
 	if err != nil {
 		return false
 	}
@@ -29,7 +29,8 @@ func InTimeSpan(t1 time.Time, t2 time.Time, now time.Time) bool {
 
 // ParseStrToLocalTime parses two time strings in "2006-01-02 15:04:05" format into CEST +0200.
 // Returns an error if the input strings cannot be parsed into time.Time objects.
-func ParseStrToLocalTime(t1 string, t2 string) (*time.Time, *time.Time, error) {
+func parseStrToLocalTime(t1 string, t2 string) (*time.Time, *time.Time, error) {
+	// TODO: use ParseInLocation instead of FixedZone
 	pt1, err := localTimeFixedZone(t1)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to parse time string: %v", err)
@@ -42,6 +43,7 @@ func ParseStrToLocalTime(t1 string, t2 string) (*time.Time, *time.Time, error) {
 }
 
 func localTimeFixedZone(t string) (*time.Time, error) {
+	// TODO: use ParseInLocation instead of FixedZone
 	zone := time.FixedZone("CEST", 2*60*60)
 	pt1, err := time.ParseInLocation(TimeFormat, t, zone)
 	if err != nil {
@@ -61,29 +63,3 @@ func ParseToLocalTime(t string, format string) (*time.Time, error) {
 	}
 	return &tOut, nil
 }
-
-// InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
-// This is useful, for example, when working with recurring events that occur at the same time every day.
-// func ParseInTimeSpanString(st1, st2 string) bool {
-// 	t1, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), st1))
-// 	if err != nil {
-// 		fmt.Printf("Error parsing time string: %v\n", err)
-// 	}
-// 	t2, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), st2))
-// 	if err != nil {
-// 		fmt.Printf("Error parsing time string: %v\n", err)
-// 	}
-// 	// fmt.Println("t1:", t1.Local())
-// 	// fmt.Println("t2:", t2.Local())
-// 	// fmt.Println("now:", time.Now())
-// 	return InTimeSpan(t1.Local(), t2.Local(), time.Now())
-// }
-
-// func ParseTimeString(ts string) (time.Time, error) {
-// 	t, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), ts))
-// 	if err != nil {
-// 		return time.Time{}, fmt.Errorf("unable to parse time string: %v", err)
-
-// 	}
-// 	return t, nil
-// }

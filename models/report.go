@@ -38,6 +38,7 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, http.StatusBadRequest, "unable to read request:", err)
 		return
 	}
+	// we must consider the given time is local timezone, CEST or CET
 	format := "2006-01-02 15:04"
 	df, err := helper.ParseToLocalTime(req.DateFrom, format)
 	if err != nil {
@@ -49,7 +50,8 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		helper.RespondErr(w, r, http.StatusInternalServerError, "unable to convert to local time: ", err)
 		return
 	}
-	data, err := sensor.GetRawDataByDateAndRef(s.DB, df.Format(format), dt.Format(format), req.DatasetRef)
+	// postgres uses UTC time
+	data, err := sensor.GetRawDataByDateAndRef(s.DB, df.UTC().Format(format), dt.UTC().Format(format), req.DatasetRef)
 	if err != nil {
 		helper.RespondErr(w, r, http.StatusInternalServerError, "unable to get data from db:", err)
 		return
@@ -63,12 +65,12 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 	for i, v := range data {
 		slice, err := helper.DecodeRawJSONtoSlice(v.Data)
 		if err != nil {
-			helper.RespondErrf(w, r, http.StatusInternalServerError, "unable to parse json: %v", err)
+			helper.RespondErrf(w, r, http.StatusBadRequest, "unable to parse json: %v", err)
 			return
 		}
 		datapoint, err := strconv.ParseFloat(slice[col], 64)
 		if err != nil {
-			helper.RespondErrf(w, r, http.StatusInternalServerError, "unable to parse datapoint: %v\n", err)
+			helper.RespondErrf(w, r, http.StatusBadRequest, "unable to parse datapoint: %v\n", err)
 			datapoint = 0
 		}
 		if i == 0 {
@@ -76,11 +78,11 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		}
 		if datapoint > max {
 			max = datapoint
-			highDate = v.Time.String()
+			highDate = v.Time.Local().String()
 		}
 		if datapoint < min {
 			min = datapoint
-			lowDate = v.Time.String()
+			lowDate = v.Time.Local().String()
 		}
 		datapoints++
 	}
