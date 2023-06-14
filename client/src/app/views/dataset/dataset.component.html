@@ -2,6 +2,11 @@
   <mat-tab label="DETAILS">
     <app-dataset-details [dataset]="dataset" *ngIf="dataset"></app-dataset-details>
   </mat-tab>
+  <mat-tab label="REPORT">
+    <ng-template matTabContent>
+      <app-report-details></app-report-details>
+    </ng-template>
+  </mat-tab>
   <mat-tab label="DATA (ngx-charts)">
     <app-dataset-data [dataset]="dataset" *ngIf="dataset"></app-dataset-data>
   </mat-tab>

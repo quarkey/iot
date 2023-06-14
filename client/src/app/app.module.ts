@@ -62,6 +62,7 @@ import { ControllerTableComponent } from './components/controller-table/controll
 import { SensorIconComponent } from './shared/auxiliary/components/sensor-icon/sensor-icon.component';
 import { DatasetTableComponent } from './components/dataset-table/dataset-table.component';
 import { MatChipsModule } from '@angular/material/chips';
+import { ReportDetailsComponent } from './components/report-details/report-details.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import { MatChipsModule } from '@angular/material/chips';
     ControllerTableComponent,
     SensorIconComponent,
     DatasetTableComponent,
+    ReportDetailsComponent,
   ],
   imports: [
     BrowserModule,

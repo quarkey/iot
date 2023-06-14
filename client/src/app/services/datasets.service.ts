@@ -40,4 +40,17 @@ export class DatasetsService {
       title,
     });
   }
+  public GetTemperatureReport() {
+    let yourDate = new Date();
+
+    var payload = {
+      date_from: yourDate.toISOString().split('T')[0] + ' 00:01',
+      date_to: yourDate.toISOString().split('T')[0] + ' 23:59',
+      dataset_ref: 'c18d64a8-c682-4f25-bbbb-8ac10382a3dc',
+      data_column: 'd1c0',
+      dataset_id: 1,
+      include_data: false,
+    };
+    return this.http.post<any>(`${environment.apiUrl}/api/report/temperature`, payload);
+  }
 }
