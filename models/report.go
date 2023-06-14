@@ -76,11 +76,11 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		}
 		if datapoint > max {
 			max = datapoint
-			highDate = v.Time.Format(format)
+			highDate = v.Time.String()
 		}
 		if datapoint < min {
 			min = datapoint
-			lowDate = v.Time.Format(format)
+			lowDate = v.Time.String()
 		}
 		datapoints++
 	}
