@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Dataset } from 'src/app/models/dataset';
 import { DatasetsService } from 'src/app/services/datasets.service';
 
 @Component({
@@ -8,9 +9,10 @@ import { DatasetsService } from 'src/app/services/datasets.service';
 })
 export class ReportDetailsComponent implements OnInit {
   constructor(private datasetService: DatasetsService) {}
+  @Input() dataset: Dataset;
   report: any;
   ngOnInit(): void {
-    this.datasetService.GetTemperatureReport().subscribe((res) => {
+    this.datasetService.GetTemperatureReport(this.dataset.reference, 'd1c0').subscribe((res) => {
       if (res) {
         this.report = res;
       }

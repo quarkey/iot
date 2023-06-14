@@ -4,7 +4,7 @@
   </mat-tab>
   <mat-tab label="REPORT">
     <ng-template matTabContent>
-      <app-report-details></app-report-details>
+      <app-report-details [dataset]="dataset" *ngIf="dataset"></app-report-details>
     </ng-template>
   </mat-tab>
   <mat-tab label="DATA (ngx-charts)">
