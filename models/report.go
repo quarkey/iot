@@ -25,6 +25,8 @@ type TemperatureReport struct {
 	DateTo      string  `json:"date_to"`
 	High        float64 `json:"high"`
 	Low         float64 `json:"low"`
+	HighDate    string  `json:"high_date"`
+	LowDate     string  `json:"low_date"`
 	Average     float64 `json:"average"`
 	Datapoints  int     `json:"datapoints"`
 }
@@ -44,6 +46,8 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 	var max float64
 	var min float64
 	var datapoints int
+	var highDate string
+	var lowDate string
 	for i, v := range data {
 		slice, err := helper.DecodeRawJSONtoSlice(v.Data)
 		if err != nil {
@@ -59,9 +63,11 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		}
 		if datapoint > max {
 			max = datapoint
+			highDate = v.Time.String()
 		}
 		if datapoint < min {
 			min = datapoint
+			lowDate = v.Time.String()
 		}
 		datapoints++
 	}
@@ -72,6 +78,8 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 		DateTo:      req.DateTo,
 		High:        max,
 		Low:         min,
+		HighDate:    highDate,
+		LowDate:     lowDate,
 		Average:     avg,
 		Datapoints:  datapoints,
 	}
