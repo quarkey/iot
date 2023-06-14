@@ -50,6 +50,18 @@ func localTimeFixedZone(t string) (*time.Time, error) {
 	return &pt1, nil
 }
 
+func ParseToLocalTime(t string, format string) (*time.Time, error) {
+	loc, err := time.LoadLocation("Europe/Oslo")
+	if err != nil {
+		return nil, err
+	}
+	tOut, err := time.ParseInLocation(format, t, loc)
+	if err != nil {
+		return nil, err
+	}
+	return &tOut, nil
+}
+
 // InTimeSpanIgnoreDate checks if the current time falls within the time range specified by t1 and t2, ignoring the date.
 // This is useful, for example, when working with recurring events that occur at the same time every day.
 // func ParseInTimeSpanString(st1, st2 string) bool {
@@ -67,11 +79,11 @@ func localTimeFixedZone(t string) (*time.Time, error) {
 // 	return InTimeSpan(t1.Local(), t2.Local(), time.Now())
 // }
 
-func ParseTimeString(ts string) (time.Time, error) {
-	t, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), ts))
-	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to parse time string: %v", err)
+// func ParseTimeString(ts string) (time.Time, error) {
+// 	t, err := time.Parse(TimeFormat, fmt.Sprintf("%s %s", time.Now().Format("2006-01-02"), ts))
+// 	if err != nil {
+// 		return time.Time{}, fmt.Errorf("unable to parse time string: %v", err)
 
-	}
-	return t, nil
-}
+// 	}
+// 	return t, nil
+// }

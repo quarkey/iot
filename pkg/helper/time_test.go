@@ -1,24 +1,36 @@
 package helper_test
 
 import (
+	"log"
 	"testing"
+
+	"github.com/quarkey/iot/pkg/helper"
 )
 
 var TimeFormat = "2006-01-02 15:04:05"
 
-func TestParseInTimeSpanString(t *testing.T) {
-	// now1 := "22:00:11"
-	// t1 := "15:00:00"
-	// t2 := "21:00:00"
-	// dur1 := "6hrs"
+func TestParseToLocalTime(t *testing.T) {
+	t1 := "2021-03-25 15:00:00" // +0100 CET
+	w1 := "2021-03-25 15:00:00 +0100 CET"
+
+	t2 := "2021-07-25 18:00:00" // +0200 CEST
+	w2 := "2021-07-25 18:00:00 +0200 CEST"
+
+	format := TimeFormat
+	t1Out, err := helper.ParseToLocalTime(t1, format)
+	if err != nil {
+		log.Fatalf("unable to parse time string: %v", err)
+	}
+	t2Out, err := helper.ParseToLocalTime(t2, format)
+	if err != nil {
+		log.Fatalf("unable to parse time string: %v", err)
+	}
+	if t1Out.String() != w1 {
+		t.Errorf("expected %v, got %v", w1, t1Out)
+	}
+	if t2Out.String() != w2 {
+		t.Errorf("expected %v, got %v", w2, t2Out)
+	}
+	// fmt.Println(t1Out)
+	// fmt.Println(t2Out)
 }
-
-// func TestParseInTimeSpanStringx(t *testing.T) {
-// 	t1, _ := time.Parse(TimeFormat, "2023-03-25 15:00:00")
-// 	t2, _ := time.Parse(TimeFormat, "2023-03-26 07:00:00")
-// 	now, _ := time.Parse(TimeFormat, "2023-05-26 04:00:00")
-
-// 	fmt.Printf("t1:  %v, unix: %v\n", t1, t1.Unix())
-// 	fmt.Printf("t2:  %v, unix: %v\n", t2, t2.Unix())
-// 	fmt.Printf("now: %v, unix: %v\n", now, now.Unix())
-// }
