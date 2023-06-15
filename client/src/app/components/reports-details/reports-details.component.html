@@ -2,6 +2,10 @@
   <mat-card-title><h2>Active reports</h2></mat-card-title>
   <mat-card-subtitle>Following items lala</mat-card-subtitle>
   <mat-card-content>
+    <pre>
+
+      {{ report | json }}
+    </pre>
     <app-min-max-average [report]="report" [title]="dataset.title"></app-min-max-average>
   </mat-card-content>
 </mat-card>
