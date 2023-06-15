@@ -3,11 +3,11 @@ import { Dataset } from 'src/app/models/dataset';
 import { DatasetsService } from 'src/app/services/datasets.service';
 
 @Component({
-  selector: 'app-report-details',
-  templateUrl: './report-details.component.html',
-  styleUrls: ['./report-details.component.scss'],
+  selector: 'app-reports-details',
+  templateUrl: './reports-details.component.html',
+  styleUrls: ['./reports-details.component.scss'],
 })
-export class ReportDetailsComponent implements OnInit {
+export class ReportsDetailsComponent implements OnInit {
   constructor(private datasetService: DatasetsService) {}
   @Input() dataset: Dataset;
   report: any;

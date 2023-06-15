@@ -62,7 +62,8 @@ import { ControllerTableComponent } from './components/controller-table/controll
 import { SensorIconComponent } from './shared/auxiliary/components/sensor-icon/sensor-icon.component';
 import { DatasetTableComponent } from './components/dataset-table/dataset-table.component';
 import { MatChipsModule } from '@angular/material/chips';
-import { ReportDetailsComponent } from './components/report-details/report-details.component';
+import { ReportsDetailsComponent } from './components/reports-details/reports-details.component';
+import { MinMaxAverageComponent } from './shared/auxiliary/components/min-max-average/min-max-average.component';
 
 @NgModule({
   declarations: [
@@ -98,7 +99,8 @@ import { ReportDetailsComponent } from './components/report-details/report-detai
     ControllerTableComponent,
     SensorIconComponent,
     DatasetTableComponent,
-    ReportDetailsComponent,
+    ReportsDetailsComponent,
+    MinMaxAverageComponent,
   ],
   imports: [
     BrowserModule,

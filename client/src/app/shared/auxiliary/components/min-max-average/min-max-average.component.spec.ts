@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ReportDetailsComponent } from './report-details.component';
+import { MinMaxAverageComponent } from './min-max-average.component';
 
-describe('ReportDetailsComponent', () => {
-  let component: ReportDetailsComponent;
-  let fixture: ComponentFixture<ReportDetailsComponent>;
+describe('MinMaxAverageComponent', () => {
+  let component: MinMaxAverageComponent;
+  let fixture: ComponentFixture<MinMaxAverageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ReportDetailsComponent ]
+      declarations: [ MinMaxAverageComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ReportDetailsComponent);
+    fixture = TestBed.createComponent(MinMaxAverageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

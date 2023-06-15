@@ -88,7 +88,7 @@ func (s *Server) GetTemperatureReport(w http.ResponseWriter, r *http.Request) {
 	}
 	avg := (min + max) / 2
 	out := TemperatureReport{
-		Description: "Temperature Report",
+		Description: "High, low and average",
 		DateFrom:    req.DateFrom,
 		DateTo:      req.DateTo,
 		High:        max,
