@@ -64,6 +64,7 @@ import { DatasetTableComponent } from './components/dataset-table/dataset-table.
 import { MatChipsModule } from '@angular/material/chips';
 import { ReportsDetailsComponent } from './components/reports-details/reports-details.component';
 import { MinMaxAverageComponent } from './shared/auxiliary/components/min-max-average/min-max-average.component';
+import { TemperatureBoxComponent } from './shared/auxiliary/components/temperature-box/temperature-box.component';
 
 @NgModule({
   declarations: [
@@ -101,6 +102,7 @@ import { MinMaxAverageComponent } from './shared/auxiliary/components/min-max-av
     DatasetTableComponent,
     ReportsDetailsComponent,
     MinMaxAverageComponent,
+    TemperatureBoxComponent,
   ],
   imports: [
     BrowserModule,

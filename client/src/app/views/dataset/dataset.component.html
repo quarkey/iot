@@ -1,11 +1,9 @@
 <mat-tab-group mat-align-tabs="start">
+  <mat-tab label="OVERVIEW">
+    <app-reports-details [dataset]="dataset" *ngIf="dataset"></app-reports-details>
+  </mat-tab>
   <mat-tab label="DETAILS">
     <app-dataset-details [dataset]="dataset" *ngIf="dataset"></app-dataset-details>
-  </mat-tab>
-  <mat-tab label="REPORTS">
-    <ng-template matTabContent>
-      <app-reports-details [dataset]="dataset" *ngIf="dataset"></app-reports-details>
-    </ng-template>
   </mat-tab>
   <mat-tab label="DATA (ngx-charts)">
     <app-dataset-data [dataset]="dataset" *ngIf="dataset"></app-dataset-data>
