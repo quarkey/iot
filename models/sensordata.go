@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -98,7 +99,18 @@ type SensorRawJSONData struct {
 // GetSensorDataByReferenceEndpoint fetches a dataset by a reference
 func (s *Server) GetSensorDataByReferenceEndpoint(w http.ResponseWriter, r *http.Request) {
 	ref := chi.URLParam(r, "reference")
-	data, err := sensor.GetRawDataWithLimitByRef(s.DB, 1000, ref)
+	limitReq := chi.URLParam(r, "limit")
+	limit := 1000
+	if limitReq != "" {
+		n, err := strconv.Atoi(limitReq)
+		if err != nil {
+			helper.RespondErr(w, r, 500, "unable parse limit parameter:", err)
+			return
+		}
+		limit = n
+	}
+
+	data, err := sensor.GetRawDataWithLimitByRef(s.DB, limit, ref)
 	if err != nil {
 		helper.RespondErr(w, r, 500, "unable to get dataset from db:", err)
 		return

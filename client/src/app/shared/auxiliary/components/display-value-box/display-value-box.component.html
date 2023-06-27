@@ -1,14 +1,15 @@
 <div class="wrapper mat-elevation-z8">
   <div class="flex-container">
     <div class="flex-child left">
-      <mat-icon style="font-size: 75px">thermostat</mat-icon>
+      <mat-icon style="font-size: 55px">{{ icon }}</mat-icon>
+      <br />
     </div>
     <div class="flex-child right">
       Temperature
       <br />
-      <span class="small-text">Outside temp east</span>
+      <span class="small-text">{{ label }}</span>
       <br /><br />
-      <span class="large-text">23.0c</span>
+      <span class="large-text"> {{ value | number : '1.2-2' }} {{ unit }}</span>
     </div>
   </div>
 </div>

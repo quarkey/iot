@@ -9,13 +9,14 @@ import (
 
 func (s *Server) SetupEndpoints() {
 	s.Router = chi.NewRouter()
-
+	// sensors
 	s.Router.Post("/api/sensors", s.AddNewDevice)
 	s.Router.Put("/api/sensors", s.UpdateDevice)
 	s.Router.Get("/api/sensors", s.GetSensorsListEndpoint)
 	s.Router.Get("/api/sensors/{reference}", s.GetSensorByReference)
 
-	s.Router.Get("/api/sensordata/{reference}", s.GetSensorDataByReferenceEndpoint)
+	// sensordata
+	s.Router.Get("/api/sensordata/{reference}/{limit}", s.GetSensorDataByReferenceEndpoint)
 	s.Router.Post("/api/sensordata", s.SaveSensorReading)
 	s.Router.Post("/api/syncdata", s.SyncSensorData)
 

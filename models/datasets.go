@@ -11,6 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
+	"github.com/quarkey/iot/pkg/sensor"
 )
 
 // Dataset ....
@@ -27,6 +28,7 @@ type Dataset struct {
 	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
 	SensorTitle string           `db:"sensor_title" json:"sensor_title"`
 	Telemetry   string           `db:"telemetry" json:"telemetry"`
+	Data        *json.RawMessage `json:"datapoints,omitempty"`
 }
 
 // GetDatasetsList fetches a list of all datasets
@@ -89,6 +91,13 @@ func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 		helper.RespondHTTPErr(w, r, 500)
 		return
 	}
+	// we'll include last available datapoints otherwise just return dataset
+	data, err := sensor.GetRawDataWithLimitByRef(s.DB, 1, dataset.Reference)
+	if err != nil {
+		helper.Respond(w, r, 200, dataset)
+		return
+	}
+	dataset.Data = data[0].Data
 	helper.Respond(w, r, 200, dataset)
 }
 

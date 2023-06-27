@@ -18,7 +18,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DeviceComponent } from './views/device/device.component';
 import { DatasetComponent } from './views/dataset/dataset.component';
 import { MatTabsModule } from '@angular/material/tabs';
-import { AreaChartNgxComponent } from './components/area-chart-ngx/area-chart-ngx.component';
+import { AreaChartNgxComponent } from './views/dataset/area-chart-ngx/area-chart-ngx.component';
 import { NewDeviceDialogComponent } from './components/dialogs/new-device/new-device.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
@@ -28,7 +28,7 @@ import { NewDatasetDialogComponent } from './components/dialogs/new-dataset/new-
 import { MatSelectModule } from '@angular/material/select';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { LineChartComponent } from './components/line-chart/line-chart.component';
+import { LineChartComponent } from './views/dataset/line-chart/line-chart.component';
 import { NgChartsModule } from 'ng2-charts';
 import { EventsComponent } from './views/events/events.component';
 import { MatTableModule } from '@angular/material/table';
@@ -36,7 +36,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { HttpErrorInterceptor } from './services/httperrorinterceptor.service';
 import { ErrorHandlingDialogComponent } from './components/dialogs/error-handling-dialog/error-handling-dialog.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { DatasetDetailsComponent } from './components/dataset-details/dataset-details.component';
+import { DatasetDetailsComponent } from './views/dataset/dataset-details/dataset-details.component';
 import { DatasetCardComponent } from './components/dataset-card/dataset-card.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DeviceCardComponent } from './components/device-card/device-card.component';
@@ -62,9 +62,9 @@ import { ControllerTableComponent } from './components/controller-table/controll
 import { SensorIconComponent } from './shared/auxiliary/components/sensor-icon/sensor-icon.component';
 import { DatasetTableComponent } from './components/dataset-table/dataset-table.component';
 import { MatChipsModule } from '@angular/material/chips';
-import { ReportsDetailsComponent } from './components/reports-details/reports-details.component';
+import { DatasetOverviewComponent } from './views/dataset/dataset-overview/dataset-overview.component';
 import { MinMaxAverageComponent } from './shared/auxiliary/components/min-max-average/min-max-average.component';
-import { TemperatureBoxComponent } from './shared/auxiliary/components/temperature-box/temperature-box.component';
+import { DisplayValueBoxComponent } from './shared/auxiliary/components/display-value-box/display-value-box.component';
 
 @NgModule({
   declarations: [
@@ -100,9 +100,9 @@ import { TemperatureBoxComponent } from './shared/auxiliary/components/temperatu
     ControllerTableComponent,
     SensorIconComponent,
     DatasetTableComponent,
-    ReportsDetailsComponent,
+    DatasetOverviewComponent,
     MinMaxAverageComponent,
-    TemperatureBoxComponent,
+    DisplayValueBoxComponent,
   ],
   imports: [
     BrowserModule,

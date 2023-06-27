@@ -16,8 +16,8 @@ export class DatasetsService {
   public LoadDataset(reference: string) {
     return this.http.get<Dataset>(`${environment.apiUrl}/api/datasets/${reference}`);
   }
-  public LoadDatasetByReference(reference: string) {
-    return this.http.get<Sensordata[]>(`${environment.apiUrl}/api/sensordata/${reference}`);
+  public LoadDatasetByReference(reference: string, limit: number) {
+    return this.http.get<Sensordata[]>(`${environment.apiUrl}/api/sensordata/${reference}/${limit}`);
   }
   public LoadCSVDatasetByReference(reference: string) {
     return this.http.get<any[]>(`${environment.apiUrl}/api/exportdataset/${reference}`);

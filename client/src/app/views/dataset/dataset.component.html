@@ -1,6 +1,6 @@
 <mat-tab-group mat-align-tabs="start">
   <mat-tab label="OVERVIEW">
-    <app-reports-details [dataset]="dataset" *ngIf="dataset"></app-reports-details>
+    <app-dataset-overview [dataset]="dataset" *ngIf="dataset"></app-dataset-overview>
   </mat-tab>
   <mat-tab label="DETAILS">
     <app-dataset-details [dataset]="dataset" *ngIf="dataset"></app-dataset-details>
