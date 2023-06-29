@@ -1,2 +1,2 @@
 <mat-icon [ngClass]="state == 'online' ? 'online' : 'offline'">circle</mat-icon>
-<span>{{ state == 'online' ? ' On' : ' Off' }}</span>
+<span *ngIf="!hideLabel">{{ state == 'online' ? ' On' : ' Off' }}</span>

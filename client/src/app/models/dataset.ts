@@ -1,4 +1,4 @@
-import { ChartDataset } from "chart.js";
+import { ChartDataset } from 'chart.js';
 
 export interface Dataset {
   id: number;
@@ -25,4 +25,16 @@ export interface Sensordata {
 export interface Ng2Dataset {
   labels: string[];
   lineChartdataset: ChartDataset[];
+}
+
+export interface GetTemperatureReport {
+  average: number;
+  datapoints: number;
+  date_from: string;
+  date_to: string;
+  description: string;
+  high: number;
+  high_date: string;
+  low: number;
+  low_date: string;
 }

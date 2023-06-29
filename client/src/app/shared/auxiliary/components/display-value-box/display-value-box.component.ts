@@ -14,15 +14,7 @@ export class DisplayValueBoxComponent implements OnInit {
   @Input() ref: string;
   @Input() time: string;
 
-  loading = true;
+  constructor() {}
 
-  constructor(private datasetService: DatasetsService) {}
-
-  ngOnInit(): void {
-    this.datasetService.LoadDatasetByReference(this.ref, 1).subscribe((data) => {
-      if (data) {
-        console.log(data);
-      }
-    });
-  }
+  ngOnInit(): void {}
 }
