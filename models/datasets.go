@@ -16,19 +16,19 @@ import (
 
 // Dataset ....
 type Dataset struct {
-	ID          int              `db:"id" json:"id"`
-	SensorID    int              `db:"sensor_id" json:"sensor_id"`
-	Title       string           `db:"title" json:"title"`
-	Description string           `db:"description" json:"description"`
-	Reference   string           `db:"reference" json:"reference"`
-	IntervalSec int              `db:"intervalsec" json:"intervalsec"`
-	Fields      *json.RawMessage `db:"fields" json:"fields"`
-	Types       *json.RawMessage `db:"types" json:"types"`
-	Showcharts  *json.RawMessage `db:"showcharts" json:"showcharts"`
-	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
-	SensorTitle string           `db:"sensor_title" json:"sensor_title"`
-	Telemetry   string           `db:"telemetry" json:"telemetry"`
-	Data        *json.RawMessage `json:"datapoints,omitempty"`
+	ID          int                  `db:"id" json:"id"`
+	SensorID    int                  `db:"sensor_id" json:"sensor_id"`
+	Title       string               `db:"title" json:"title"`
+	Description string               `db:"description" json:"description"`
+	Reference   string               `db:"reference" json:"reference"`
+	IntervalSec int                  `db:"intervalsec" json:"intervalsec"`
+	Fields      *json.RawMessage     `db:"fields" json:"fields"`
+	Types       *json.RawMessage     `db:"types" json:"types"`
+	Showcharts  *json.RawMessage     `db:"showcharts" json:"showcharts"`
+	CreatedAt   time.Time            `db:"created_at" json:"created_at"`
+	SensorTitle string               `db:"sensor_title" json:"sensor_title"`
+	Telemetry   string               `db:"telemetry" json:"telemetry"`
+	Data        sensor.RawSensorData `json:"datapoints,omitempty"`
 }
 
 // GetDatasetsList fetches a list of all datasets
@@ -97,7 +97,7 @@ func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 		helper.Respond(w, r, 200, dataset)
 		return
 	}
-	dataset.Data = data[0].Data
+	dataset.Data = data[0]
 	helper.Respond(w, r, 200, dataset)
 }
 

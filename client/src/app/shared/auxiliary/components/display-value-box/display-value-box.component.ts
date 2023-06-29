@@ -12,6 +12,7 @@ export class DisplayValueBoxComponent implements OnInit {
   @Input() icon?: string = 'thermostat';
   @Input() unit?: string;
   @Input() ref: string;
+  @Input() time: string;
 
   loading = true;
 

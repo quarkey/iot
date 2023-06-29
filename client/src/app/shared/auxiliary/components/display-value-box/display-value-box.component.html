@@ -3,6 +3,7 @@
     <div class="flex-child left">
       <mat-icon style="font-size: 55px">{{ icon }}</mat-icon>
       <br />
+      <span class="small-text"> {{ time | date : 'yyyy-MM-dd HH:mm:ss' }}</span>
     </div>
     <div class="flex-child right">
       Temperature
