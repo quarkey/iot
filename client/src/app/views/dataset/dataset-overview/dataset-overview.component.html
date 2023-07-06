@@ -16,15 +16,13 @@
           <mat-spinner></mat-spinner>
         </ng-container>
         <ng-template #show>
-          <div *ngFor="let x of dataset.showcharts; let i = index">
+          <div *ngFor="let x of dataset.showcharts; let i = index" class="padding-bottom-12px">
             <app-display-value-box
               [ref]="x.reference"
               [label]="dataset.fields[i]"
               [value]="dataset.datapoints.data[i]"
               [time]="dataset.datapoints.time"
-            ></app-display-value-box
-            ><br />
-            {{ x }}
+            ></app-display-value-box>
           </div>
         </ng-template>
       </div>
@@ -34,10 +32,5 @@
         </ng-container>
       </div>
     </div>
-    <br /><br />
-    <pre>
-
-      {{ dataset | json }}
-    </pre>
   </mat-card-content>
 </mat-card>

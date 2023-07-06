@@ -10,7 +10,12 @@
       <br />
       <span class="small-text">{{ label }}</span>
       <br /><br />
-      <span class="large-text"> {{ value | number : '1.2-2' }} {{ unit }}</span>
+      <div *ngIf="showError == true; else show">
+        <span class="small-text-error">{{ errorMessage }}</span>
+      </div>
+      <ng-template #show>
+        <span class="large-text"> {{ value | number : '1.2-2' }} {{ unit }}</span>
+      </ng-template>
     </div>
   </div>
 </div>

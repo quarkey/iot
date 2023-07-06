@@ -18,7 +18,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DeviceComponent } from './views/device/device.component';
 import { DatasetComponent } from './views/dataset/dataset.component';
 import { MatTabsModule } from '@angular/material/tabs';
-import { AreaChartNgxComponent } from './views/dataset/area-chart-ngx/area-chart-ngx.component';
+import { DatasetAreaChartNgxComponent } from './views/dataset/dataset-area-chart-ngx/dataset-area-chart-ngx.component';
 import { NewDeviceDialogComponent } from './components/dialogs/new-device/new-device.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
@@ -28,7 +28,7 @@ import { NewDatasetDialogComponent } from './components/dialogs/new-dataset/new-
 import { MatSelectModule } from '@angular/material/select';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { LineChartComponent } from './views/dataset/line-chart/line-chart.component';
+import { DatasetLineChartComponent } from './views/dataset/dataset-line-chart/dataset-line-chart.component';
 import { NgChartsModule } from 'ng2-charts';
 import { EventsComponent } from './views/events/events.component';
 import { MatTableModule } from '@angular/material/table';
@@ -77,10 +77,10 @@ import { DisplayValueBoxComponent } from './shared/auxiliary/components/display-
     DeviceComponent,
     DatasetComponent,
     DatasetDetailsComponent,
-    AreaChartNgxComponent,
+    DatasetAreaChartNgxComponent,
     NewDeviceDialogComponent,
     NewDatasetDialogComponent,
-    LineChartComponent,
+    DatasetLineChartComponent,
     EventsComponent,
     ErrorHandlingDialogComponent,
     DatasetCardComponent,

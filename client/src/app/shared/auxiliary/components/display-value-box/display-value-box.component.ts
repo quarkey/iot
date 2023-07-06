@@ -13,8 +13,16 @@ export class DisplayValueBoxComponent implements OnInit {
   @Input() unit?: string;
   @Input() ref: string;
   @Input() time: string;
+  errorMessage: string;
+  showError = false;
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // cheking if incoming value is a number, if not set it to 0.0
+    if (isNaN(this.value)) {
+      this.errorMessage = 'Input value is not a number';
+      this.showError = true;
+    }
+  }
 }

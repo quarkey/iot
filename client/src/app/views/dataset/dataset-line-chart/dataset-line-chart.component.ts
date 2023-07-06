@@ -6,11 +6,11 @@ import { DatasetsService } from 'src/app/services/datasets.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-line-chart',
-  templateUrl: './line-chart.component.html',
-  styleUrls: ['./line-chart.component.scss'],
+  selector: 'app-dataset-line-chart',
+  templateUrl: './dataset-line-chart.component.html',
+  styleUrls: ['./dataset-line-chart.component.scss'],
 })
-export class LineChartComponent implements OnInit {
+export class DatasetLineChartComponent implements OnInit {
   @Input() dataset: Dataset;
   @ViewChild(BaseChartDirective) private _chart;
   liveSensordata: Sensordata;
