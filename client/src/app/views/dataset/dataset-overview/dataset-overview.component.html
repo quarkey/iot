@@ -1,14 +1,16 @@
 <mat-card>
-  <mat-card-title
-    ><h2>
-      <app-status-dot
-        [hideLabel]="true"
-        [state]="dataset.telemetry === 'online' ? 'online' : 'offline'"
-      ></app-status-dot>
-      {{ dataset.title }}
-    </h2>
-  </mat-card-title>
-  <mat-card-subtitle>{{ dataset.description }}</mat-card-subtitle>
+  <mat-card-header>
+    <mat-card-title
+      ><h2>
+        <app-status-dot
+          [hideLabel]="true"
+          [state]="dataset.telemetry === 'online' ? 'online' : 'offline'"
+        ></app-status-dot>
+        {{ dataset.title }}
+      </h2>
+    </mat-card-title>
+    <mat-card-subtitle>{{ dataset.description }}</mat-card-subtitle>
+  </mat-card-header>
   <mat-card-content>
     <div class="flex-container">
       <div class="flex-child">

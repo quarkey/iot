@@ -20,7 +20,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { DatasetAreaChartNgxComponent } from './views/dataset/dataset-area-chart-ngx/dataset-area-chart-ngx.component';
 import { NewDeviceDialogComponent } from './components/dialogs/new-device/new-device.component';
 import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
-
 import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NewDatasetDialogComponent } from './components/dialogs/new-dataset/new-dataset.component';
@@ -30,7 +29,10 @@ import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@ang
 import { DatasetLineChartComponent } from './views/dataset/dataset-line-chart/dataset-line-chart.component';
 import { NgChartsModule } from 'ng2-charts';
 import { EventsComponent } from './views/events/events.component';
-import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
+
+// import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
+import { MatTableModule } from '@angular/material/table';
+
 import { MatSortModule } from '@angular/material/sort';
 import { HttpErrorInterceptor } from './services/httperrorinterceptor.service';
 import { ErrorHandlingDialogComponent } from './components/dialogs/error-handling-dialog/error-handling-dialog.component';
@@ -41,7 +43,7 @@ import { DeviceCardComponent } from './components/device-card/device-card.compon
 import { DashComponent } from './views/dash/dash.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
-import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
+import { MatMenuModule } from '@angular/material/menu';
 import { LayoutModule } from '@angular/cdk/layout';
 import { SystemComponent } from './views/system/system.component';
 import { ControllersListComponent } from './views/controllers-list/controllers-list.component';
@@ -51,7 +53,7 @@ import { ControllerComponent } from './views/controller/controller.component';
 import { NewControllerComponent } from './components/dialogs/new-controller/new-controller.component';
 import { TwoColumnDivComponent } from './shared/auxiliary/components/two-column-div/two-column-div.component';
 import { StatusDotComponent } from './shared/auxiliary/components/status-dot/status-dot.component';
-import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle';
+// import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle';
 import { MatTimepickerModule } from 'mat-timepicker';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
@@ -135,7 +137,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatGridListModule,
     MatMenuModule,
     LayoutModule,
-    MatSlideToggleModule,
+    // MatSlideToggleModule,
     MatChipsModule,
   ],
   providers: [
