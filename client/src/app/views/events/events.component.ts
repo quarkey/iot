@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { EventsList } from "src/app/models/event";
 import { EventsService } from "src/app/services/events.service";
 import { MatSort, Sort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { LiveAnnouncer } from "@angular/cdk/a11y";
 
 @Component({
