@@ -31,7 +31,9 @@ import { NewDatasetDialogComponent } from './components/dialogs/new-dataset/new-
 import { MatSelectModule } from '@angular/material/select';
 
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+// import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 import { DatasetLineChartComponent } from './views/dataset/dataset-line-chart/dataset-line-chart.component';
 import { NgChartsModule } from 'ng2-charts';
 import { EventsComponent } from './views/events/events.component';
@@ -44,7 +46,8 @@ import { HttpErrorInterceptor } from './services/httperrorinterceptor.service';
 import { ErrorHandlingDialogComponent } from './components/dialogs/error-handling-dialog/error-handling-dialog.component';
 import { DatasetDetailsComponent } from './views/dataset/dataset-details/dataset-details.component';
 import { DatasetCardComponent } from './components/dataset-card/dataset-card.component';
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+// import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+
 import { DeviceCardComponent } from './components/device-card/device-card.component';
 import { DashComponent } from './views/dash/dash.component';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -60,6 +63,7 @@ import { NewControllerComponent } from './components/dialogs/new-controller/new-
 import { TwoColumnDivComponent } from './shared/auxiliary/components/two-column-div/two-column-div.component';
 import { StatusDotComponent } from './shared/auxiliary/components/status-dot/status-dot.component';
 // import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle';
+
 import { MatTimepickerModule } from 'mat-timepicker';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
@@ -68,12 +72,13 @@ import { TipTextComponent } from './shared/auxiliary/components/tip-text/tip-tex
 import { ControllerTableComponent } from './components/controller-table/controller-table.component';
 import { SensorIconComponent } from './shared/auxiliary/components/sensor-icon/sensor-icon.component';
 import { DatasetTableComponent } from './components/dataset-table/dataset-table.component';
-import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
+
 import { DatasetOverviewComponent } from './views/dataset/dataset-overview/dataset-overview.component';
 import { MinMaxAverageComponent } from './shared/auxiliary/components/min-max-average/min-max-average.component';
 import { DisplayValueBoxComponent } from './shared/auxiliary/components/display-value-box/display-value-box.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -146,7 +151,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatMenuModule,
     LayoutModule,
     // MatSlideToggleModule,
-    MatChipsModule,
   ],
   providers: [
     NewDeviceDialogComponent,
