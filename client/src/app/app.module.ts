@@ -22,12 +22,14 @@ import { NewDeviceDialogComponent } from './components/dialogs/new-device/new-de
 // import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 
-import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
-// import { MatInputModule } from '@angular/material/input';
+// import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
+import { MatInputModule } from '@angular/material/input';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NewDatasetDialogComponent } from './components/dialogs/new-dataset/new-dataset.component';
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+// import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
+import { MatSelectModule } from '@angular/material/select';
+
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { DatasetLineChartComponent } from './views/dataset/dataset-line-chart/dataset-line-chart.component';
@@ -71,6 +73,7 @@ import { DatasetOverviewComponent } from './views/dataset/dataset-overview/datas
 import { MinMaxAverageComponent } from './shared/auxiliary/components/min-max-average/min-max-average.component';
 import { DisplayValueBoxComponent } from './shared/auxiliary/components/display-value-box/display-value-box.component';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
@@ -130,6 +133,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatInputModule,
     ReactiveFormsModule,
     FormsModule,
+    MatFormFieldModule,
     MatSelectModule,
     NgxChartsModule,
     MatProgressSpinnerModule,
