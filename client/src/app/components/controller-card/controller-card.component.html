@@ -2,7 +2,6 @@
   <mat-card-header>
     <div mat-card-avatar>
       <div [ngSwitch]="citem.category">
-        <!-- [class.online]="citem.switch === 1" -->
         <mat-icon class="bigger-icon" *ngSwitchCase="'switch'">lightbulb</mat-icon>
         <mat-icon class="bigger-icon" *ngSwitchCase="'thresholdswitch'">data_thresholding</mat-icon>
         <mat-icon class="bigger-icon" *ngSwitchCase="'timeswitch'">schedule</mat-icon>
@@ -12,9 +11,9 @@
     <mat-card-subtitle>{{ citem.description }}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <div fxLayout="row" fxLayoutAlign="start center">
-      <div fxFlex="30">Switch state:</div>
-      <div fxFlex="70">
+    <div class="wrapper">
+      <div class="left">Switch state:</div>
+      <div class="right">
         <app-status-dot [state]="citem.switch == 1 ? 'online' : 'offline'"></app-status-dot>
       </div>
     </div>

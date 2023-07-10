@@ -1,12 +1,17 @@
 <mat-card class="hideOnMobile">
-  <mat-card-title>Datasets</mat-card-title>
-  <div style="width: 600px">
-    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum asperiores et deserunt maiores exercitationem nobis.
-  </div>
-  <br />
-  <mat-divider></mat-divider>
-  <br />
-  <app-dataset-table [dataSource]="datasets"></app-dataset-table>
+  <mat-card-header>
+    <mat-card-title>Datasets</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div style="width: 600px">
+      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum asperiores et deserunt maiores exercitationem
+      nobis.
+    </div>
+    <br />
+    <mat-divider></mat-divider>
+    <br />
+    <app-dataset-table [dataSource]="datasets"></app-dataset-table>
+  </mat-card-content>
 </mat-card>
 
 <div class="backgroundImage hideOnDesktop" style="overflow-y: auto">

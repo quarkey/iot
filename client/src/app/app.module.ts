@@ -7,21 +7,20 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { ToolbarComponent } from './navigation/toolbar/toolbar.component';
 import { SidenavComponent } from './navigation/sidenav/sidenav.component';
-import { MatLegacyListModule as MatListModule } from '@angular/material/legacy-list';
+import { MatListModule } from '@angular/material/list';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { DevicesListComponent } from './views/devices-list/devices-list.component';
 import { DatasetsListComponent } from './views/dataset-list/dataset-list.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DeviceComponent } from './views/device/device.component';
 import { DatasetComponent } from './views/dataset/dataset.component';
-import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 import { DatasetAreaChartNgxComponent } from './views/dataset/dataset-area-chart-ngx/dataset-area-chart-ngx.component';
 import { NewDeviceDialogComponent } from './components/dialogs/new-device/new-device.component';
 import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
-import { MatLegacyCardModule as MatCardModule } from '@angular/material/legacy-card';
+
 import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NewDatasetDialogComponent } from './components/dialogs/new-dataset/new-dataset.component';
@@ -35,13 +34,13 @@ import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy
 import { MatSortModule } from '@angular/material/sort';
 import { HttpErrorInterceptor } from './services/httperrorinterceptor.service';
 import { ErrorHandlingDialogComponent } from './components/dialogs/error-handling-dialog/error-handling-dialog.component';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { DatasetDetailsComponent } from './views/dataset/dataset-details/dataset-details.component';
 import { DatasetCardComponent } from './components/dataset-card/dataset-card.component';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { DeviceCardComponent } from './components/device-card/device-card.component';
 import { DashComponent } from './views/dash/dash.component';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatCardModule } from '@angular/material/card';
 import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
 import { LayoutModule } from '@angular/cdk/layout';
 import { SystemComponent } from './views/system/system.component';
@@ -65,6 +64,7 @@ import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy
 import { DatasetOverviewComponent } from './views/dataset/dataset-overview/dataset-overview.component';
 import { MinMaxAverageComponent } from './shared/auxiliary/components/min-max-average/min-max-average.component';
 import { DisplayValueBoxComponent } from './shared/auxiliary/components/display-value-box/display-value-box.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -108,12 +108,13 @@ import { DisplayValueBoxComponent } from './shared/auxiliary/components/display-
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    MatTimepickerModule,
+    // MatTimepickerModule,
     MatSidenavModule,
     MatDatepickerModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
+    // MatGridListModule,
     MatListModule,
     HttpClientModule,
     MatTabsModule,
@@ -129,7 +130,7 @@ import { DisplayValueBoxComponent } from './shared/auxiliary/components/display-
     NgChartsModule,
     MatTableModule,
     MatSortModule,
-    FlexLayoutModule,
+    // FlexLayoutModule,
     MatTooltipModule,
     MatGridListModule,
     MatMenuModule,

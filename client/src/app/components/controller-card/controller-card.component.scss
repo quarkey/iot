@@ -1,3 +1,18 @@
+mat-card {
+  margin-bottom: 10px;
+}
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.left {
+  flex-basis: 30%;
+}
+
+.right {
+  flex-basis: 70%;
+}
 .online {
   vertical-align: middle;
   // border-color: #1da086;
@@ -12,5 +27,5 @@
 }
 
 .bigger-icon {
-  font-size: 45px;
+  font-size: 25px;
 }
