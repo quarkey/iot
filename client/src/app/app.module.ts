@@ -19,8 +19,12 @@ import { DatasetComponent } from './views/dataset/dataset.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DatasetAreaChartNgxComponent } from './views/dataset/dataset-area-chart-ngx/dataset-area-chart-ngx.component';
 import { NewDeviceDialogComponent } from './components/dialogs/new-device/new-device.component';
-import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
+// import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
+import { MatDialogModule } from '@angular/material/dialog';
+
 import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
+// import { MatInputModule } from '@angular/material/input';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NewDatasetDialogComponent } from './components/dialogs/new-dataset/new-dataset.component';
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';

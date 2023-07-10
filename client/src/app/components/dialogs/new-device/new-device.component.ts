@@ -1,13 +1,15 @@
-import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
-import { Router } from "@angular/router";
-import { DevicesService } from "src/app/services/devices.service";
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+// import { MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
+import { MatDialogRef } from '@angular/material/dialog';
+
+import { Router } from '@angular/router';
+import { DevicesService } from 'src/app/services/devices.service';
 
 @Component({
-  selector: "app-new-device",
-  templateUrl: "./new-device.component.html",
-  styleUrls: ["./new-device.component.scss"],
+  selector: 'app-new-device',
+  templateUrl: './new-device.component.html',
+  styleUrls: ['./new-device.component.scss'],
 })
 export class NewDeviceDialogComponent implements OnInit {
   constructor(
@@ -19,13 +21,13 @@ export class NewDeviceDialogComponent implements OnInit {
   form: FormGroup;
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      title: ["", Validators.required],
-      description: ["", Validators.required],
+      title: ['', Validators.required],
+      description: ['', Validators.required],
     });
   }
   addNewDevice() {
-    const title = this.form.get("title").value;
-    const desc = this.form.get("description").value;
+    const title = this.form.get('title').value;
+    const desc = this.form.get('description').value;
     this.deviceService.AddNewDevice(title, desc).subscribe((res) => {
       this.router.navigate([`/devices/${res.arduino_key}`]);
       this.dialogRef.close();

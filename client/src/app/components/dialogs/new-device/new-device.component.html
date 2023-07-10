@@ -1,4 +1,4 @@
-<h3>Add new device</h3>
+<h2 mat-dialog-title>Add new device</h2>
 <mat-dialog-content [formGroup]="form">
   <mat-form-field class="example-full-width" appearance="fill">
     <mat-label>Titlte</mat-label>
@@ -12,12 +12,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <div style="flex: 1 1 auto"></div>
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="addNewDevice()"
-    [disabled]="form.invalid"
-  >
+  <button mat-raised-button color="primary" (click)="addNewDevice()" [disabled]="form.invalid">
     <mat-icon>add</mat-icon>
     <span>ADD</span>
   </button>

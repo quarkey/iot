@@ -4,15 +4,14 @@
     <mat-card-subtitle>{{ dataset.sensor_title }}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <div fxLayout="row" fxFlexFill fxLayout.lt-md="column" fxLayoutGap="16px">
-      <mat-form-field fxFlex appearance="fill">
-        <input matInput formControlName="title" placeholder="Title" />
-      </mat-form-field>
-      <mat-form-field fxFlex appearance="fill">
-        <mat-label>Description</mat-label>
-        <textarea matInput formControlName="description"></textarea>
-      </mat-form-field>
-    </div>
+    <mat-form-field appearance="fill">
+      <input matInput formControlName="title" placeholder="Title" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
 
     <br />
     <h3>Datapoint collection interval in seconds</h3>
