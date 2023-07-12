@@ -200,5 +200,7 @@
       }
     }
   },
-  "defaultProject": "iot-ng"
+  "cli": {
+    "analytics": false
+  }
 }

@@ -1,15 +1,17 @@
-import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { MatDialogRef } from "@angular/material/dialog";
-import { Router } from "@angular/router";
-import { Device } from "src/app/models/device";
-import { DatasetsService } from "src/app/services/datasets.service";
-import { DevicesService } from "src/app/services/devices.service";
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+// import { MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
+import { MatDialogRef } from '@angular/material/dialog';
+
+import { Router } from '@angular/router';
+import { Device } from 'src/app/models/device';
+import { DatasetsService } from 'src/app/services/datasets.service';
+import { DevicesService } from 'src/app/services/devices.service';
 
 @Component({
-  selector: "app-new-dataset-dialog",
-  templateUrl: "./new-dataset.component.html",
-  styleUrls: ["./new-dataset.component.scss"],
+  selector: 'app-new-dataset-dialog',
+  templateUrl: './new-dataset.component.html',
+  styleUrls: ['./new-dataset.component.scss'],
 })
 export class NewDatasetDialogComponent implements OnInit {
   form: FormGroup;
@@ -31,11 +33,11 @@ export class NewDatasetDialogComponent implements OnInit {
       }
     });
     this.form = this.formBuilder.group({
-      title: ["", Validators.required],
-      description: ["", Validators.required],
-      sensor_id: ["", Validators.required],
+      title: ['', Validators.required],
+      description: ['', Validators.required],
+      sensor_id: ['', Validators.required],
     });
-    this.form.get("sensor_id").valueChanges.subscribe((sensor_id) => {
+    this.form.get('sensor_id').valueChanges.subscribe((sensor_id) => {
       this.deviceList.filter((x) => {
         if (sensor_id == x.id) {
           this.ref = x.arduino_key;

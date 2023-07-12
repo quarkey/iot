@@ -1,6 +1,7 @@
 <mat-nav-list dense>
   <mat-list-item *ngFor="let item of menuItems" [routerLink]="item.url">
     <a matLine routerLinkActive>{{ item.descr }}</a>
-    <mat-icon mat-list-icon>{{ item.icon }}</mat-icon>
+    <span style="flex: 1 1 auto"></span>
+    <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
   </mat-list-item>
 </mat-nav-list>

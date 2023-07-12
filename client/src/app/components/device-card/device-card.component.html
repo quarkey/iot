@@ -7,19 +7,16 @@
     <mat-card-subtitle
       >Last telemetry:
       <span *ngIf="device.dataset_telemetry">
-        {{
-          device.dataset_telemetry.String
-            | date: "YYYY-MM-dd HH:mm:ss" || "no values"
-        }}
+        {{ device.dataset_telemetry.String | date : 'YYYY-MM-dd HH:mm:ss' || 'no values' }}
       </span>
     </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     {{ device.description }}
   </mat-card-content>
-  <mat-card-actions align="end">
-    <button mat-raised-button color="primary" [routerLink]="device.arduino_key">
-      DETAILS
-    </button>
-  </mat-card-actions>
+  <mat-card-footer>
+    <mat-card-actions align="end">
+      <button mat-raised-button color="primary" [routerLink]="device.arduino_key">DETAILS</button>
+    </mat-card-actions>
+  </mat-card-footer>
 </mat-card>

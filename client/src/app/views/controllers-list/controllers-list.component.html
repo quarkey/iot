@@ -1,16 +1,20 @@
 <mat-card class="hideOnMobile">
-  <mat-card-title>Controllers</mat-card-title>
-  <div style="width: 600px">
-    A controller in this system is programmable and can function as a switch, time switch, or threshold switch based on
-    sensor data.
-  </div>
-  <br />
-  <mat-divider></mat-divider>
-  <br />
-  <div *ngIf="loading; else showx">loading...</div>
-  <ng-template #showx>
-    <app-controller-table></app-controller-table>
-  </ng-template>
+  <mat-card-header>
+    <mat-card-title>Controllers</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div style="width: 600px">
+      A controller in this system is programmable and can function as a switch, time switch, or threshold switch based
+      on sensor data.
+    </div>
+    <br />
+    <mat-divider></mat-divider>
+    <br />
+    <div *ngIf="loading; else showx">loading...</div>
+    <ng-template #showx>
+      <app-controller-table></app-controller-table>
+    </ng-template>
+  </mat-card-content>
 </mat-card>
 
 <div class="backgroundImage hideOnDesktop" style="overflow-y: auto">
@@ -19,8 +23,8 @@
     <mat-spinner *ngIf="loading; else show"></mat-spinner>
   </div>
   <ng-template #show>
-    <div fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="space-evenly center" style="padding: 20px">
-      <div fxFlex="50%" fxFlex.xs="90%" fxFlex.sm="90%" *ngFor="let item of citems">
+    <div style="padding: 20px">
+      <div *ngFor="let item of citems">
         <app-controller-card [citem]="item"></app-controller-card>
       </div>
     </div>

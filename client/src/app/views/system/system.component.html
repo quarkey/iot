@@ -1,18 +1,18 @@
 <div class="backgroundImage" style="overflow-y: auto">
   <mat-card class="full" style="background-color: rgba(101, 98, 98, 0)">
-    <mat-card-title>System information</mat-card-title>
+    <mat-card-content>
+      <mat-card-title>System information</mat-card-title>
+    </mat-card-content>
     <mat-card-content>
       <br />
-      <div
-        fxLayoutAlign="center"
-        style="padding-top: 20px"
-        *ngIf="loading; else show"
-      >
+      <div style="padding-top: 20px" *ngIf="loading; else show">
         <mat-spinner></mat-spinner>
       </div>
       <ng-template #show>
         <mat-card style="opacity: 0.8">
-          <pre>{{ stats | json }}</pre>
+          <mat-card-content>
+            <pre>{{ stats | json }}</pre>
+          </mat-card-content>
         </mat-card>
       </ng-template>
     </mat-card-content>

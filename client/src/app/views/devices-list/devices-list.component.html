@@ -3,29 +3,13 @@
     <mat-spinner *ngIf="loading; else show"></mat-spinner>
   </div>
   <ng-template #show>
-    <div
-      fxLayout="row wrap"
-      fxLayoutGap="16px grid"
-      fxLayoutAlign="space-evenly center"
-      style="padding: 20px"
-    >
-      <div
-        fxFlex="50%"
-        fxFlex.xs="90%"
-        fxFlex.sm="50%"
-        *ngFor="let item of devices"
-      >
+    <div class="wrapper">
+      <div *ngFor="let item of devices">
         <app-device-card [device]="item"></app-device-card>
       </div>
     </div>
   </ng-template>
 </div>
-<button
-  mat-mini-fab
-  color="primary"
-  class="bottom-right"
-  matTooltip="Add new device"
-  (click)="newDeviceDialog()"
->
+<button mat-mini-fab color="primary" class="bottom-right" matTooltip="Add new device" (click)="newDeviceDialog()">
   <mat-icon>add</mat-icon>
 </button>

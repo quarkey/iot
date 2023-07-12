@@ -1,3 +1,9 @@
+.wrapper {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+}
 .error {
   background-color: red;
   color: #000;

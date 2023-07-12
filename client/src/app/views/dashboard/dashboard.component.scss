@@ -1,3 +1,13 @@
+.wrapper {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+}
+mat-card {
+  width: 350px;
+  margin-bottom: 10px;
+}
 .title-header {
   font-size: 35px;
   font-weight: 200;

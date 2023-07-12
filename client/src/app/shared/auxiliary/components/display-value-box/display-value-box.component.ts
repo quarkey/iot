@@ -10,8 +10,8 @@ export class DisplayValueBoxComponent implements OnInit {
   @Input() value?: number = 0.0;
   @Input() label?: string = 'Label missing';
   @Input() icon?: string = 'thermostat';
+  @Input() title?: string = 'Datapoint value';
   @Input() unit?: string;
-  @Input() ref: string;
   @Input() time: string;
   errorMessage: string;
   showError = false;
