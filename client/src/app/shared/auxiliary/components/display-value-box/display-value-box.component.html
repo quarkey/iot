@@ -1,14 +1,16 @@
 <div class="wrapper mat-elevation-z8">
   <div class="flex-container">
     <div class="flex-child left">
-      <mat-icon style="font-size: 55px">{{ icon }}</mat-icon>
+      <!-- <mat-icon style="font-size: 55px">{{ icon }}</mat-icon> -->
+      <span style="font-size: 54px" class="material-symbols-outlined"> database </span>
+      <!-- Datapoints<br /> -->
       <br />
       <span class="small-text"> {{ time | date : 'yyyy-MM-dd HH:mm:ss' }}</span>
     </div>
     <div class="flex-child right">
-      Temperature
+      {{ label }}
       <br />
-      <span class="small-text">{{ label }}</span>
+      <span class="small-text">{{ title }}</span>
       <br /><br />
       <div *ngIf="showError == true; else show">
         <span class="small-text-error">{{ errorMessage }}</span>
