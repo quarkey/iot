@@ -32,6 +32,7 @@ export class DatasetDetailsComponent implements OnInit {
       types: this.formBuilder.array([]),
       fields: this.formBuilder.array([]),
       showcharts: this.formBuilder.array([]),
+      icon: [this.dataset.icon],
     });
     this.populateFormArray();
   }

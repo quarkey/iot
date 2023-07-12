@@ -16,7 +16,7 @@ import { Dataset } from 'src/app/models/dataset';
 })
 export class DatasetTableComponent implements OnInit {
   @Input() dataSource: Dataset[];
-  columnsToDisplay = ['title', 'sensor_title', 'description', 'telemetry'];
+  columnsToDisplay = ['type', 'title', 'sensor_title', 'description', 'telemetry'];
   columnsToDisplayWithExpand = [...this.columnsToDisplay, 'expand'];
   expandedElement: Dataset | null;
   constructor() {}

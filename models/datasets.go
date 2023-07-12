@@ -25,6 +25,7 @@ type Dataset struct {
 	Fields      *json.RawMessage     `db:"fields" json:"fields"`
 	Types       *json.RawMessage     `db:"types" json:"types"`
 	Showcharts  *json.RawMessage     `db:"showcharts" json:"showcharts"`
+	Icon        string               `db:"icon" json:"icon"`
 	CreatedAt   time.Time            `db:"created_at" json:"created_at"`
 	SensorTitle string               `db:"sensor_title" json:"sensor_title"`
 	Telemetry   string               `db:"telemetry" json:"telemetry"`
@@ -45,6 +46,7 @@ func (s *Server) GetDatasetsListEndpoint(w http.ResponseWriter, r *http.Request)
 			a.fields,
 			a.types,
 			a.showcharts,
+			a.icon,
 			a.created_at,
 			b.title as sensor_title,
 			a.telemetry
@@ -72,6 +74,7 @@ func GetDatasetsList(db *sqlx.DB) []Dataset {
 			a.fields,
 			a.types,
 			a.showcharts,
+			a.icon,
 			a.created_at,
 			b.title as sensor_title,
 			a.telemetry
@@ -114,6 +117,7 @@ func (s Server) getDsetByRef(ref string) (Dataset, error) {
 		a.fields,
 		a.types,
 		a.showcharts,
+		a.icon,
 		a.created_at,
 		b.title as sensor_title,
 		a.telemetry
@@ -177,10 +181,11 @@ func (s *Server) UpdateDataset(w http.ResponseWriter, r *http.Request) {
 		fields=$3,
 		types=$4,
 		intervalsec=$5,
-		showcharts=$6
-	where reference=$7
-	and id=$8
-	`, dat.Title, dat.Description, dat.Fields, dat.Types, dat.IntervalSec, dat.Showcharts, dat.Reference, dat.ID)
+		showcharts=$6,
+		icon=$7
+	where reference=$8
+	and id=$9
+	`, dat.Title, dat.Description, dat.Fields, dat.Types, dat.IntervalSec, dat.Showcharts, dat.Icon, dat.Reference, dat.ID)
 	if err != nil {
 		log.Printf("unable to run query: %v", err)
 		helper.RespondErr(w, r, 500, err)

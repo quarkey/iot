@@ -11,6 +11,7 @@ export interface Dataset {
   created_at: string;
   types: string[];
   showcharts: boolean[];
+  icon: string;
   sensor_title: string;
   telemetry?: string;
 }
