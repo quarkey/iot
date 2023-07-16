@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { environment } from 'src/environments/environment';
-import { Controller, thresholdswitch, timeswitch } from '../models/controllers';
+import { Controller, thresholdswitch, timeswitch, webcamstreamtimelapse } from '../models/controllers';
 
 @Injectable({
   providedIn: 'root',
@@ -86,6 +86,15 @@ export class ControllersService {
       datasource: [item.datasource || null, Validators.required],
       threshold_limit: [item.threshold_limit || null, Validators.required],
       on: [item.on || null],
+    });
+  }
+  addWebcamStreamTimelapse(item: webcamstreamtimelapse) {
+    return this.formBuilder.group({
+      hostname: [item.hostname || null, Validators.required],
+      interval: [item.interval || null, Validators.required],
+      project_name: [item.project_name || null, Validators.required],
+      output_name: [item.output_name || null, Validators.required],
+      next_capture_time: [item.next_capture_time || null, Validators.required],
     });
   }
 }

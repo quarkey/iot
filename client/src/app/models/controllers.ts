@@ -25,6 +25,13 @@ export interface timeswitch {
   duration: string;
   repeat: number;
 }
+export interface webcamstreamtimelapse {
+  hostname: string;
+  interval: number;
+  project_name: string;
+  output_name: string;
+  next_capture_time: number;
+}
 
 export interface normalswitch {
   on: boolean;

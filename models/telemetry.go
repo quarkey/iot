@@ -218,6 +218,9 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			c.CheckTimeSwitchEntries(t.db)
 		case "switch":
 			// do we need to track switches other than sensor telemetry?
+		case "webcamstreamtimelapse":
+			// do timelapse capture
+			c.CheckWebCamStreamEntries(t.db)
 		default:
 			log.Println("[ERROR] unsupported controller category:", c.Category)
 		}

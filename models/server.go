@@ -22,7 +22,9 @@ import (
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
 	"github.com/quarkey/iot/pkg/hub"
+	"github.com/quarkey/iot/pkg/human"
 	"github.com/quarkey/iot/pkg/webhooks"
+	"golang.org/x/sys/unix"
 
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
@@ -48,11 +50,14 @@ type Server struct {
 	httpServer *http.Server
 	//Hub to keep track of socket connection
 	// for live monitoring of datasets.
-	Hub       *hub.Hub
-	Telemetry *Telemetry
-	Debug     bool
-	simulator *Sim
-	startTime time.Time
+	Hub              *hub.Hub
+	Telemetry        *Telemetry
+	StoragePath      string
+	storageAvailable bool
+	storageSize      string
+	Debug            bool
+	simulator        *Sim
+	startTime        time.Time
 }
 
 var GLOBALCONFIG map[string]interface{}
@@ -121,6 +126,30 @@ func New(path string, automigrate bool, debug bool) *Server {
 			log.Printf("[INFO] Database auto migrated from db version '%v' to '%v'", versionBefore, versionAfter)
 		}
 	}
+	// checking for storage location
+	dir := srv.Config["storagePath"].(string)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		log.Printf("[ERROR] storage location not found: %v", err)
+		srv.storageAvailable = false
+	} else {
+		var stat unix.Statfs_t
+		wd, err := os.Getwd()
+		if err != nil {
+			log.Printf("[ERROR] storage location unavailable: %v", dir)
+		}
+		err = unix.Statfs(wd, &stat)
+		if err != nil {
+			log.Printf("[ERROR] storage location available: %v", dir)
+		}
+		size := stat.Bavail * uint64(stat.Bsize)
+		hsize := human.BytesToHuman(int64(size))
+
+		log.Printf("[INFO] torage location '%s' (%s) available", dir, hsize)
+		srv.storageAvailable = true
+		srv.storageSize = hsize
+	}
+
+	srv.StoragePath = dir
 	srv.DB = db
 	log.Printf("[INFO] Connected to: %s (%s)", connectionstr, db.DriverName())
 	return srv
@@ -235,6 +264,7 @@ func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 		"system_mem":         helper.BytesToHuman(int64(m.Sys)),
 		"garbage_collection": m.NumGC,
 		"pg_table_stats":     s.pgTableStats(),
+		"storage:":           fmt.Sprintf("%s, %s", s.StoragePath, s.storageSize),
 	}
 	helper.Respond(w, r, 200, out)
 }

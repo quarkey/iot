@@ -12,6 +12,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
+	"github.com/quarkey/iot/pkg/webcam"
 	"github.com/quarkey/iot/pkg/webhooks"
 )
 
@@ -68,6 +69,15 @@ var TimesSwitchRepeatDefaultValues = `
 	"on": false
 }]
 `
+var WebcamStreamTimelapseDefaultValues = `
+[{
+	"hostname": "",
+	"interval": "",
+	"project_name": "",
+	"output_name": "",
+	"next_capture_time": ""
+}]
+`
 var SWITCH_ON = 1
 var SWITCH_OFF = 0
 
@@ -86,6 +96,13 @@ type Timeswitch struct {
 	Duration string `json:"duration"`
 	Repeat   bool   `json:"repeat"`
 	On       bool   `json:"on"`
+}
+type WebcamStreamTimelapse struct {
+	Hostname        string `json:"hostname"`
+	Interval        string `json:"interval"`
+	ProjectName     string `json:"project_name"`
+	OutputName      string `json:"output_name"`
+	NextCaptimeTime string `json:"next_capture_time"`
 }
 
 // GetControllersList returns a list of all available controllers, including those that are not currently active.
@@ -184,6 +201,8 @@ func (s *Server) AddNewControllerEndpoint(w http.ResponseWriter, r *http.Request
 		itemJSON = TimesSwitchDefaultValues
 	case "timeswitchrepeat":
 		itemJSON = TimesSwitchRepeatDefaultValues
+	case "webcamstreamtimelapse":
+		itemJSON = WebcamStreamTimelapseDefaultValues
 	default:
 		// handle unknown category
 		helper.RespondErr(w, r, http.StatusBadRequest, "unknown controller type")
@@ -283,6 +302,8 @@ func (s *Server) ResetControllerSwitchValueEndpoint(w http.ResponseWriter, r *ht
 		defaultValues = ThresholdswitchDefaultValues
 	case "timeswitch":
 		defaultValues = TimesSwitchDefaultValues
+	case "webcamstreamtimelapse":
+		defaultValues = WebcamStreamTimelapseDefaultValues
 	}
 	_, err = s.DB.Exec(`update controllers set
 		items=$1,
@@ -480,6 +501,22 @@ func (c *Controller) CheckTimeSwitchEntries(db *sqlx.DB) {
 	// 	fmt.Println("JSON RAW:", string(bArr))
 	// 	c.Items = &bArr
 	// }
+}
+
+func (c *Controller) CheckWebCamStreamEntries(db *sqlx.DB) {
+	if !c.Active {
+		return
+	}
+	var webcamtl []WebcamStreamTimelapse
+	err := json.Unmarshal(*c.Items, &webcamtl)
+	if err != nil {
+		log.Printf("[ERROR] unable to unmarshal %s json: %v", c.Category, err)
+	}
+	for _, tlc := range webcamtl {
+		// new timesapse
+		tlx := webcam.NewTimelase("./testdata/storage1", tlc.ProjectName, tlc.OutputName)
+		fmt.Println("timelapse:", tlx.ProjectName)
+	}
 }
 
 type switchState struct {

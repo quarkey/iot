@@ -1,7 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Controller, normalswitch, thresholdswitch, timeswitch } from 'src/app/models/controllers';
+import {
+  Controller,
+  normalswitch,
+  thresholdswitch,
+  timeswitch,
+  webcamstreamtimelapse,
+} from 'src/app/models/controllers';
 import { Sensordata } from 'src/app/models/dataset';
 import { ControllersService } from 'src/app/services/controllers.service';
 import { DialogsService } from 'src/app/services/dialogs.service';
@@ -16,7 +22,7 @@ export class ControllerDetailsComponent implements OnInit {
   @Input() citem: Controller;
   form: FormGroup;
   showReloadbutton = false;
-  categories: string[] = ['switch', 'thresholdswitch', 'timeswitch', 'timeswitchrepeat'];
+  categories: string[] = ['switch', 'thresholdswitch', 'timeswitch', 'timeswitchrepeat', 'webcamstreamtimelapse'];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -48,6 +54,9 @@ export class ControllerDetailsComponent implements OnInit {
           break;
         case 'switch':
           this.items.push(this.controllerService.addSwitchForm(item as normalswitch));
+          break;
+        case 'webcamstreamtimelapse':
+          this.items.push(this.controllerService.addWebcamStreamTimelapse(item as webcamstreamtimelapse));
           break;
       }
     });
