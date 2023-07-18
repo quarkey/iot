@@ -22,7 +22,6 @@ import (
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
 	"github.com/quarkey/iot/pkg/hub"
-	"github.com/quarkey/iot/pkg/human"
 	"github.com/quarkey/iot/pkg/webhooks"
 	"golang.org/x/sys/unix"
 
@@ -142,7 +141,7 @@ func New(path string, automigrate bool, debug bool) *Server {
 			log.Printf("[ERROR] storage location available: %v", dir)
 		}
 		size := stat.Bavail * uint64(stat.Bsize)
-		hsize := human.BytesToHuman(int64(size))
+		hsize := helper.BytesToHuman(int64(size))
 
 		log.Printf("[INFO] torage location '%s' (%s) available", dir, hsize)
 		srv.storageAvailable = true

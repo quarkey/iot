@@ -91,10 +91,10 @@ export class ControllersService {
   addWebcamStreamTimelapse(item: webcamstreamtimelapse) {
     return this.formBuilder.group({
       hostname: [item.hostname || null, Validators.required],
-      interval: [item.interval || null, Validators.required],
+      interval: [+item.interval || null, Validators.required],
       project_name: [item.project_name || null, Validators.required],
       output_name: [item.output_name || null, Validators.required],
-      next_capture_time: [item.next_capture_time || null, Validators.required],
+      next_capture_time: [item.next_capture_time || null],
     });
   }
 }

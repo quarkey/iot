@@ -18,16 +18,17 @@ import (
 
 // Controller data structure
 type Controller struct {
-	ID          int              `db:"id" json:"id"`
-	SensorID    int              `db:"sensor_id" json:"sensor_id"`
-	Category    string           `db:"category" json:"category"`
-	Title       string           `db:"title" json:"title"`
-	Description string           `db:"description" json:"description"`
-	Switch      int              `db:"switch" json:"switch"`
-	Items       *json.RawMessage `db:"items" json:"items"`
-	Alert       bool             `db:"alert" json:"alert"`
-	Active      bool             `db:"active" json:"active"`
-	CreatedAt   time.Time        `db:"created_at" json:"created_at"`
+	ID                int              `db:"id" json:"id"`
+	SensorID          int              `db:"sensor_id" json:"sensor_id"`
+	Category          string           `db:"category" json:"category"`
+	Title             string           `db:"title" json:"title"`
+	Description       string           `db:"description" json:"description"`
+	Switch            int              `db:"switch" json:"switch"`
+	Items             *json.RawMessage `db:"items" json:"items"`
+	Alert             bool             `db:"alert" json:"alert"`
+	Active            bool             `db:"active" json:"active"`
+	CreatedAt         time.Time        `db:"created_at" json:"created_at"`
+	next_capture_time time.Time
 }
 type ControllerList []*Controller
 
@@ -72,7 +73,7 @@ var TimesSwitchRepeatDefaultValues = `
 var WebcamStreamTimelapseDefaultValues = `
 [{
 	"hostname": "",
-	"interval": "",
+	"interval": 300,
 	"project_name": "",
 	"output_name": "",
 	"next_capture_time": ""
@@ -98,11 +99,11 @@ type Timeswitch struct {
 	On       bool   `json:"on"`
 }
 type WebcamStreamTimelapse struct {
-	Hostname        string `json:"hostname"`
-	Interval        string `json:"interval"`
-	ProjectName     string `json:"project_name"`
-	OutputName      string `json:"output_name"`
-	NextCaptimeTime string `json:"next_capture_time"`
+	Hostname        string    `json:"hostname"`
+	Interval        int       `json:"interval"`
+	ProjectName     string    `json:"project_name"`
+	OutputName      string    `json:"output_name"`
+	NextCaptimeTime time.Time `json:"next_capture_time"`
 }
 
 // GetControllersList returns a list of all available controllers, including those that are not currently active.
@@ -512,11 +513,43 @@ func (c *Controller) CheckWebCamStreamEntries(db *sqlx.DB) {
 	if err != nil {
 		log.Printf("[ERROR] unable to unmarshal %s json: %v", c.Category, err)
 	}
-	for _, tlc := range webcamtl {
-		// new timesapse
-		tlx := webcam.NewTimelase("./testdata/storage1", tlc.ProjectName, tlc.OutputName)
-		fmt.Println("timelapse:", tlx.ProjectName)
-	}
+	// not sure if this is correct way to do this...
+	// the motive behind this is to prevent webcam timeouts that may cause the function to lock up
+	go func() {
+
+		for _, tlc := range webcamtl {
+
+			// TODO: c.next_capture_time should be a maps of ids and next capture time
+			if c.next_capture_time.IsZero() {
+				fmt.Println("no next capture time set, to now + 20 seconds")
+				c.next_capture_time = time.Now().Add(time.Second * time.Duration(tlc.Interval))
+
+				tlx, err := webcam.NewTimelase("./testdata/storage1", tlc.Hostname, tlc.ProjectName, tlc.OutputName)
+				if err != nil {
+					log.Printf("[ERROR] problems with NewTimelapse: %v", err)
+				}
+				err = tlx.CaptureTimelapseImage()
+				if err != nil {
+					log.Printf("[ERROR] Problems with capturing timelapse image: %v", err)
+				}
+				log.Printf("[INFO] timelapse image captured for %s (%s)", tlx.ProjectName, tlx.Hostname)
+			}
+
+			if time.Now().After(c.next_capture_time) {
+				c.next_capture_time = time.Now().Add(time.Second * time.Duration(tlc.Interval))
+
+				tlx, err := webcam.NewTimelase("./testdata/storage1", tlc.Hostname, tlc.ProjectName, tlc.OutputName)
+				if err != nil {
+					log.Printf("[ERROR] Problems with NewTimelapse: %v", err)
+				}
+				err = tlx.CaptureTimelapseImage()
+				if err != nil {
+					log.Printf("[ERROR] Problems with capturing timelapse image: %v", err)
+				}
+				log.Printf("[INFO] timelapse image captured for %s (%s)", tlx.ProjectName, tlx.Hostname)
+			}
+		}
+	}()
 }
 
 type switchState struct {
