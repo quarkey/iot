@@ -25,6 +25,7 @@ Thumbs.db
 **/resources/prod/ng/dist
 **/resources/local/ng/dist
 **/qa_pg-data
+**/testdata
 
 // iot bins
 api

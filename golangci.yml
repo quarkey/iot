@@ -1,0 +1,11 @@
+run:
+  timeout: 1m30s
+  issues-exit-code: 1
+  tests: true
+  skip-dirs:
+    - testdata
+
+linters:
+  disable-all: true
+  enable:
+    - gosimple
