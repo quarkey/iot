@@ -522,7 +522,7 @@ func (c *Controller) CheckWebCamStreamEntries(db *sqlx.DB) {
 
 			// TODO: c.next_capture_time should be a maps of ids and next capture time
 			if c.next_capture_time.IsZero() {
-				log.Printf("no next capture time set, to now + 20 seconds go for %s (%s)", tlc.ProjectName, tlc.Hostname)
+				log.Printf("[WARNING] No next capture time available, seting time now + 20 for %s (%s)", tlc.ProjectName, tlc.Hostname)
 				c.next_capture_time = time.Now().Add(time.Second * time.Duration(tlc.Interval))
 
 				tlx, err := webcam.NewTimelase("./testdata/storage1", tlc.Hostname, tlc.ProjectName)
@@ -535,7 +535,7 @@ func (c *Controller) CheckWebCamStreamEntries(db *sqlx.DB) {
 					log.Printf("[ERROR] Problems with capturing timelapse image: %v", err)
 					return
 				}
-				log.Printf("[INFO] timelapse image captured for %s (%s)", tlx.ProjectName, tlx.Hostname)
+				log.Printf("[INFO] Timelapse image captured for %s (%s)", tlx.ProjectName, tlx.Hostname)
 			}
 
 			if time.Now().After(c.next_capture_time) {
@@ -551,7 +551,7 @@ func (c *Controller) CheckWebCamStreamEntries(db *sqlx.DB) {
 					log.Printf("[ERROR] Problems with capturing timelapse image: %v", err)
 					return
 				}
-				log.Printf("[INFO] timelapse image captured for %s (%s)", tlx.ProjectName, tlx.Hostname)
+				log.Printf("[INFO] Timelapse image captured for %s (%s)", tlx.ProjectName, tlx.Hostname)
 			}
 		}
 	}()
