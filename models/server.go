@@ -49,14 +49,13 @@ type Server struct {
 	httpServer *http.Server
 	//Hub to keep track of socket connection
 	// for live monitoring of datasets.
-	Hub              *hub.Hub
-	Telemetry        *Telemetry
-	StoragePath      string
-	storageAvailable bool
-	storageSize      string
-	Debug            bool
-	simulator        *Sim
-	startTime        time.Time
+	Hub         *hub.Hub
+	Telemetry   *Telemetry
+	StoragePath string
+	storageSize string
+	Debug       bool
+	simulator   *Sim
+	startTime   time.Time
 }
 
 var GLOBALCONFIG map[string]interface{}
@@ -125,26 +124,24 @@ func New(path string, automigrate bool, debug bool) *Server {
 			log.Printf("[INFO] Database auto migrated from db version '%v' to '%v'", versionBefore, versionAfter)
 		}
 	}
-	// checking for storage location
+	// checking for storage location, if not found we exit.
 	dir := srv.Config["storagePath"].(string)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		log.Printf("[ERROR] storage location not found: %v", err)
-		srv.storageAvailable = false
+		log.Printf("[ERROR] Storage location not found: %v", err)
 	} else {
 		var stat unix.Statfs_t
 		wd, err := os.Getwd()
 		if err != nil {
-			log.Printf("[ERROR] storage location unavailable: %v", dir)
+			log.Printf("[ERROR] Storage location unavailable: %v", dir)
 		}
 		err = unix.Statfs(wd, &stat)
 		if err != nil {
-			log.Printf("[ERROR] storage location available: %v", dir)
+			log.Printf("[ERROR] Storage location available: %v", dir)
 		}
 		size := stat.Bavail * uint64(stat.Bsize)
 		hsize := helper.BytesToHuman(int64(size))
 
-		log.Printf("[INFO] torage location '%s' (%s) available", dir, hsize)
-		srv.storageAvailable = true
+		log.Printf("[INFO] Storage location '%s' (%s) available", dir, hsize)
 		srv.storageSize = hsize
 	}
 

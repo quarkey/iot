@@ -525,7 +525,7 @@ func (c *Controller) CheckWebCamStreamEntries(db *sqlx.DB) {
 				log.Printf("no next capture time set, to now + 20 seconds go for %s (%s)", tlc.ProjectName, tlc.Hostname)
 				c.next_capture_time = time.Now().Add(time.Second * time.Duration(tlc.Interval))
 
-				tlx, err := webcam.NewTimelase("./testdata/storage1", tlc.Hostname, tlc.ProjectName, tlc.OutputName)
+				tlx, err := webcam.NewTimelase("./testdata/storage1", tlc.Hostname, tlc.ProjectName)
 				if err != nil {
 					log.Printf("[ERROR] problems with NewTimelapse: %v", err)
 					return
@@ -541,7 +541,7 @@ func (c *Controller) CheckWebCamStreamEntries(db *sqlx.DB) {
 			if time.Now().After(c.next_capture_time) {
 				c.next_capture_time = time.Now().Add(time.Second * time.Duration(tlc.Interval))
 
-				tlx, err := webcam.NewTimelase("./testdata/storage1", tlc.Hostname, tlc.ProjectName, tlc.OutputName)
+				tlx, err := webcam.NewTimelase("./testdata/storage1", tlc.Hostname, tlc.ProjectName)
 				if err != nil {
 					log.Printf("[ERROR] Problems with NewTimelapse: %v", err)
 					return

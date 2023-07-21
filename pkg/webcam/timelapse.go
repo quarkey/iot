@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// StreamTimelapse is a struct that holds the configuration for a timelapse project.
 type StreamTimelapse struct {
 	StorageDir  string
 	Hostname    string
@@ -20,32 +21,86 @@ type StreamTimelapse struct {
 	ProjectName string
 	JsonConfig  string
 	projectfh   *os.File
+	retryCount  int
 }
 
-func NewTimelase(storageDir string, hostname string, projectName string, outputName string) (StreamTimelapse, error) {
+// NewTimelapse either opens or creates a new timelapse project.
+func NewTimelase(storageDir string, hostname string, projectName string) (StreamTimelapse, error) {
 	projectPath := path.Join(storageDir, projectName)
 	cfgPath := path.Join(projectPath, fmt.Sprintf("%s.json", projectName))
+
 	stl := StreamTimelapse{
 		StorageDir:  storageDir,
 		Hostname:    hostname,
 		ProjectPath: projectPath,
 		ProjectName: projectName,
 		JsonConfig:  cfgPath,
+		retryCount:  5,
 	}
 	if stl.projectExist() {
-		// fmt.Println("opening project", stl.ProjectPath)
 		err := stl.openProject()
 		if err != nil {
 			return StreamTimelapse{}, err
 		}
 	} else {
-		// fmt.Println("unable to find project creating", stl.ProjectPath)
 		stl.createAndOpenProject()
 	}
 	return stl, nil
 }
 
-// openProject opens the project file handler
+// CaptureTimelapseImage captures a single image from stream and saves it to the project folder.
+// The image is saved as a jpeg file with the name: <unix-timestamp>-image.jpg to prevent overwriting.
+
+func (s *StreamTimelapse) CaptureTimelapseImage() error {
+	// we are not using fh at this moment in time, so closing right away
+	s.closeProjectfh() // close file handler
+	var currentError []error
+	var allErrors []error
+	retry := 0
+	// read stream, retrying n times if needed
+	for i := 0; i < s.retryCount; i++ {
+
+		// TODO: we can skip extracting image if readStreamResp fails
+		output, err := s.readStreamResp()
+		if err != nil {
+			currentError = append(currentError, err)
+		}
+
+		// TODO: we can skip saving picture of extractImage fails
+		imgdata, err := extractImage(output.Bytes())
+		if err != nil {
+			currentError = append(currentError, err)
+		}
+
+		err = saveImg(imgdata, s.ProjectPath)
+		if err != nil {
+			currentError = append(currentError, err)
+		}
+
+		// no errors, breaking out
+		if len(currentError) == 0 {
+			if retry > 0 {
+				log.Printf("success!")
+			}
+			return nil
+		}
+		// we have errors, appending to allErrors and retrying
+		allErrors = append(allErrors, currentError...)
+		log.Printf("retrying %d due to '%v'...", retry+1, currentError)
+		currentError = nil
+		time.Sleep(1 * time.Second)
+		retry++
+	}
+
+	// if we encounter this we expect all retries to have failed
+	if len(allErrors) > 0 && s.retryCount == retry {
+		return fmt.Errorf("unable to capture timelapse image: %v", allErrors)
+	}
+
+	return nil
+}
+
+// openProject opens the project file handler.
 func (s *StreamTimelapse) openProject() error {
 	fh, err := os.Open(s.JsonConfig)
 	if err != nil {
@@ -55,7 +110,7 @@ func (s *StreamTimelapse) openProject() error {
 	return nil
 }
 
-// close closes the project file handler
+// closeProjectfh closes the project file handler.
 func (s *StreamTimelapse) closeProjectfh() {
 	s.projectfh.Close()
 }
@@ -86,47 +141,7 @@ func (s *StreamTimelapse) createAndOpenProject() error {
 	return nil
 }
 
-// CaptureTimelapseImage captures a single image from the stream and saves it to the project folder.
-// The image is saved as a jpeg file with the name: <unix-timestamp>-image.jpg
-func (s *StreamTimelapse) CaptureTimelapseImage() error {
-	resp, err := http.Get(s.Hostname)
-	if err != nil {
-		return fmt.Errorf("unable to open stream: %v", err)
-	}
-	var output bytes.Buffer
-	firstRead := true
-	clen := 0
-	for {
-		buffer := make([]byte, 1024)
-		n, _ := resp.Body.Read(buffer)
-		// fmt.Printf("reading %d bytes...\n", n)
-		if firstRead {
-			clen = contentLenght(buffer)
-			// fmt.Println("content-lenght:", clen)
-			firstRead = false
-		}
-		output.Write(buffer[:n])
-		// reading until content-lenght and some extra just for good measure
-		if output.Len() > clen {
-			break
-		}
-	}
-	resp.Body.Close()
-	imgdata, err := extractImage(output.Bytes())
-	if err != nil {
-		return fmt.Errorf("unable to extract image: %v", err)
-	}
-	// fmt.Println("read total of", output.Len(), "bytes..")
-	// fmt.Println("image lenght:", len(imgdata))
-	s.closeProjectfh() // close file handler
-	err = saveImg(imgdata, s.ProjectPath)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// projectExist checks if the project folder exists
+// projectExist checks if the project folder exists.
 func (s *StreamTimelapse) projectExist() bool {
 	if _, err := os.Stat(s.ProjectPath); os.IsNotExist(err) {
 		return false
@@ -134,18 +149,55 @@ func (s *StreamTimelapse) projectExist() bool {
 	return true
 }
 
-var ErrNoImage = fmt.Errorf("image/jpeg end not detected")
+// readStreamResp reads the stream response and returns a buffer.
+func (s *StreamTimelapse) readStreamResp() (bytes.Buffer, error) {
+	var output bytes.Buffer
+	firstRead := true
+	clen := 0
+	client := http.Client{
+		Timeout: 3 * time.Second,
+	}
+	resp, err := client.Get(s.Hostname)
+	if err != nil {
+		return output, fmt.Errorf("unable to open stream: %v", err)
+	}
+	defer resp.Body.Close()
+	for {
+		buffer := make([]byte, 1024)
+		n, _ := resp.Body.Read(buffer)
+		if firstRead {
+			clen = contentLenght(buffer)
+			firstRead = false
+		}
+		output.Write(buffer[:n])
+		// reading until content-lenght is reached
+		if output.Len() > clen {
+			break
+		}
+	}
+	return output, nil
+}
 
-// extractImage extracts the image from the stream
+var (
+	ErrNoStartOfImage = fmt.Errorf("image/jpeg start mark not detected")
+	ErrNoEndOfImage   = fmt.Errorf("image/jpeg end mark not detected")
+)
+
+// extractImage scans the data to find the beginning and end markers of an image in the JPEG format.
+// It looks for markers 0xFF 0xD8 (start marker) and 0xFF 0xD9 (end marker) to determine the image's boundaries.
 func extractImage(data []byte) ([]byte, error) {
-	n := len(data)
-	start := 0
-	end := 0
-	found_end := false
+	var (
+		n           = len(data)
+		start       = 0
+		end         = 0
+		found_end   = false
+		found_start = false
+	)
 	for i := 0; i < n-1; i++ {
 		if data[i] == 0xFF && data[i+1] == 0xD8 {
 			// fmt.Printf("Image/jpeg start detected at pos %d\n", i)
 			start = i
+			found_start = true
 		}
 		if data[i] == 0xFF && data[i+1] == 0xD9 {
 			// fmt.Printf("Image/jpeg end detected at pos %d\n", i)
@@ -154,13 +206,16 @@ func extractImage(data []byte) ([]byte, error) {
 			break
 		}
 	}
+	if !found_start {
+		return nil, ErrNoStartOfImage
+	}
 	if !found_end {
-		return nil, ErrNoImage
+		return nil, ErrNoEndOfImage
 	}
 	return data[start : end+2], nil
 }
 
-// contentLenght extracts the content-lenght from the stream
+// contentLenght scans bytes for the content-lenght header.
 func contentLenght(b []byte) int {
 	re := regexp.MustCompile(`Content-Length:\s+(\d+)`)
 	match := re.FindStringSubmatch(string(b))
@@ -177,23 +232,19 @@ func contentLenght(b []byte) int {
 	}
 }
 
-// saveImg saves the image to the project folder
+// saveImg saves the image to the project folder.
 func saveImg(data []byte, outpath string) error {
 	// Save the image data to a file
 	outputName := fmt.Sprintf("%d-image.jpg", time.Now().Unix())
 	file, err := os.Create(path.Join(outpath, outputName))
 	if err != nil {
-		// Handle error
 		return fmt.Errorf("unable to create image file: %v", err)
 	}
 	defer file.Close()
 
 	_, err = file.Write(data)
 	if err != nil {
-		// Handle error
 		return fmt.Errorf("unable to write image file: %v", err)
 	}
-
-	// fmt.Println("Image saved to image.jpg.")
 	return nil
 }

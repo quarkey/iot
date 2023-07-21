@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -51,7 +50,7 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 					if len(telemetry.datasets) > 0 {
 						log.Println("[INFO] Telemetry check")
 						telemetry.CheckDatasetTelemetry()
-						telemetry.CheckSensorsTelemetry()
+						// telemetry.CheckSensorsTelemetry()
 					}
 					duration = 0
 				}
@@ -107,16 +106,16 @@ func (t *Telemetry) init(runTelemetryCheck bool) {
 	}
 
 	if runTelemetryCheck {
-		t.CheckSensorsTelemetry()
+		// t.CheckSensorsTelemetry()
 		t.CheckDatasetTelemetry()
 		t.CheckControllersTelemetry()
 	}
 }
 
-func (t *Telemetry) CheckSensorsTelemetry() {
-	log.Println("[INFO] UpdateSensorsTelemetry() NOT IMPLEMENTED")
-	// TODO: "ping" device by ip, waiting for arduino sketch
-}
+// func (t *Telemetry) CheckSensorsTelemetry() {
+// 	log.Println("[INFO] UpdateSensorsTelemetry() NOT IMPLEMENTED")
+// 	// TODO: "ping" device by ip, waiting for arduino sketch
+// }
 
 // UpdateDatasetTelemetry updates the telemetry data for a given dataset.
 // It also checks if the telemetry data is overdue by more than 60 seconds, and if so,
@@ -170,7 +169,7 @@ func (t *Telemetry) CheckDatasetTelemetry() {
 	}
 }
 
-var mutex sync.Mutex
+// var mutex sync.Mutex
 
 // CheckControllersTelemetry ...
 func (t *Telemetry) CheckControllersTelemetry() {
