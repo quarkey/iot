@@ -54,47 +54,25 @@ func NewTimelase(storageDir string, hostname string, projectName string) (Stream
 func (s *StreamTimelapse) CaptureTimelapseImage() error {
 	// we are not using fh at this moment in time, so closing right away
 	s.closeProjectfh() // close file handler
-	var currentError []error
-	var allErrors []error
-	retry := 0
-	// read stream, retrying n times if needed
-	for i := 0; i < s.retryCount; i++ {
 
-		// TODO: we can skip extracting image if readStreamResp fails
-		output, err := s.readStreamResp()
-		if err != nil {
-			currentError = append(currentError, err)
-		}
+	// TODO: add retry logic
 
-		// TODO: we can skip saving picture of extractImage fails
-		imgdata, err := extractImage(output.Bytes())
-		if err != nil {
-			currentError = append(currentError, err)
-		}
-
-		err = saveImg(imgdata, s.ProjectPath)
-		if err != nil {
-			currentError = append(currentError, err)
-		}
-
-		// no errors, breaking out
-		if len(currentError) == 0 {
-			if retry > 0 {
-				log.Printf("success!")
-			}
-			return nil
-		}
-		// we have errors, appending to allErrors and retrying
-		allErrors = append(allErrors, currentError...)
-		log.Printf("retrying %d due to '%v'...", retry+1, currentError)
-		currentError = nil
-		time.Sleep(1 * time.Second)
-		retry++
+	output, err := s.readStreamResp()
+	if err != nil {
+		return fmt.Errorf("unable to read stream: %v", err)
 	}
 
-	// if we encounter this we expect all retries to have failed
-	if len(allErrors) > 0 && s.retryCount == retry {
-		return fmt.Errorf("unable to capture timelapse image: %v", allErrors)
+	imgdata, err := extractImage(output.Bytes())
+	if err != nil {
+		if err == ErrNoEndOfImage {
+			fmt.Println("no end of image detected")
+		}
+		return fmt.Errorf("unable to extract image: %v", err)
+	}
+
+	err = saveImg(imgdata, s.ProjectPath)
+	if err != nil {
+		return fmt.Errorf("unable to save image: %v", err)
 	}
 
 	return nil
