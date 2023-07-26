@@ -5,6 +5,7 @@
     "encryptionkey": "enter encryption key",
     "migration": "database/migrations",
     "checkTelemetryTimer": 10,
-    "allowSim": true,
-    "discordConfig": "./config/discord.json"
+    "allowSim": false,
+    "discordConfig": "./config/discord.json",
+    "storageLocation": "./testdata/storage1"
 }
