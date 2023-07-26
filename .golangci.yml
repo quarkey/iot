@@ -4,8 +4,92 @@ run:
   tests: true
   skip-dirs:
     - testdata
+    - resources
+    - database
+    - config
 
 linters:
   disable-all: true
   enable:
+    # defaults
+    - deadcode
+    - errcheck
     - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+
+    # disabled by default linters
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - contextcheck
+    - cyclop # This also checks package complexity
+    # - depguard # should be enabled?
+    - dogsled
+    - dupl
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    # - gci # MUST be enabled
+    - gochecknoglobals
+    # - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    # - gocyclo # SHOULD? Or gocognit enough
+    - godot
+    # - godox # MUST be enabled
+    - goerr113
+    - gofmt
+    - gofumpt
+    - goheader
+    - goimports
+    - gomnd
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - ifshort
+    - importas
+    - interfacer # deprecated
+    - ireturn
+    - lll
+    - makezero
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    # - nlreturn # wsl is enough
+    - noctx
+    # - nolintlint # this clashes with gofmt
+    # - paralleltest
+    - prealloc
+    - predeclared
+    - promlinter
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - stylecheck
+    - tagliatelle
+    - tenv
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    # - varnamelen # SHOULD? too many issues for now
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl
