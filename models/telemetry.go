@@ -15,18 +15,20 @@ import (
 
 // A telemetry struct holds the telemetry components in memory.
 type Telemetry struct {
-	done        chan bool // closes the time.Ticker go routine.
-	db          *sqlx.DB
-	datasets    []Dataset      // in memory datasets
-	sensors     []SensorDevice // in memory sensors
-	controllers ControllerList // in memory controllers
+	done            chan bool // closes the time.Ticker go routine.
+	db              *sqlx.DB
+	datasets        []Dataset      // in memory datasets
+	sensors         []SensorDevice // in memory sensors
+	controllers     ControllerList // in memory controllers
+	storageLocation string
 }
 
 // newTelemetryTicker ...
-func newTelemetryTicker(db *sqlx.DB) *Telemetry {
+func newTelemetryTicker(db *sqlx.DB, path string) *Telemetry {
 	return &Telemetry{
-		done: make(chan bool),
-		db:   db,
+		done:            make(chan bool),
+		db:              db,
+		storageLocation: path,
 	}
 }
 
@@ -219,7 +221,7 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			// do we need to track switches other than sensor telemetry?
 		case "webcamstreamtimelapse":
 			// do timelapse capture
-			c.CheckWebCamStreamEntries(t.db)
+			c.CheckWebCamStreamEntries(t.db, t.storageLocation)
 		default:
 			log.Println("[ERROR] unsupported controller category:", c.Category)
 		}

@@ -50,7 +50,6 @@ func NewTimelase(storageDir string, hostname string, projectName string) (Stream
 
 // CaptureTimelapseImage captures a single image from stream and saves it to the project folder.
 // The image is saved as a jpeg file with the name: <unix-timestamp>-image.jpg to prevent overwriting.
-
 func (s *StreamTimelapse) CaptureTimelapseImage() error {
 	// we are not using fh at this moment in time, so closing right away
 	s.closeProjectfh() // close file handler

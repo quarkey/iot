@@ -49,13 +49,13 @@ type Server struct {
 	httpServer *http.Server
 	//Hub to keep track of socket connection
 	// for live monitoring of datasets.
-	Hub         *hub.Hub
-	Telemetry   *Telemetry
-	StoragePath string
-	storageSize string
-	Debug       bool
-	simulator   *Sim
-	startTime   time.Time
+	Hub             *hub.Hub
+	Telemetry       *Telemetry
+	StorageLocation string
+	storageSize     string
+	Debug           bool
+	simulator       *Sim
+	startTime       time.Time
 }
 
 var GLOBALCONFIG map[string]interface{}
@@ -125,7 +125,7 @@ func New(path string, automigrate bool, debug bool) *Server {
 		}
 	}
 	// checking for storage location, if not found we exit.
-	dir := srv.Config["storagePath"].(string)
+	dir := srv.Config["storageLocation"].(string)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		log.Printf("[ERROR] Storage location not found: %v", err)
 	} else {
@@ -145,7 +145,7 @@ func New(path string, automigrate bool, debug bool) *Server {
 		srv.storageSize = hsize
 	}
 
-	srv.StoragePath = dir
+	srv.StorageLocation = dir
 	srv.DB = db
 	log.Printf("[INFO] Connected to: %s (%s)", connectionstr, db.DriverName())
 	return srv
@@ -177,7 +177,8 @@ func (srv *Server) Run(ctx context.Context) {
 	srv.Hub = hub
 	go srv.Hub.Run()
 	// server ticker timer for scheduled tasks
-	srv.Telemetry = newTelemetryTicker(srv.DB)
+	// TODO: reconsider passing storage path to telemetry ticker
+	srv.Telemetry = newTelemetryTicker(srv.DB, srv.StorageLocation)
 	srv.Telemetry.startTelemetryTicker(srv.Config, srv.Debug)
 
 	// only when allowSim is set we start the simulator.
@@ -260,7 +261,7 @@ func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 		"system_mem":         helper.BytesToHuman(int64(m.Sys)),
 		"garbage_collection": m.NumGC,
 		"pg_table_stats":     s.pgTableStats(),
-		"storage:":           fmt.Sprintf("%s, %s", s.StoragePath, s.storageSize),
+		"storageLocation:":   fmt.Sprintf("%s, %s", s.StorageLocation, s.storageSize),
 	}
 	helper.Respond(w, r, 200, out)
 }
