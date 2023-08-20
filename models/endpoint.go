@@ -34,6 +34,13 @@ func (s *Server) SetupEndpoints() {
 	// reports
 	s.Router.Post("/api/report/temperature", s.GetTemperatureReport)
 
+	// camera
+	s.Router.Post("/api/camera", s.InsertCameraEndpoint)
+	s.Router.Put("/api/camera", s.UpdateCameraEndpoint)
+	s.Router.Get("/api/cameras", s.GetCameraListEndpoint)
+	s.Router.Get("/api/camera/{id}", s.GetCameraByIDEndpoint)
+	s.Router.Delete("/api/camera", s.DeleteCameraEndpoint)
+
 	// events
 	s.Router.Get("/api/events/{count}", s.GetEventLogListEndpoint)
 

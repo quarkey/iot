@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"runtime"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -22,6 +23,7 @@ import (
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
 	"github.com/quarkey/iot/pkg/hub"
+	"github.com/quarkey/iot/pkg/webcam"
 	"github.com/quarkey/iot/pkg/webhooks"
 	"golang.org/x/sys/unix"
 
@@ -36,6 +38,7 @@ import (
 var SystemEvent = "system"
 var SernsorEvent = "sensor"
 var DatasetEvent = "dataset"
+var WebCamEvent = "webcam"
 var ControllerEvent = "controller"
 
 var TimeFormat = "2006-01-02 15:04:05"
@@ -56,6 +59,7 @@ type Server struct {
 	Debug           bool
 	simulator       *Sim
 	startTime       time.Time
+	mu              sync.Mutex
 }
 
 var GLOBALCONFIG map[string]interface{}
@@ -170,6 +174,13 @@ func (srv *Server) Run(ctx context.Context) {
 	if err != nil {
 		log.Printf("[ERROR] %v", err)
 	}
+
+	// resetting timelapse next capture time
+	err = webcam.ResetConnectivity(srv.DB)
+	if err != nil {
+		log.Printf("[ERROR] problem with resetting webcam next capture time: %v", err)
+	}
+
 	e := event.New(srv.DB)
 	e.LogEvent(SystemEvent, "Server started")
 	// socket hub for live monitoring

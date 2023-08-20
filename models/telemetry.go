@@ -11,6 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/helper"
+	"github.com/quarkey/iot/pkg/webcam"
 )
 
 // A telemetry struct holds the telemetry components in memory.
@@ -20,6 +21,7 @@ type Telemetry struct {
 	datasets        []Dataset      // in memory datasets
 	sensors         []SensorDevice // in memory sensors
 	controllers     ControllerList // in memory controllers
+	webcams         []*webcam.Camera
 	storageLocation string
 }
 
@@ -58,6 +60,7 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 				}
 				// controllers require extra precision so a check is done every second
 				telemetry.CheckControllersTelemetry()
+				telemetry.CheckWebcamTelemetry()
 				duration++
 			}
 		}
@@ -88,11 +91,22 @@ func (t *Telemetry) init(runTelemetryCheck bool) {
 	}
 
 	// loading controllers into memory
-	t.controllers, _ = GetControllersListFromDB(t.db)
-	// TODO handle error
 	log.Printf("[INFO] loading telemetry controllers list...")
+	// TODO: handle error
+	t.controllers, _ = GetControllersListFromDB(t.db)
 	if len(t.controllers) == 0 {
 		log.Printf("[WARNING] No active controllers")
+	}
+
+	log.Printf("[INFO] loading webcam list...")
+	clist, err := webcam.GetCameraList(t.db)
+	if err != nil {
+		log.Printf("[ERROR] unable to load webcam list: %v", err)
+	}
+	t.webcams = clist
+
+	if len(t.webcams) == 0 {
+		log.Printf("[WARNING] No active webcams")
 	}
 
 	for _, dset := range t.sensors {
@@ -107,10 +121,15 @@ func (t *Telemetry) init(runTelemetryCheck bool) {
 		fmt.Printf("=> monitoring controllers telemetry for '%v'\n", c.Title)
 	}
 
+	for _, cam := range t.webcams {
+		fmt.Printf("=> monitoring webcam telemetry for '%v'\n", cam.Title)
+	}
+
 	if runTelemetryCheck {
 		// t.CheckSensorsTelemetry()
 		t.CheckDatasetTelemetry()
 		t.CheckControllersTelemetry()
+		t.CheckWebcamTelemetry()
 	}
 }
 
@@ -226,4 +245,45 @@ func (t *Telemetry) CheckControllersTelemetry() {
 			log.Println("[ERROR] unsupported controller category:", c.Category)
 		}
 	}
+}
+
+// CheckWebcamTelemetry ...
+func (t *Telemetry) CheckWebcamTelemetry() {
+	// we are locking to prevent ...
+	// for _, cam := range t.webcams {
+	// 	if !cam.Active {
+	// 		continue
+	// 	}
+
+	// 	cam.DB = t.db
+	// 	firstCapture := false
+	// 	doCapture := false
+	// 	if !cam.NextCapTureTime.Valid {
+	// 		fmt.Println("next capture time is zero for", cam.Title)
+	// 		err := cam.SetNextCaptureTime()
+	// 		if err != nil {
+	// 			log.Printf("[ERROR] unable to set next capture time: %v", err)
+	// 		}
+	// 		firstCapture = true
+	// 	}
+
+	// 	if time.Now().After(cam.NextCapTureTime.Time) {
+	// 		if cam.Online() {
+	// 			fmt.Printf("%s is online\n", cam.Title)
+	// 		}
+	// 		err := cam.SetNextCaptureTime()
+	// 		if err != nil {
+	// 			log.Printf("[ERROR] unable to set next capture time: %v", err)
+	// 		}
+	// 		doCapture = true
+	// 	}
+	// 	if firstCapture || doCapture {
+	// 		timelapse, err := webcam.NewTimelase(t.storageLocation, cam.Hostname, cam.ProjectName)
+	// 		if err != nil {
+	// 			log.Printf("[ERROR] problems initiate timelapse %v", err)
+	// 			return
+	// 		}
+	// 		go cam.CaptureTimelapseImage(timelapse)
+	// 	}
+	// }
 }

@@ -22,6 +22,7 @@ type StreamTimelapse struct {
 	JsonConfig  string
 	projectfh   *os.File
 	retryCount  int
+	data        []byte
 }
 
 // NewTimelapse either opens or creates a new timelapse project.
@@ -36,6 +37,7 @@ func NewTimelase(storageDir string, hostname string, projectName string) (Stream
 		ProjectName: projectName,
 		JsonConfig:  cfgPath,
 		retryCount:  5,
+		data:        []byte{},
 	}
 	if stl.projectExist() {
 		err := stl.openProject()
@@ -68,7 +70,7 @@ func (s *StreamTimelapse) CaptureTimelapseImage() error {
 		}
 		return fmt.Errorf("unable to extract image: %v", err)
 	}
-
+	s.data = imgdata
 	err = saveImg(imgdata, s.ProjectPath)
 	if err != nil {
 		return fmt.Errorf("unable to save image: %v", err)

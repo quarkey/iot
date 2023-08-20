@@ -104,7 +104,7 @@ func (s *Server) GetDatasetByReference(w http.ResponseWriter, r *http.Request) {
 	helper.Respond(w, r, 200, dataset)
 }
 
-func (s Server) getDsetByRef(ref string) (Dataset, error) {
+func (s *Server) getDsetByRef(ref string) (Dataset, error) {
 	var dataset Dataset
 	err := s.DB.Get(&dataset, `
 	select 

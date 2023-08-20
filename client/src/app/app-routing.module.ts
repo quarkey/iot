@@ -10,6 +10,7 @@ import { DashComponent } from './views/dash/dash.component';
 import { SystemComponent } from './views/system/system.component';
 import { ControllersListComponent } from './views/controllers-list/controllers-list.component';
 import { ControllerComponent } from './views/controller/controller.component';
+import { WebcamListComponent } from './views/webcam-list/webcam-list.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
@@ -20,6 +21,7 @@ const routes: Routes = [
   { path: 'devices/:arduino_key', component: DeviceComponent },
   { path: 'datasets', component: DatasetsListComponent },
   { path: 'datasets/:reference', component: DatasetComponent },
+  { path: 'webcam', component: WebcamListComponent },
   { path: 'events', component: EventsComponent },
   { path: 'system', component: SystemComponent },
 

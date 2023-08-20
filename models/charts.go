@@ -42,7 +42,7 @@ func (s *Server) AreaChartDataSeries(w http.ResponseWriter, r *http.Request) {
 			helper.RespondErr(w, r, http.StatusBadRequest, err)
 			return
 		}
-		helper.RespondErrf(w, r, 500, "Problems with loading area chart series: ", err)
+		helper.RespondErrf(w, r, 500, "Problems with loading area chart series: %v", err)
 		return
 	}
 	helper.Respond(w, r, 200, series)

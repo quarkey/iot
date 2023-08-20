@@ -79,6 +79,7 @@ import { DisplayValueBoxComponent } from './shared/auxiliary/components/display-
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { WebcamListComponent } from './views/webcam-list/webcam-list.component';
 
 @NgModule({
   declarations: [
@@ -117,6 +118,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     DatasetOverviewComponent,
     MinMaxAverageComponent,
     DisplayValueBoxComponent,
+    WebcamListComponent,
   ],
   imports: [
     BrowserModule,

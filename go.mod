@@ -10,12 +10,13 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/jmoiron/sqlx v1.3.1
 	github.com/lib/pq v1.10.0
-	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c
+	golang.org/x/sys v0.8.0
 )
 
 require (
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
+	github.com/jackc/pgx/v5 v5.4.2
 	go.uber.org/atomic v1.6.0 // indirect
 )
