@@ -63,7 +63,6 @@ func (s *Server) SetupEndpoints() {
 	})
 	// export
 	s.Router.Get("/api/exportdataset/{reference}", s.ExportSensorDataToCSVEndpoint)
-
 	s.Router.Get("/api/dashboard", s.DashboardInfoEndpoint)
 	s.Router.Get("/api/health", s.HealthCheckHandler)
 	s.Router.Get("/api/webhook/test", s.TestCheckWebhooks)

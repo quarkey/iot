@@ -19,6 +19,8 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/event"
 	"github.com/quarkey/iot/pkg/helper"
@@ -183,10 +185,12 @@ func (srv *Server) Run(ctx context.Context) {
 
 	e := event.New(srv.DB)
 	e.LogEvent(SystemEvent, "Server started")
+
 	// socket hub for live monitoring
 	hub := hub.NewHub()
 	srv.Hub = hub
 	go srv.Hub.Run()
+
 	// server ticker timer for scheduled tasks
 	// TODO: reconsider passing storage path to telemetry ticker
 	srv.Telemetry = newTelemetryTicker(srv.DB, srv.StorageLocation)
@@ -219,6 +223,30 @@ func (srv *Server) Run(ctx context.Context) {
 			}
 		}
 	}(ctx)
+
+	// prometheus metrics setu
+
+	reg := prometheus.NewRegistry()
+	metric := prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "iot",
+		Name:      "server_start_time",
+		Help:      "The time when the server started",
+	})
+
+	reg.MustRegister(metric)
+	metric.Set(float64(time.Now().Unix()))
+	srv.Telemetry.metricsRegistry = prometheus.Registerer(reg)
+
+	go func(r prometheus.Registerer) {
+		http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
+			latestRegistry := srv.Telemetry.metricsRegistry
+			promhttp.HandlerFor(reg, promhttp.HandlerOpts{Registry: latestRegistry}).ServeHTTP(w, r)
+		})
+
+		// http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+		http.ListenAndServe(":8081", nil)
+	}(reg)
+
 	err = srv.httpServer.ListenAndServe()
 	if err != nil {
 		log.Printf("[INFO] Service stopped")

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/helper"
 	"github.com/quarkey/iot/pkg/webcam"
@@ -23,6 +24,7 @@ type Telemetry struct {
 	controllers     ControllerList // in memory controllers
 	webcams         []*webcam.Camera
 	storageLocation string
+	metricsRegistry prometheus.Registerer
 }
 
 // newTelemetryTicker ...
@@ -115,6 +117,13 @@ func (t *Telemetry) init(runTelemetryCheck bool) {
 
 	for _, dset := range t.datasets {
 		fmt.Printf("=> monitoring dataset telemetry for '%s'\n", dset.Title)
+
+		devices := prometheus.NewGauge(prometheus.GaugeOpts{
+			Namespace: "myapp",
+			Name:      "connected_devices",
+			Help:      "Number of currently connected devices.",
+		})
+		t.metricsRegistry.Register(devices)
 	}
 
 	for _, c := range t.controllers {
@@ -286,4 +295,15 @@ func (t *Telemetry) CheckWebcamTelemetry() {
 	// 		go cam.CaptureTimelapseImage(timelapse)
 	// 	}
 	// }
+}
+
+// GetInMemDatasetByID returns a dataset from memory by id, if id is not found
+// an empty dataset is returned.
+func (t *Telemetry) GetInMemDatasetInfoByID(id int) Dataset {
+	for _, dset := range t.datasets {
+		if dset.ID == id {
+			return dset
+		}
+	}
+	return Dataset{}
 }
