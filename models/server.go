@@ -235,15 +235,9 @@ func (srv *Server) Run(ctx context.Context) {
 
 	reg.MustRegister(metric)
 	metric.Set(float64(time.Now().Unix()))
-	srv.Telemetry.metricsRegistry = prometheus.Registerer(reg)
 
 	go func(r prometheus.Registerer) {
-		http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
-			latestRegistry := srv.Telemetry.metricsRegistry
-			promhttp.HandlerFor(reg, promhttp.HandlerOpts{Registry: latestRegistry}).ServeHTTP(w, r)
-		})
-
-		// http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+		http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
 		http.ListenAndServe(":8081", nil)
 	}(reg)
 

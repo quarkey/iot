@@ -9,6 +9,7 @@ import (
 
 func (s *Server) SetupEndpoints() {
 	s.Router = chi.NewRouter()
+
 	// sensors
 	s.Router.Post("/api/sensors", s.AddNewDevice)
 	s.Router.Put("/api/sensors", s.UpdateDevice)
@@ -63,6 +64,8 @@ func (s *Server) SetupEndpoints() {
 	})
 	// export
 	s.Router.Get("/api/exportdataset/{reference}", s.ExportSensorDataToCSVEndpoint)
+
+	// other endpoints
 	s.Router.Get("/api/dashboard", s.DashboardInfoEndpoint)
 	s.Router.Get("/api/health", s.HealthCheckHandler)
 	s.Router.Get("/api/webhook/test", s.TestCheckWebhooks)
