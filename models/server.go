@@ -20,6 +20,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/event"
@@ -62,6 +63,8 @@ type Server struct {
 	simulator       *Sim
 	startTime       time.Time
 	mu              sync.Mutex
+	PromRegistry    *prometheus.Registry
+	PromChan        chan string
 }
 
 var GLOBALCONFIG map[string]interface{}
@@ -74,7 +77,10 @@ func New(path string, automigrate bool, debug bool) *Server {
 	//TODO move timezone to config
 	SetTimeZone("Europe/Oslo")
 	srv := &Server{}
+
 	srv.startTime = time.Now()
+	srv.PromRegistry = prometheus.NewRegistry()
+
 	log.Printf("[INFO] Loading config: %v", path)
 	err := srv.loadcfg(path)
 	if err != nil {
@@ -191,6 +197,29 @@ func (srv *Server) Run(ctx context.Context) {
 	srv.Hub = hub
 	go srv.Hub.Run()
 
+	// prometheus metrics setup
+	metric := promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: "iot",
+		Name:      "server_start_time",
+		Help:      "The time when the server started",
+	})
+	metric.Set(float64(time.Now().Unix()))
+	srv.PromRegistry.MustRegister(metric)
+
+	// prometheus metrics endpoint as a seperate server
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":2112", nil)
+	}()
+
+	// registering incoming metrics
+	srv.PromChan = make(chan string)
+	go func(inc chan string) {
+		for v := range inc {
+			fmt.Println("registering metric:", v)
+		}
+	}(srv.PromChan)
+
 	// server ticker timer for scheduled tasks
 	// TODO: reconsider passing storage path to telemetry ticker
 	srv.Telemetry = newTelemetryTicker(srv.DB, srv.StorageLocation)
@@ -207,6 +236,7 @@ func (srv *Server) Run(ctx context.Context) {
 		}
 	}
 
+	// catching signals to shutdown gracefully
 	go func(ctx context.Context) {
 		signalCh := make(chan os.Signal, 1024)
 		signal.Notify(signalCh, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM, os.Interrupt)
@@ -224,26 +254,10 @@ func (srv *Server) Run(ctx context.Context) {
 		}
 	}(ctx)
 
-	// prometheus metrics setu
-
-	reg := prometheus.NewRegistry()
-	metric := prometheus.NewGauge(prometheus.GaugeOpts{
-		Namespace: "iot",
-		Name:      "server_start_time",
-		Help:      "The time when the server started",
-	})
-
-	reg.MustRegister(metric)
-	metric.Set(float64(time.Now().Unix()))
-
-	go func(r prometheus.Registerer) {
-		http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
-		http.ListenAndServe(":8081", nil)
-	}(reg)
-
+	// starting the webserver
 	err = srv.httpServer.ListenAndServe()
 	if err != nil {
-		log.Printf("[INFO] Service stopped")
+		log.Printf("[INFO] Service stopped %v", err)
 		e.LogEvent(SystemEvent, "Server stopped")
 	}
 }
@@ -298,6 +312,7 @@ func (s *Server) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	helper.Respond(w, r, 200, out)
 }
+
 func (s *Server) TestCheckWebhooks(w http.ResponseWriter, r *http.Request) {
 	wh, err := webhooks.ParseConfig(GLOBALCONFIG["discordConfig"].(string))
 	if err != nil {
@@ -305,9 +320,11 @@ func (s *Server) TestCheckWebhooks(w http.ResponseWriter, r *http.Request) {
 	}
 	wh.Discord.Sendf("testing connection ...")
 }
+
 func (s *Server) API_URL() string {
 	return fmt.Sprintf("http://%s/api", s.Config["api_addr"].(string))
 }
+
 func (s *Server) SERVER_URL() string {
 	return fmt.Sprintf("http://%s", s.Config["api_addr"].(string))
 }
@@ -337,4 +354,15 @@ func SetTimeZone(tz string) {
 	}
 	time.Local = loc
 	log.Printf("[INFO] Timezone set to '%s'", loc.String())
+}
+
+func (s *Server) AddMetricEndpoint(w http.ResponseWriter, r *http.Request) {
+	metric := promauto.NewCounter(prometheus.CounterOpts{
+		Name: "myapp_processed_ops_total_2",
+		Help: "The total number of processed events",
+	})
+	metric.Inc()
+	s.PromRegistry.MustRegister(metric)
+	fmt.Fprintf(w, "Added metric")
+	s.PromChan <- "myapp_processed_ops_total_2"
 }

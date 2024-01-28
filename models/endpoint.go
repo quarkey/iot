@@ -69,4 +69,7 @@ func (s *Server) SetupEndpoints() {
 	s.Router.Get("/api/dashboard", s.DashboardInfoEndpoint)
 	s.Router.Get("/api/health", s.HealthCheckHandler)
 	s.Router.Get("/api/webhook/test", s.TestCheckWebhooks)
+
+	s.Router.Get("/api/addmetric", s.AddMetricEndpoint)
+
 }
