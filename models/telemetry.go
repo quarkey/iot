@@ -42,7 +42,8 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 
 	ticker := time.NewTicker(time.Duration(1 * time.Second))
 	log.Printf("[INFO] Telemetry check every %d seconds\n", int(checkTelemetryTimer))
-	telemetry.init(true)
+	telemetry.runInit(true)
+
 	done := make(chan bool)
 	go func() {
 		for {
@@ -70,12 +71,12 @@ func (telemetry *Telemetry) startTelemetryTicker(cfg map[string]interface{}, deb
 // UpdateTelemetryLists updates sensors and dataset lists
 // TODO: remove t.init method
 func (t *Telemetry) UpdateTelemetryLists() {
-	t.init(false)
+	t.runInit(false)
 }
 
-// init loads sensors, dataset and controllers into memory, caller can initiate telemetry check
+// runInit loads sensors, dataset and controllers into memory, caller can initiate telemetry check
 // by passing true.
-func (t *Telemetry) init(runTelemetryCheck bool) {
+func (t *Telemetry) runInit(runTelemetryCheck bool) {
 	// loading sensor into memory
 	t.sensors = GetSensorsList(t.db)
 	log.Printf("[INFO] loading telemetry sensor list...")

@@ -63,8 +63,10 @@ type Server struct {
 	simulator       *Sim
 	startTime       time.Time
 	mu              sync.Mutex
-	PromRegistry    *prometheus.Registry
-	PromChan        chan string
+
+	// Prometheus metrics
+	PromRegistry *prometheus.Registry
+	PromChan     chan string
 }
 
 var GLOBALCONFIG map[string]interface{}
@@ -197,29 +199,6 @@ func (srv *Server) Run(ctx context.Context) {
 	srv.Hub = hub
 	go srv.Hub.Run()
 
-	// prometheus metrics setup
-	metric := promauto.NewGauge(prometheus.GaugeOpts{
-		Namespace: "iot",
-		Name:      "server_start_time",
-		Help:      "The time when the server started",
-	})
-	metric.Set(float64(time.Now().Unix()))
-	srv.PromRegistry.MustRegister(metric)
-
-	// prometheus metrics endpoint as a seperate server
-	go func() {
-		http.Handle("/metrics", promhttp.Handler())
-		http.ListenAndServe(":2112", nil)
-	}()
-
-	// registering incoming metrics
-	srv.PromChan = make(chan string)
-	go func(inc chan string) {
-		for v := range inc {
-			fmt.Println("registering metric:", v)
-		}
-	}(srv.PromChan)
-
 	// server ticker timer for scheduled tasks
 	// TODO: reconsider passing storage path to telemetry ticker
 	srv.Telemetry = newTelemetryTicker(srv.DB, srv.StorageLocation)
@@ -235,6 +214,49 @@ func (srv *Server) Run(ctx context.Context) {
 			srv.StartSim(sim)
 		}
 	}
+	// register prometheus metrics
+
+	for _, d := range srv.Telemetry.datasets {
+		metric := promauto.NewGauge(prometheus.GaugeOpts{
+			Namespace: "iot",
+			Name:      fmt.Sprintf("dataset_%d_data", d.ID),
+			Help:      fmt.Sprintf("%s (sensor id: %d)", d.Title, d.SensorID),
+		})
+		metric.Set(23.00)
+		srv.PromRegistry.MustRegister(metric)
+	}
+
+	// prometheus metrics setup
+	metric := promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: "iot",
+		Name:      "server_start_time",
+		Help:      "The time when the server started",
+	})
+	metric.Set(float64(time.Now().Unix()))
+	srv.PromRegistry.MustRegister(metric)
+
+	// add other metrics here..
+	fmt.Println("prometheus metric")
+	fmt.Println("kor mange?", len(srv.Telemetry.datasets))
+	// prometheus metrics endpoint as a seperate server
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":2112", nil)
+	}()
+
+	// registering incoming metrics
+	srv.PromChan = make(chan string)
+	go func(inc chan string) {
+		for v := range inc {
+			fmt.Println("registering metric:", v)
+		}
+		// select {
+		// case msg := <-inc:
+		// 	fmt.Println("received message", msg)
+		// default:
+		// 	fmt.Println("no activity")
+		// }
+	}(srv.PromChan)
 
 	// catching signals to shutdown gracefully
 	go func(ctx context.Context) {
@@ -272,6 +294,8 @@ func (s *Server) Stop(ctx context.Context) {
 }
 
 // loadcfg reads the contents of a jsonfile
+// TODO: move to helper function and also improve, currently can cause issues
+// if elements in the configuration is missing.
 func (s *Server) loadcfg(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
@@ -358,8 +382,9 @@ func SetTimeZone(tz string) {
 
 func (s *Server) AddMetricEndpoint(w http.ResponseWriter, r *http.Request) {
 	metric := promauto.NewCounter(prometheus.CounterOpts{
-		Name: "myapp_processed_ops_total_2",
-		Help: "The total number of processed events",
+		Namespace: "iot",
+		Name:      "processed_ops_total_2",
+		Help:      "The total number of processed events",
 	})
 	metric.Inc()
 	s.PromRegistry.MustRegister(metric)
