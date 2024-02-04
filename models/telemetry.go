@@ -14,15 +14,25 @@ import (
 	"github.com/quarkey/iot/pkg/webcam"
 )
 
-// A telemetry struct holds the telemetry components in memory.
+// A telemetry struct holds various telemetry components in memory.
 type Telemetry struct {
-	done            chan bool // closes the time.Ticker go routine.
-	db              *sqlx.DB
-	datasets        []Dataset      // in memory datasets
+	done     chan bool // closes the time.Ticker go routine.
+	db       *sqlx.DB
+	datasets []Dataset // in memory datasets
+	// datasetsMetrics is a map of values for each dataset used by prometheus.
+	// The custom prometheus collector will use this map to create metrics.
+	// Initialization of this map is done in the newTelemetryTicker method.
+	datasetsMetrics map[string][]dsetMetric
 	sensors         []SensorDevice // in memory sensors
 	controllers     ControllerList // in memory controllers
 	webcams         []*webcam.Camera
 	storageLocation string
+}
+type dsetMetric struct {
+	ID    int
+	Name  string
+	Help  string
+	Value float64
 }
 
 // newTelemetryTicker ...
@@ -31,6 +41,7 @@ func newTelemetryTicker(db *sqlx.DB, path string) *Telemetry {
 		done:            make(chan bool),
 		db:              db,
 		storageLocation: path,
+		datasetsMetrics: make(map[string][]dsetMetric),
 	}
 }
 
@@ -113,9 +124,16 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 	for _, dset := range t.sensors {
 		fmt.Printf("=> monitoring sensor telemetry for '%s'\n", dset.Title)
 	}
-
+	// registering datasets and also adding dataset to metrics map
 	for _, dset := range t.datasets {
 		fmt.Printf("=> monitoring dataset telemetry for '%s'\n", dset.Title)
+		name := fmt.Sprintf("iot_dataset_%d", dset.ID)
+		if err != nil {
+			log.Printf("[ERROR] unable to decode fields while creating dataset metrics: %v", err)
+		}
+		t.datasetsMetrics[name] = []dsetMetric{
+			{ID: dset.ID, Name: name, Help: dset.Title, Value: 0},
+		}
 	}
 
 	for _, c := range t.controllers {

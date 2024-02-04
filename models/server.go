@@ -219,17 +219,11 @@ func (srv *Server) Run(ctx context.Context) {
 		"iot_temp_2_metric",
 		"iot_hydro_2_metric",
 	}
-	metricsListDfault := []string{
-		"default_temp_1_metric",
-		"default_hydro_1_metric",
-		"default_temp_2_metric",
-		"default_hydro_2_metric",
-	}
 	// prometheus metrics setup and registration
-	defaultManager := NewCollection(metricsListDfault)
-	manager := NewCollection(metricsList)
+	dsetManager := NewCollectionDataset(srv.Telemetry.datasetsMetrics)
+	manager := NewCollection(metricsList, srv.DB)
 
-	prometheus.MustRegister(manager, defaultManager)
+	prometheus.MustRegister(manager, dsetManager)
 
 	// prometheus metrics endpoint as a seperate server
 	go func() {
@@ -360,5 +354,13 @@ func SetTimeZone(tz string) {
 }
 
 func (s *Server) AddMetricEndpoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("not implemented yet")
+	metricsList := []string{
+		"added_temp_1_metric",
+		"added_hydro_1_metric",
+		"added_temp_2_metric",
+		"added_hydro_2_metric",
+	}
+	// prometheus metrics setup and registration
+	manager := NewCollection(metricsList, s.DB)
+	prometheus.MustRegister(manager)
 }
