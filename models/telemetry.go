@@ -126,10 +126,9 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 	}
 
 	// registering datasets and also adding dataset to metrics map
+	var dsets []preDfinedMetric
 	for _, dset := range t.datasets {
 		fmt.Printf("=> monitoring dataset telemetry for '%s'\n", dset.Title)
-
-		var dsets []preDfinedMetric
 		namePrefix := fmt.Sprintf("iot_dataset_%d_col", dset.ID)
 		fields, showcharts, err := dataset.DatasetFieldAndShowCartList(dset.Reference, t.db)
 		if err != nil {
@@ -138,19 +137,25 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 		for i := range fields {
 			if showcharts[i] {
 				dsetname := fmt.Sprintf("%s%d", namePrefix, i)
-				dsets = append(dsets, preDfinedMetric{
+				fmt.Println("adding prefined", dsetname)
+				tmp := preDfinedMetric{
 					ID:        dset.ID,
 					Reference: dset.Reference,
 					Name:      dsetname,
 					Help:      dset.Title,
 					Value:     0,
-				})
+				}
+				dsets = append(dsets, tmp)
 			}
 		}
-		t.datasetsMetrics = append(t.datasetsMetrics, dsets...)
-		// register metrics for prometheus in the database
 	}
+	t.datasetsMetrics = dsets
 
+	// register metrics for prometheus in the database
+	err = RegisterPrefinedMetrics(t.db, t.datasetsMetrics)
+	if err != nil {
+		log.Printf("[ERROR] unable to register metrics to database: %v", err)
+	}
 	for _, c := range t.controllers {
 		fmt.Printf("=> monitoring controllers telemetry for '%v'\n", c.Title)
 	}

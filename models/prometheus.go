@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"math/rand"
+	"log"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -10,9 +10,9 @@ import (
 )
 
 type iotCollector struct {
-	metrics         []*prometheus.Desc
-	prefinedMetrics []preDfinedMetric
-	db              *sqlx.DB
+	metrics           []*prometheus.Desc
+	predefinedMetrics []preDfinedMetric
+	db                *sqlx.DB
 }
 
 func NewCollection(list []preDfinedMetric, db *sqlx.DB) *iotCollector {
@@ -26,9 +26,9 @@ func NewCollection(list []preDfinedMetric, db *sqlx.DB) *iotCollector {
 	}
 
 	return &iotCollector{
-		metrics:         md,
-		prefinedMetrics: list,
-		db:              db,
+		metrics:           md,
+		predefinedMetrics: list,
+		db:                db,
 	}
 }
 
@@ -51,16 +51,72 @@ func (c *iotCollector) Collect(ch chan<- prometheus.Metric) {
 		fmt.Println("[INFO] database connection is OK")
 	}
 
-	for _, metric := range c.prefinedMetrics {
-		fmt.Println("=>", metric.Name)
+	// get metrics from database
+	metrics, err := GetRegisteredMetricsFromDB(c.db)
+	if err != nil {
+		log.Printf("[ERROR] unable to get metrics from db: %v", err)
+	}
 
+	for _, metric := range c.predefinedMetrics {
+		fmt.Println("=>", metric.Name)
+		var metricValue float64
+		existingMetric, ok := metrics[metric.Name]
+		if ok {
+			metricValue = existingMetric.Value
+		}
 		newMetric := prometheus.MustNewConstMetric(prometheus.NewDesc(metric.Name,
 			metric.Help,
 			nil, nil,
-		), prometheus.GaugeValue, rand.Float64()) // inject real data
+		), prometheus.GaugeValue, metricValue) // inject real data
 
 		newMetric = prometheus.NewMetricWithTimestamp(time.Now(), newMetric)
 
 		ch <- newMetric
 	}
+}
+
+// RegisterPrefinedMetrics registers predefined metrics into the database.
+// Before registering, it clears all the existing metrics. If it fails to clear before registering,
+// it returns an error.
+// TODO: add insert to a transaction
+func RegisterPrefinedMetrics(db *sqlx.DB, list []preDfinedMetric) error {
+	err := ClearRegisteredMetrics(db)
+	if err != nil {
+		return err
+	}
+	for _, metric := range list {
+		fmt.Println("regging", metric.Name)
+		_, err := db.Exec(`insert into iot.metrics (metric_id, name, help, value) values ($1, $2, $3, $4);`,
+			metric.ID, metric.Name, metric.Help, metric.Value)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func ClearRegisteredMetrics(db *sqlx.DB) error {
+	_, err := db.Exec(`delete from iot.metrics;`)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetRegisteredMetricsFromDB(db *sqlx.DB) (map[string]preDfinedMetric, error) {
+	metricsMap := make(map[string]preDfinedMetric)
+	rows, err := db.Queryx(`select metric_id, name, help, value from iot.metrics;`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var m preDfinedMetric
+		err = rows.Scan(&m.ID, &m.Name, &m.Help, &m.Value)
+		if err != nil {
+			return nil, err
+		}
+		metricsMap[m.Name] = m
+	}
+	return metricsMap, nil
 }

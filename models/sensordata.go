@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -46,6 +47,10 @@ func (s *Server) SaveSensorReading(w http.ResponseWriter, r *http.Request) {
 		}
 		s.Hub.Broadcast <- b
 	}
+	err = s.RegisterMetricsDBValue(dat)
+	if err != nil {
+		log.Printf("[ERROR] unable to register metrics to db: %v", err)
+	}
 }
 func saveReadings(datapoints []SensorData, db *sqlx.DB) error {
 	for _, r := range datapoints {
@@ -69,6 +74,25 @@ func saveReadingsTx(datapoints []SensorData, db *sqlx.DB) error {
 	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("commit failed: %v", err)
+	}
+	return nil
+}
+
+func (s *Server) RegisterMetricsDBValue(data SensorData) error {
+	values, err := helper.DecodeRawJSONtoSlice(data.Data)
+	if err != nil {
+		return fmt.Errorf("[ERROR] unable to decode raw json to slice when registering metrics to db: %v", err)
+	}
+	for i, point := range values {
+		num, err := strconv.ParseFloat(point, 64)
+		if err != nil {
+			return fmt.Errorf("[ERROR] unable to parse float when registering metrics to db: %v", err)
+		}
+		name := fmt.Sprintf("iot_dataset_%d_col%d", data.DatasetID, i)
+		_, err = s.DB.Exec("update iot.metrics set value = $1 where name = $2", num, name)
+		if err != nil {
+			return fmt.Errorf("[ERROR] unable to update metrics in the database: %v", err)
+		}
 	}
 	return nil
 }
