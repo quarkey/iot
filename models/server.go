@@ -20,7 +20,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // postgres driver
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/quarkey/iot/pkg/dataset"
 	"github.com/quarkey/iot/pkg/event"
@@ -66,7 +65,6 @@ type Server struct {
 
 	// Prometheus metrics
 	PromRegistry *prometheus.Registry
-	PromChan     chan string
 }
 
 var GLOBALCONFIG map[string]interface{}
@@ -215,48 +213,29 @@ func (srv *Server) Run(ctx context.Context) {
 		}
 	}
 	// register prometheus metrics
-
-	for _, d := range srv.Telemetry.datasets {
-		metric := promauto.NewGauge(prometheus.GaugeOpts{
-			Namespace: "iot",
-			Name:      fmt.Sprintf("dataset_%d_data", d.ID),
-			Help:      fmt.Sprintf("%s (sensor id: %d)", d.Title, d.SensorID),
-		})
-		metric.Set(23.00)
-		srv.PromRegistry.MustRegister(metric)
+	metricsList := []string{
+		"iot_temp_1_metric",
+		"iot_hydro_1_metric",
+		"iot_temp_2_metric",
+		"iot_hydro_2_metric",
 	}
+	metricsListDfault := []string{
+		"default_temp_1_metric",
+		"default_hydro_1_metric",
+		"default_temp_2_metric",
+		"default_hydro_2_metric",
+	}
+	// prometheus metrics setup and registration
+	defaultManager := NewCollection(metricsListDfault)
+	manager := NewCollection(metricsList)
 
-	// prometheus metrics setup
-	metric := promauto.NewGauge(prometheus.GaugeOpts{
-		Namespace: "iot",
-		Name:      "server_start_time",
-		Help:      "The time when the server started",
-	})
-	metric.Set(float64(time.Now().Unix()))
-	srv.PromRegistry.MustRegister(metric)
+	prometheus.MustRegister(manager, defaultManager)
 
-	// add other metrics here..
-	fmt.Println("prometheus metric")
-	fmt.Println("kor mange?", len(srv.Telemetry.datasets))
 	// prometheus metrics endpoint as a seperate server
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 		http.ListenAndServe(":2112", nil)
 	}()
-
-	// registering incoming metrics
-	srv.PromChan = make(chan string)
-	go func(inc chan string) {
-		for v := range inc {
-			fmt.Println("registering metric:", v)
-		}
-		// select {
-		// case msg := <-inc:
-		// 	fmt.Println("received message", msg)
-		// default:
-		// 	fmt.Println("no activity")
-		// }
-	}(srv.PromChan)
 
 	// catching signals to shutdown gracefully
 	go func(ctx context.Context) {
@@ -381,13 +360,5 @@ func SetTimeZone(tz string) {
 }
 
 func (s *Server) AddMetricEndpoint(w http.ResponseWriter, r *http.Request) {
-	metric := promauto.NewCounter(prometheus.CounterOpts{
-		Namespace: "iot",
-		Name:      "processed_ops_total_2",
-		Help:      "The total number of processed events",
-	})
-	metric.Inc()
-	s.PromRegistry.MustRegister(metric)
-	fmt.Fprintf(w, "Added metric")
-	s.PromChan <- "myapp_processed_ops_total_2"
+	fmt.Println("not implemented yet")
 }
