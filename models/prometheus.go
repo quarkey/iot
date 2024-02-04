@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 type iotCollector struct {
 	metrics         []*prometheus.Desc
 	prefinedMetrics map[string][]dsetMetric
+	db              *sqlx.DB
 }
 
 // NewCollection creates a new iotCollector
@@ -28,7 +30,7 @@ func NewCollection(list []string, db *sqlx.DB) *iotCollector {
 	}
 }
 
-func NewCollectionDataset(dataMap map[string][]dsetMetric) *iotCollector {
+func NewCollectionDataset(dataMap map[string][]dsetMetric, db *sqlx.DB) *iotCollector {
 	var md []*prometheus.Desc
 	for k, v := range dataMap {
 		for _, metric := range v {
@@ -42,6 +44,7 @@ func NewCollectionDataset(dataMap map[string][]dsetMetric) *iotCollector {
 	return &iotCollector{
 		metrics:         md,
 		prefinedMetrics: dataMap,
+		db:              db,
 	}
 }
 
@@ -54,11 +57,19 @@ func (c *iotCollector) Describe(ch chan<- *prometheus.Desc) {
 }
 
 // Collect is a custom implementation of the prometheus.Collector interface.
-// It is called when prometheus scrapes the metrics endpoint.
-// This allows us to inject our own data into the prometheus metrics upon creation.
+// This methods is invoked when prometheus scrapes metrics endpoint.
+// By making a custom implementation allows us to inject db into the prometheus collector.
 func (c *iotCollector) Collect(ch chan<- prometheus.Metric) {
+	// pull metrics information from database
+	err := c.db.Ping()
+	if err != nil {
+		fmt.Printf("[ERROR] unable to ping database: %v\n", err)
+	} else {
+		fmt.Println("[INFO] database connection is OK")
+	}
 	for k, v := range c.prefinedMetrics {
 		for _, metric := range v {
+			fmt.Println("=>", k)
 			newMetric := prometheus.MustNewConstMetric(prometheus.NewDesc(k,
 				metric.Help,
 				nil, nil,

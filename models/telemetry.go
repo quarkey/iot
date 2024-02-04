@@ -29,10 +29,11 @@ type Telemetry struct {
 	storageLocation string
 }
 type dsetMetric struct {
-	ID    int
-	Name  string
-	Help  string
-	Value float64
+	ID        int
+	Reference string // dataset reference
+	Name      string
+	Help      string
+	Value     float64
 }
 
 // newTelemetryTicker ...
@@ -124,16 +125,30 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 	for _, dset := range t.sensors {
 		fmt.Printf("=> monitoring sensor telemetry for '%s'\n", dset.Title)
 	}
+
 	// registering datasets and also adding dataset to metrics map
 	for _, dset := range t.datasets {
 		fmt.Printf("=> monitoring dataset telemetry for '%s'\n", dset.Title)
-		name := fmt.Sprintf("iot_dataset_%d", dset.ID)
+
+		var dsets []dsetMetric
+		namePrefix := fmt.Sprintf("iot_dataset_%d_col", dset.ID)
+		fields, showcharts, err := dataset.DatasetFieldAndShowCartList(dset.Reference, t.db)
 		if err != nil {
-			log.Printf("[ERROR] unable to decode fields while creating dataset metrics: %v", err)
+			log.Printf("[ERROR] unable to get dataset fieldsAndCharts: %v", err)
 		}
-		t.datasetsMetrics[name] = []dsetMetric{
-			{ID: dset.ID, Name: name, Help: dset.Title, Value: 0},
+		for i := range fields {
+			if showcharts[i] {
+				dsetname := fmt.Sprintf("%s%d", namePrefix, i)
+				t.datasetsMetrics[dsetname] = append(dsets, dsetMetric{
+					ID:        dset.ID,
+					Reference: dset.Reference,
+					Name:      dsetname,
+					Help:      dset.Title,
+					Value:     0,
+				})
+			}
 		}
+		// register metrics for prometheus in the database
 	}
 
 	for _, c := range t.controllers {

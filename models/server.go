@@ -212,20 +212,11 @@ func (srv *Server) Run(ctx context.Context) {
 			srv.StartSim(sim)
 		}
 	}
-	// register prometheus metrics
-	metricsList := []string{
-		"iot_temp_1_metric",
-		"iot_hydro_1_metric",
-		"iot_temp_2_metric",
-		"iot_hydro_2_metric",
-	}
-	// prometheus metrics setup and registration
-	dsetManager := NewCollectionDataset(srv.Telemetry.datasetsMetrics)
-	manager := NewCollection(metricsList, srv.DB)
 
-	prometheus.MustRegister(manager, dsetManager)
+	// prometheus metrics setup and registration, server runs on port 2112 in a go routine
+	dsetManager := NewCollectionDataset(srv.Telemetry.datasetsMetrics, srv.DB)
+	prometheus.MustRegister(dsetManager)
 
-	// prometheus metrics endpoint as a seperate server
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 		http.ListenAndServe(":2112", nil)
