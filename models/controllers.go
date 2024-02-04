@@ -277,13 +277,14 @@ func (s *Server) UpdateControllerByIDEndpoint(w http.ResponseWriter, r *http.Req
 	helper.Respond(w, r, 200, "updated")
 }
 
-func updateControllerItems(db *sqlx.DB, cid int, json json.RawMessage) error {
-	_, err := db.Exec(`update iot.controllers set items=$1 where id=$2`, cid, json)
-	if err != nil {
-		return fmt.Errorf("unable to run query: %v", err)
-	}
-	return nil
-}
+// NOT IN USE
+// func updateControllerItems(db *sqlx.DB, cid int, json json.RawMessage) error {
+// 	_, err := db.Exec(`update iot.controllers set items=$1 where id=$2`, cid, json)
+// 	if err != nil {
+// 		return fmt.Errorf("unable to run query: %v", err)
+// 	}
+// 	return nil
+// }
 
 // ResetControllerSwitchValueEndpoint resets the active configuration (raw JSON) for a given controller to its default state.
 // Additionally, the method sets the controller switch state to OFF and inactive to prevent unwanted situations when IoT equiment is running in an active envionment.
