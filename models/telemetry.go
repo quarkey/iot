@@ -22,13 +22,13 @@ type Telemetry struct {
 	// datasetsMetrics is a map of values for each dataset used by prometheus.
 	// The custom prometheus collector will use this map to create metrics.
 	// Initialization of this map is done in the newTelemetryTicker method.
-	datasetsMetrics map[string][]dsetMetric
+	datasetsMetrics []preDfinedMetric
 	sensors         []SensorDevice // in memory sensors
 	controllers     ControllerList // in memory controllers
 	webcams         []*webcam.Camera
 	storageLocation string
 }
-type dsetMetric struct {
+type preDfinedMetric struct {
 	ID        int
 	Reference string // dataset reference
 	Name      string
@@ -42,7 +42,6 @@ func newTelemetryTicker(db *sqlx.DB, path string) *Telemetry {
 		done:            make(chan bool),
 		db:              db,
 		storageLocation: path,
-		datasetsMetrics: make(map[string][]dsetMetric),
 	}
 }
 
@@ -130,7 +129,7 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 	for _, dset := range t.datasets {
 		fmt.Printf("=> monitoring dataset telemetry for '%s'\n", dset.Title)
 
-		var dsets []dsetMetric
+		var dsets []preDfinedMetric
 		namePrefix := fmt.Sprintf("iot_dataset_%d_col", dset.ID)
 		fields, showcharts, err := dataset.DatasetFieldAndShowCartList(dset.Reference, t.db)
 		if err != nil {
@@ -139,7 +138,7 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 		for i := range fields {
 			if showcharts[i] {
 				dsetname := fmt.Sprintf("%s%d", namePrefix, i)
-				t.datasetsMetrics[dsetname] = append(dsets, dsetMetric{
+				dsets = append(dsets, preDfinedMetric{
 					ID:        dset.ID,
 					Reference: dset.Reference,
 					Name:      dsetname,
@@ -148,6 +147,7 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 				})
 			}
 		}
+		t.datasetsMetrics = append(t.datasetsMetrics, dsets...)
 		// register metrics for prometheus in the database
 	}
 

@@ -11,39 +11,23 @@ import (
 
 type iotCollector struct {
 	metrics         []*prometheus.Desc
-	prefinedMetrics map[string][]dsetMetric
+	prefinedMetrics []preDfinedMetric
 	db              *sqlx.DB
 }
 
-// NewCollection creates a new iotCollector
-func NewCollection(list []string, db *sqlx.DB) *iotCollector {
+func NewCollection(list []preDfinedMetric, db *sqlx.DB) *iotCollector {
 	var md []*prometheus.Desc
 	for _, metric := range list {
-		metric := prometheus.NewDesc(metric,
-			"dynamically created metric",
+		newDesc := prometheus.NewDesc(metric.Name,
+			metric.Help,
 			nil, nil,
 		)
-		md = append(md, metric)
+		md = append(md, newDesc)
 	}
-	return &iotCollector{
-		metrics: md,
-	}
-}
 
-func NewCollectionDataset(dataMap map[string][]dsetMetric, db *sqlx.DB) *iotCollector {
-	var md []*prometheus.Desc
-	for k, v := range dataMap {
-		for _, metric := range v {
-			newDesc := prometheus.NewDesc(k,
-				metric.Help,
-				nil, nil,
-			)
-			md = append(md, newDesc)
-		}
-	}
 	return &iotCollector{
 		metrics:         md,
-		prefinedMetrics: dataMap,
+		prefinedMetrics: list,
 		db:              db,
 	}
 }
@@ -51,7 +35,6 @@ func NewCollectionDataset(dataMap map[string][]dsetMetric, db *sqlx.DB) *iotColl
 // Describe ...
 func (c *iotCollector) Describe(ch chan<- *prometheus.Desc) {
 	for _, metric := range c.metrics {
-		// fmt.Println("Setting up metric:", metric.String())
 		ch <- metric
 	}
 }
@@ -67,15 +50,17 @@ func (c *iotCollector) Collect(ch chan<- prometheus.Metric) {
 	} else {
 		fmt.Println("[INFO] database connection is OK")
 	}
-	for k, v := range c.prefinedMetrics {
-		for _, metric := range v {
-			fmt.Println("=>", k)
-			newMetric := prometheus.MustNewConstMetric(prometheus.NewDesc(k,
-				metric.Help,
-				nil, nil,
-			), prometheus.GaugeValue, rand.Float64())
-			newMetric = prometheus.NewMetricWithTimestamp(time.Now(), newMetric)
-			ch <- newMetric
-		}
+
+	for _, metric := range c.prefinedMetrics {
+		fmt.Println("=>", metric.Name)
+
+		newMetric := prometheus.MustNewConstMetric(prometheus.NewDesc(metric.Name,
+			metric.Help,
+			nil, nil,
+		), prometheus.GaugeValue, rand.Float64()) // inject real data
+
+		newMetric = prometheus.NewMetricWithTimestamp(time.Now(), newMetric)
+
+		ch <- newMetric
 	}
 }

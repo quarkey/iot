@@ -214,7 +214,7 @@ func (srv *Server) Run(ctx context.Context) {
 	}
 
 	// prometheus metrics setup and registration, server runs on port 2112 in a go routine
-	dsetManager := NewCollectionDataset(srv.Telemetry.datasetsMetrics, srv.DB)
+	dsetManager := NewCollection(srv.Telemetry.datasetsMetrics, srv.DB)
 	prometheus.MustRegister(dsetManager)
 
 	go func() {
@@ -345,13 +345,5 @@ func SetTimeZone(tz string) {
 }
 
 func (s *Server) AddMetricEndpoint(w http.ResponseWriter, r *http.Request) {
-	metricsList := []string{
-		"added_temp_1_metric",
-		"added_hydro_1_metric",
-		"added_temp_2_metric",
-		"added_hydro_2_metric",
-	}
-	// prometheus metrics setup and registration
-	manager := NewCollection(metricsList, s.DB)
-	prometheus.MustRegister(manager)
+	fmt.Println("not implemented")
 }
