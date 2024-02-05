@@ -213,8 +213,8 @@ func (srv *Server) Run(ctx context.Context) {
 		}
 	}
 
-	// prometheus metrics setup and registration, server runs on port 2112 in a go routine
-	dsetManager := NewCollection(srv.Telemetry.datasetsMetrics, srv.DB)
+	// prometheus metrics setup and registration
+	dsetManager := NewCollection(srv.Telemetry.pdm, srv.DB)
 	prometheus.MustRegister(dsetManager)
 
 	go func() {

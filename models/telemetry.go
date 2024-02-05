@@ -19,21 +19,14 @@ type Telemetry struct {
 	done     chan bool // closes the time.Ticker go routine.
 	db       *sqlx.DB
 	datasets []Dataset // in memory datasets
-	// datasetsMetrics is a map of values for each dataset used by prometheus.
+	// pdm is a map of values for each dataset used by prometheus.
 	// The custom prometheus collector will use this map to create metrics.
 	// Initialization of this map is done in the newTelemetryTicker method.
-	datasetsMetrics []preDfinedMetric
+	pdm             []PreDefinedMetric
 	sensors         []SensorDevice // in memory sensors
 	controllers     ControllerList // in memory controllers
 	webcams         []*webcam.Camera
 	storageLocation string
-}
-type preDfinedMetric struct {
-	ID        int
-	Reference string // dataset reference
-	Name      string
-	Help      string
-	Value     float64
 }
 
 // newTelemetryTicker ...
@@ -125,8 +118,8 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 		fmt.Printf("=> monitoring sensor telemetry for '%s'\n", dset.Title)
 	}
 
-	// registering datasets and also adding dataset to metrics map
-	var dsets []preDfinedMetric
+	// registering datasets telemetry and also adding it to the metrics.
+	var pdms []PreDefinedMetric
 	for _, dset := range t.datasets {
 		fmt.Printf("=> monitoring dataset telemetry for '%s'\n", dset.Title)
 		namePrefix := fmt.Sprintf("iot_dataset_%d_col", dset.ID)
@@ -137,25 +130,24 @@ func (t *Telemetry) runInit(runTelemetryCheck bool) {
 		for i := range fields {
 			if showcharts[i] {
 				dsetname := fmt.Sprintf("%s%d", namePrefix, i)
-				fmt.Println("adding prefined", dsetname)
-				tmp := preDfinedMetric{
+				tmp := PreDefinedMetric{
 					ID:        dset.ID,
 					Reference: dset.Reference,
 					Name:      dsetname,
 					Help:      dset.Title,
 					Value:     0,
 				}
-				dsets = append(dsets, tmp)
+				pdms = append(pdms, tmp)
 			}
 		}
 	}
-	t.datasetsMetrics = dsets
+	t.pdm = pdms
 
-	// register metrics for prometheus in the database
-	err = RegisterPrefinedMetrics(t.db, t.datasetsMetrics)
+	err = RegisterPrefinedMetrics(t.db, t.pdm)
 	if err != nil {
 		log.Printf("[ERROR] unable to register metrics to database: %v", err)
 	}
+
 	for _, c := range t.controllers {
 		fmt.Printf("=> monitoring controllers telemetry for '%v'\n", c.Title)
 	}
